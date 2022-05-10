@@ -18,6 +18,7 @@ module.exports = {
     'prefer-destructuring': 'off',
     'import/prefer-default-export': 'warn',
     '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

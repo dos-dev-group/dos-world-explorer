@@ -1,12 +1,12 @@
 import { Image, Typography } from 'antd';
 import { Flex } from 'renderer/components/styledComponents';
-import mainImage from 'assets/main-test.png';
+import mainImage from 'assets/icon.png';
 
 export default function Home() {
   return (
     <Flex>
-      <Typography.Title level={2}>여기는 도스갱이 점령한닷!</Typography.Title>
-      <Image src={mainImage} />
+      <Typography.Title level={2}>DOS GANG HAS ARRIVED!</Typography.Title>
+      <Image src={mainImage} width={480} height={480} />
     </Flex>
   );
 }
