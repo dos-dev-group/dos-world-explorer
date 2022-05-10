@@ -5,10 +5,23 @@ import {
 } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, Typography } from 'antd';
 import { Content, Footer } from 'antd/lib/layout/layout';
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
+import {
+  MemoryRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+  useNavigate,
+  useOutlet,
+  useOutletContext,
+  useResolvedPath,
+  useMatch,
+  useLocation,
+} from 'react-router-dom';
 // import './App.css';
 import { Flex } from './components/styledComponents';
+import Favorite from './features/favorite/Favorite';
+import Home from './features/home/Home';
+import WorldList from './features/world/WorldList';
 
 const { Header, Sider } = Layout;
 const { Title } = Typography;
@@ -49,27 +62,7 @@ const { Title } = Typography;
 //     </div>
 //   );
 // };
-function Home() {
-  return (
-    <Flex css={{ minHeight: '100vh' }}>
-      <Layout>
-        <Sider>
-          <Title level={4} style={{ color: 'white', textAlign: 'center' }}>
-            DOS WORLD EXPLORER
-          </Title>
-          <Menu
-            theme="dark"
-            defaultSelectedKeys={['1']}
-            mode="inline"
-            items={[
-              { label: 'Option 1', key: '1', icon: <PieChartOutlined /> },
-              { label: 'Option 2', key: '2', icon: <DesktopOutlined /> },
-              { label: 'Option 3', key: '3', icon: <UserOutlined /> },
-            ]}
-          />
-        </Sider>
-        <Layout>
-          <Content style={{ margin: '0 16px' }}>
+/* <Content style={{ margin: '0 16px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
               <Breadcrumb.Item>User</Breadcrumb.Item>
               <Breadcrumb.Item>Dos</Breadcrumb.Item>
@@ -80,7 +73,57 @@ function Home() {
             >
               Dos Chat is Dos Gang.
             </div>
-          </Content>
+          </Content> */
+
+function MenuLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  console.log('location', location);
+
+  // let menuKey = '';
+  // if ()
+
+  return (
+    <Flex css={{ minHeight: '100vh' }}>
+      <Layout>
+        <Sider>
+          <Title level={4} style={{ color: 'white', textAlign: 'center' }}>
+            DOS WORLD EXPLORER
+          </Title>
+          <Menu
+            theme="dark"
+            defaultSelectedKeys={['home']}
+            mode="inline"
+            items={[
+              {
+                label: 'Home',
+                key: 'home',
+                icon: <PieChartOutlined />,
+                onClick(ev) {
+                  navigate('/');
+                },
+              },
+              {
+                label: 'World',
+                key: 'world',
+                icon: <DesktopOutlined />,
+                onClick(ev) {
+                  navigate('/world');
+                },
+              },
+              {
+                label: 'Favorites',
+                key: 'favorite',
+                icon: <UserOutlined />,
+                onClick(ev) {
+                  navigate('/favorite');
+                },
+              },
+            ]}
+          />
+        </Sider>
+        <Layout>
+          <Outlet />
           <Footer style={{ textAlign: 'center' }}>
             Dos Gang Application ©2022 Created by Dos Chat
           </Footer>
@@ -94,7 +137,11 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<MenuLayout />}>
+          <Route index element={<Home />} />
+          <Route path="world" element={<WorldList />} />
+          <Route path="favorite" element={<Favorite />} />
+        </Route>
       </Routes>
     </Router>
   );

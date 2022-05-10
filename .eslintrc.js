@@ -11,11 +11,13 @@ module.exports = {
     'react/require-default-props': 'off',
     'react/jsx-curly-brace-presence': 'off',
     'react/destructuring-assignment': 'off',
+    'react/no-array-index-key': 'off',
     'prefer-template': 'off',
     'object-shorthand': 'off',
     'no-console': 'off',
     'prefer-destructuring': 'off',
     'import/prefer-default-export': 'warn',
+    '@typescript-eslint/no-use-before-define': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
