@@ -3,18 +3,14 @@ import {
   PieChartOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Breadcrumb, Layout, Menu, Typography } from 'antd';
-import { Content, Footer } from 'antd/lib/layout/layout';
+import { Layout, Menu, Typography } from 'antd';
+import { Footer } from 'antd/lib/layout/layout';
 import {
   MemoryRouter as Router,
   Routes,
   Route,
   Outlet,
   useNavigate,
-  useOutlet,
-  useOutletContext,
-  useResolvedPath,
-  useMatch,
   useLocation,
 } from 'react-router-dom';
 // import './App.css';
@@ -23,7 +19,7 @@ import Favorite from './features/favorite/Favorite';
 import Home from './features/home/Home';
 import WorldList from './features/world/WorldList';
 
-const { Header, Sider } = Layout;
+const { Sider } = Layout;
 const { Title } = Typography;
 
 // const Hello = () => {
@@ -78,7 +74,6 @@ const { Title } = Typography;
 function MenuLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log('location', location);
 
   // let menuKey = '';
   // if ()
