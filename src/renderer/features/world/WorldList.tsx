@@ -1,6 +1,7 @@
 import { StarFilled } from '@ant-design/icons';
 import { Button, Table, Tabs, Tag } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Flex, FlexRow } from 'renderer/components/styledComponents';
 import openExternalLink from 'util/ipc-renderer/openExternalLink';
 import simpleStringHash from 'util/simpleStringHash';
@@ -9,7 +10,11 @@ import { spacing } from 'util/styling';
 const { TabPane } = Tabs;
 
 export default function WorldList() {
-  const renderPane = (index: number) => {
+  const params = useParams();
+  const navigate = useNavigate();
+  const currentType = params.type || '일반';
+
+  const renderWorldList = (type: string) => {
     return (
       <Table
         columns={columns}
@@ -23,20 +28,18 @@ export default function WorldList() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
-      <Tabs defaultActiveKey="1" onChange={() => {}}>
-        <TabPane tab="일반" key="1">
-          Content 1<br />
-          {renderPane(1)}
-        </TabPane>
-        <TabPane tab="풍경" key="2">
-          Content 2<br />
-          {renderPane(2)}
-        </TabPane>
-        <TabPane tab="사이코" key="3">
-          Content 3<br />
-          {renderPane(3)}
-        </TabPane>
+      <Tabs
+        activeKey={currentType}
+        onChange={(key) => {
+          navigate('/world/' + key);
+        }}
+      >
+        <TabPane tab="일반" key="일반" />
+        <TabPane tab="풍경" key="풍경" />
+        <TabPane tab="사이코" key="사이코" />
       </Tabs>
+      {params.type}
+      {renderWorldList(currentType)}
     </Flex>
   );
 }

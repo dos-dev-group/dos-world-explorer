@@ -12,6 +12,7 @@ import {
   Outlet,
   useNavigate,
   useLocation,
+  Navigate,
 } from 'react-router-dom';
 // import './App.css';
 import { Flex } from './components/styledComponents';
@@ -134,8 +135,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MenuLayout />}>
           <Route index element={<Home />} />
-          <Route path="world" element={<WorldList />} />
-          <Route path="favorite" element={<Favorite />} />
+          <Route path="world" element={<Navigate replace to="일반" />} />
+          <Route path="world/:type" element={<WorldList />} />
+          <Route path="favorite" element={<Navigate replace to="일반" />} />
+          <Route path="favorite/:type" element={<Favorite />} />
         </Route>
       </Routes>
     </Router>
