@@ -49,7 +49,7 @@ export function getSheetWorldData() {
       // log($worldList);
       // eslint-disable-next-line no-plusplus
       for (let j = 1; j < $worldList.length; j++) {
-        if ($worldList[j].children[1].children.length == 0) {
+        if ($worldList[j].children[2].children.length == 0) {
           break;
         }let world = {
           key:
@@ -80,14 +80,14 @@ export function getSheetWorldData() {
         // log(world);
         worlds.push(world);
 
-        if ($worldList[j].children[6].children.length == 0) {
+        if ($worldList[j].children[7].children.length == 0) {
           break;
         }
         world = {
           key:
-            $worldList[j].children[5].children[0].type === 'text'
+            $worldList[j].children[10].children[0].type === 'text'
               ? ''
-              : $worldList[j].children[5].children[0].children[0].data.replace("https://vrchat.com/home/world/",""),
+              : $worldList[j].children[10].children[0].children[0].data.replace("https://vrchat.com/home/world/",""),
           name: $worldList[j].children[7].children[0].data,
           author: $worldList[j].children[7].children[2].data.substring(
             5,
