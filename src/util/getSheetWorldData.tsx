@@ -1,6 +1,8 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/return-await */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable promise/catch-or-return */
+import { url } from 'inspector';
 import { World, WorldSheet, WorldData } from 'util/types';
 
 const axios = require('axios');
@@ -49,121 +51,67 @@ export function getSheetWorldData() {
       for (let j = 1; j < $worldList.length; j++) {
         if ($worldList[j].children[1].children.length == 0) {
           break;
-        }
-        try {
-          const world = {
-            category: category[i].name,
-            img_url:
-              $worldList[j].children[1].children[0].children[0].attribs.src,
-            name: $worldList[j].children[2].children[0].data,
-            author: $worldList[j].children[2].children[2].data.substring(
-              5,
-              $worldList[j].children[2].children[2].data.length - 1,
-            ),
-            description: $worldList[j].children[3].children[0].data,
-            tags:
-              $worldList[j].children[3].children.length > 2
-                ? $worldList[j].children[3].children[2].data
-                    .replace(' ', '')
-                    .substring(1)
-                    .split('#')
-                : [],
-            score: $worldList[j].children[4].children[0].data.length,
-            url:
-              $worldList[j].children[5].children[0].type === 'text'
-                ? '소실'
-                : $worldList[j].children[5].children[0].children[0].data,
-          };
-          // log(world);
-          worlds.push(world);
-        } catch {
-          log(j, worlds[worlds.length - 1]);
-          log($worldList[j]);
-          const world = {
-            category: category[i].name,
-            img_url:
-              $worldList[j].children[1].children[0].children[0].attribs.src,
-            name: $worldList[j].children[2].children[0].data,
-            author: $worldList[j].children[2].children[2].data.substring(
-              5,
-              $worldList[j].children[2].children[2].data.length - 1,
-            ),
-            description: $worldList[j].children[3].children[0].data,
-            tags:
-              $worldList[j].children[3].children.length > 2
-                ? $worldList[j].children[3].children[2].data
-                    .replace(' ', '')
-                    .substring(1)
-                    .split('#')
-                : [],
-            score: $worldList[j].children[4].children[0].data.length,
-            url:
-              $worldList[j].children[5].children[0].type === 'text'
-                ? '소실'
-                : $worldList[j].children[5].children[0].children[0].data,
-          };
-
-          break;
-        }
+        }let world = {
+          key:
+            $worldList[j].children[5].children[0].type === 'text'
+              ? ''
+              : $worldList[j].children[5].children[0].children[0].data.replace("https://vrchat.com/home/world/",""),
+          name: $worldList[j].children[2].children[0].data,
+          author: $worldList[j].children[2].children[2].data.substring(
+            5,
+            $worldList[j].children[2].children[2].data.length - 1,
+          ),
+          description: $worldList[j].children[3].children[0].data,
+          tags:
+            $worldList[j].children[3].children.length > 2
+              ? $worldList[j].children[3].children[2].data
+                  .replace(' ', '')
+                  .substring(1)
+                  .split('#')
+              : [],
+          score: $worldList[j].children[4].children[0].data.length,
+          url:
+            $worldList[j].children[5].children[0].type === 'text'
+              ? '소실'
+              : $worldList[j].children[5].children[0].children[0].data,
+          imageUrl:
+            $worldList[j].children[1].children[0].children[0].attribs.src,
+        };
+        // log(world);
+        worlds.push(world);
 
         if ($worldList[j].children[6].children.length == 0) {
           break;
         }
-        try {
-          const world = {
-            category: category[i].name,
-            img_url:
-              $worldList[j].children[6].children[0].children[0].attribs.src,
-            name: $worldList[j].children[7].children[0].data,
-            author: $worldList[j].children[7].children[2].data.substring(
-              5,
-              $worldList[j].children[7].children[2].data.length - 1,
-            ),
-            description: $worldList[j].children[8].children[0].data,
-            tags:
-              $worldList[j].children[8].children.length > 2
-                ? $worldList[j].children[8].children[2].data
-                    .replace(' ', '')
-                    .substring(1)
-                    .split('#')
-                : [],
-            score: $worldList[j].children[9].children[0].data.length,
-            url:
-              $worldList[j].children[10].children[0].type === 'text'
-                ? '소실'
-                : $worldList[j].children[10].children[0].children[0].data,
-          };
-          // log(world);
-          worlds.push(world);
-        } catch {
-          log(j, worlds[worlds.length - 1]);
-          log($worldList[j]);
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const world = {
-            img_url:
-              $worldList[j].children[6].children[0].children[0].attribs.src,
-            name: $worldList[j].children[7].children[0].data,
-            author: $worldList[j].children[7].children[2].data.substring(
-              5,
-              $worldList[j].children[7].children[2].data.length - 1,
-            ),
-            description: $worldList[j].children[8].children[0].data,
-            tags:
-              $worldList[j].children[8].children.length > 2
-                ? $worldList[j].children[8].children[2].data
-                    .replace(' ', '')
-                    .substring(1)
-                    .split('#')
-                : [],
-            score: $worldList[j].children[9].children[0].data.length,
-            url:
-              $worldList[j].children[10].children[0].type === 'text'
-                ? '소실'
-                : $worldList[j].children[10].children[0].children[0].data,
-          };
+        world = {
+          key:
+            $worldList[j].children[5].children[0].type === 'text'
+              ? ''
+              : $worldList[j].children[5].children[0].children[0].data.replace("https://vrchat.com/home/world/",""),
+          name: $worldList[j].children[7].children[0].data,
+          author: $worldList[j].children[7].children[2].data.substring(
+            5,
+            $worldList[j].children[7].children[2].data.length - 1,
+          ),
+          description: $worldList[j].children[8].children[0].data,
+          tags:
+            $worldList[j].children[8].children.length > 2
+              ? $worldList[j].children[8].children[2].data
+                  .replace(' ', '')
+                  .substring(1)
+                  .split('#')
+              : [],
+          score: $worldList[j].children[9].children[0].data.length,
+          url:
+            $worldList[j].children[10].children[0].type === 'text'
+              ? '소실'
+              : $worldList[j].children[10].children[0].children[0].data,
+          imageUrl:
+            $worldList[j].children[6].children[0].children[0].attribs.src,
+        };
+        // log(world);
+        worlds.push(world);
 
-          break;
-        }
       }
       const WorldSheet = {
         type: category[i].name,
