@@ -108,7 +108,11 @@ const columns = [
     title: 'URL',
     dataIndex: 'url',
     render: (url: string) => (
-      <Button type="link" onClick={() => openExternalLink(url)}>
+      <Button
+        type="link"
+        onClick={() => openExternalLink(url)}
+        css={{ whiteSpace: 'normal' }}
+      >
         {url}
       </Button>
     ),
