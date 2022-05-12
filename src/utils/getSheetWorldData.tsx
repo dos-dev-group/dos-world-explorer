@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable promise/catch-or-return */
 import { url } from 'inspector';
-import { World, WorldSheet, WorldData } from 'util/types';
+import { World, WorldSheet, WorldData } from 'utils/types';
 
 const axios = require('axios');
 const cheerio = require('cheerio');
@@ -49,7 +49,7 @@ export function getSheetWorldData() {
       // log($worldList);
       // eslint-disable-next-line no-plusplus
       for (let j = 1; j < $worldList.length; j++) {
-        if ($worldList[j].children[2].children.length == 0) {
+        if ($worldList[j].children[2].children.length === 0) {
           break;
         }let world = {
           key:
@@ -80,7 +80,7 @@ export function getSheetWorldData() {
         // log(world);
         worlds.push(world);
 
-        if ($worldList[j].children[7].children.length == 0) {
+        if ($worldList[j].children[7].children.length === 0) {
           break;
         }
         world = {
@@ -113,12 +113,12 @@ export function getSheetWorldData() {
         worlds.push(world);
 
       }
-      const WorldSheet = {
+      const worldSheet: WorldSheet = {
         type: category[i].name,
         worlds: worlds,
       };
       // log(WorldSheet);
-      worldData.push(WorldSheet);
+      worldData.push(worldSheet);
     }
   });
   return worldData;
