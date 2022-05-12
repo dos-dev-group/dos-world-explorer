@@ -1,125 +1,79 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/return-await */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable promise/catch-or-return */
-import { url } from 'inspector';
-import { World, WorldSheet, WorldData } from 'utils/types';
+import axios from 'axios';
 
-const axios = require('axios');
-const cheerio = require('cheerio');
+//const axios = require('axios');
 
 const log = console.log;
 
 const sheetUrl =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5aaBlO_r5xaHXz7uac1ya_D_yTQTLMY7KrHinZVLobJ66l7f0999AIsCYoY5gAlhTEbzBIrmBbDA2/pubhtml';
 
+const domparser = new DOMParser()​​;
+
 // eslint-disable-next-line consistent-return
 const getHtml = async () => {
   try {
-    const get = await axios.get(sheetUrl);
-    return get;
+    const html = await axios.get(sheetUrl);
+    return html;
   } catch (error) {
     console.error(error);
   }
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export function getSheetWorldData() {
-  const worldData: WorldData = [];
-  getHtml().then((html) => {
-    const category: any = [];
-    const $ = cheerio.load(html.data);
-    const $categoryList = $('#sheet-menu > li');
-
-    // log($categoryList);
-
-    // eslint-disable-next-line promise/always-return
-    for (let i = 0; i < $categoryList.length; i++) {
-      const worlds: any[] = [];
-      // log(i);
-      category[i] = {
-        id: $categoryList[i].attribs.id.split('-')[2],
-        name: $categoryList[i].children[0].children[0].data,
+ // eslint-disable-next-line promise/always-return
+ const worldData: any[] = [];
+ getHtml().then((html) => {
+  const doc = domparser.parseFromString(html.data, 'text/html')
+  //console.log(doc);
+  const sheetList = doc.getElementById('sheet-menu')!.getElementsByTagName('li');
+  for(let i=0;i<sheetList.length;i++){
+    const c_id = sheetList[i].getAttribute('id')?.split('-')[2];
+    const c_name = sheetList[i].getElementsByTagName('a')[0].textContent;
+    const worlds =[];
+    const sheetData = doc.getElementById(c_id)!.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    for(let j=1;j<sheetData.length;j++){
+      const row_data = sheetData[j].getElementsByTagName('td')
+      if (row_data[1].textContent === '')
+        break
+      let temp_data = row_data[1].textContent.split('[제작자:')
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      let world ={
+        key: row_data[4].textContent?.replace('https://vrchat.com/home/world/',''), // 월드 고유ID
+        name: temp_data[0],
+        author: temp_data[1].slice(0, -1),
+        description: row_data[2].childNodes[0].data,
+        tags: row_data[2].childNodes.length == 3 ? row_data[2].childNodes[2].data.replace(' ','').slice(1).split('#') : [],
+        score: row_data[3].textContent?.length,
+        url: row_data[4].textContent,
+        imageUrl: row_data[0].getElementsByTagName('img')[0].getAttribute('src'),
       };
-      // log($categoryList[i].attribs.id.split('-')[2]);
-      // log($categoryList[i].children[0].children[0].data);
-      const $worldList = $(
-        '#sheets-viewport #' + category[i].id + ' > div > table > tbody',
-      )[0].children;
-      // log($worldList);
-      // eslint-disable-next-line no-plusplus
-      for (let j = 1; j < $worldList.length; j++) {
-        if ($worldList[j].children[2].children.length === 0) {
-          break;
-        }let world = {
-          key:
-            $worldList[j].children[5].children[0].type === 'text'
-              ? ''
-              : $worldList[j].children[5].children[0].children[0].data.replace("https://vrchat.com/home/world/",""),
-          name: $worldList[j].children[2].children[0].data,
-          author: $worldList[j].children[2].children[2].data.substring(
-            5,
-            $worldList[j].children[2].children[2].data.length - 1,
-          ),
-          description: $worldList[j].children[3].children[0].data,
-          tags:
-            $worldList[j].children[3].children.length > 2
-              ? $worldList[j].children[3].children[2].data
-                  .replace(' ', '')
-                  .substring(1)
-                  .split('#')
-              : [],
-          score: $worldList[j].children[4].children[0].data.length,
-          url:
-            $worldList[j].children[5].children[0].type === 'text'
-              ? '소실'
-              : $worldList[j].children[5].children[0].children[0].data,
-          imageUrl:
-            $worldList[j].children[1].children[0].children[0].attribs.src,
-        };
-        // log(world);
-        worlds.push(world);
+      //console.log(world);
+      worlds.push(world);
+      if (row_data[6].textContent === '')
+        break
 
-        if ($worldList[j].children[7].children.length === 0) {
-          break;
-        }
-        world = {
-          key:
-            $worldList[j].children[10].children[0].type === 'text'
-              ? ''
-              : $worldList[j].children[10].children[0].children[0].data.replace("https://vrchat.com/home/world/",""),
-          name: $worldList[j].children[7].children[0].data,
-          author: $worldList[j].children[7].children[2].data.substring(
-            5,
-            $worldList[j].children[7].children[2].data.length - 1,
-          ),
-          description: $worldList[j].children[8].children[0].data,
-          tags:
-            $worldList[j].children[8].children.length > 2
-              ? $worldList[j].children[8].children[2].data
-                  .replace(' ', '')
-                  .substring(1)
-                  .split('#')
-              : [],
-          score: $worldList[j].children[9].children[0].data.length,
-          url:
-            $worldList[j].children[10].children[0].type === 'text'
-              ? '소실'
-              : $worldList[j].children[10].children[0].children[0].data,
-          imageUrl:
-            $worldList[j].children[6].children[0].children[0].attribs.src,
-        };
-        // log(world);
-        worlds.push(world);
-
-      }
-      const worldSheet: WorldSheet = {
-        type: category[i].name,
-        worlds: worlds,
+      temp_data = row_data[6].textContent.split('[제작자:')
+      world ={
+        key: row_data[9].textContent?.replace('https://vrchat.com/home/world/',''), // 월드 고유ID
+        name: temp_data[0],
+        author: temp_data[1].slice(0, -1),
+        description: row_data[7].childNodes[0].data,
+        tags: row_data[7].childNodes.length == 3 ? row_data[7].childNodes[2].data.replace(' ','').slice(1).split('#') : [],
+        score: row_data[8].textContent?.length,
+        url: row_data[9].textContent,
+        imageUrl: row_data[5].getElementsByTagName('img')[0].getAttribute('src'),
       };
-      // log(WorldSheet);
-      worldData.push(worldSheet);
+      //console.log(world);
+      worlds.push(world);
     }
+    const worldSheet = {
+      type: c_name,
+      worlds: worlds,
+    };
+    worldData.push(worldSheet);
+
+  }
+
   });
   return worldData;
 }
