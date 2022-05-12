@@ -16,3 +16,6 @@
 5. breaking change가 담긴 코드면 회의 후 Merge 진행 혹은  
    사소한 (chore) 변경사항이면 바로 Merge를 진행한다.  
    (Github페이지에 Merge 버튼이 있음)
+
+## Environment
+NodeJS 16.13.*
