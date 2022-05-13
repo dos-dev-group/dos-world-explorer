@@ -2,10 +2,10 @@ import { StarFilled } from '@ant-design/icons';
 import { Button, Table, Tabs, Tag } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Flex, FlexRow } from 'renderer/components/styledComponents';
-import openExternalLink from 'utils/ipc-renderer/openExternalLink';
-import simpleStringHash from 'utils/simpleStringHash';
-import { spacing } from 'utils/styling';
+import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
+import openExternalLink from '@src/utils/ipc-renderer/openExternalLink';
+import simpleStringHash from '@src/utils/simpleStringHash';
+import { spacing } from '@src/utils/styling';
 
 const { TabPane } = Tabs;
 
