@@ -1,6 +1,6 @@
 import { Image, Typography } from 'antd';
-import { Flex } from 'renderer/components/styledComponents';
-import mainImage from 'assets/icon.png';
+import mainImage from '@assets/icon.png';
+import { Flex } from '@src/renderer/components/styledComponents';
 
 export default function Home() {
   return (
