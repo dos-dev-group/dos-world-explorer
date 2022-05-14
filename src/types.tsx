@@ -9,8 +9,11 @@ export interface World {
   imageUrl: string;
 }
 
+export type WorldPartial = Partial<World>;
+
 export interface WorldSheet {
   type: string; // ex: 풍경담화탐험기능VRMV게임아바타사이코소실
+  typeId: number;
   worlds: World[];
 }
 
