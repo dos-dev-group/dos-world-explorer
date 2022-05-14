@@ -1,25 +1,42 @@
+import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
-import { WorldData } from '@src/types';
-import { useNavigate, useParams } from 'react-router-dom';
+import { WorldSortOrder, World, WorldData } from '@src/types';
+import { SortOrder } from 'antd/lib/table/interface';
+import { useEffect, useState } from 'react';
 
 interface HookMember {
   currentType: string;
-  worldData: WorldData;
+  isLoading: boolean;
+  typeList: string[];
+  currentTableData: World[];
 
   onChangeSheetTab: (tabKey: string) => void;
   onClickUrl: (url: string) => void;
 }
 const useWorldList = (): HookMember => {
-  const params = useParams();
-  const navigate = useNavigate();
-  const currentType = params.type || '일반';
+  const [currentType, setCurrentType] = useState<string>('풍경');
+  const [isLoading, setIsLoading] = useState(true);
+  const [worldData, setWorldData] = useState<WorldData>([]);
+
+  const typeList = worldData.map((e) => e.type);
+  const currentTableData =
+    worldData.filter((e) => e.type === currentType)[0]?.worlds || [];
+
+  useEffect(() => {
+    getSheetWorldData().then((data) => {
+      setIsLoading(false);
+      return setWorldData(data);
+    });
+  }, []);
 
   return {
     currentType,
-    worldData: [],
+    isLoading,
+    typeList,
+    currentTableData,
 
     onChangeSheetTab(tabKey) {
-      navigate('/world/' + tabKey);
+      setCurrentType(tabKey);
     },
     onClickUrl(url) {
       openExternalLink(url);
