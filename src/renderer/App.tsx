@@ -19,6 +19,7 @@ import { Flex } from './components/styledComponents';
 import Favorite from './features/favorite/Favorite';
 import Home from './features/home/Home';
 import WorldList from './features/world/WorldList';
+import Test from './features/test/Test';
 
 const { Sider } = Layout;
 const { Title } = Typography;
@@ -115,6 +116,14 @@ function MenuLayout() {
                   navigate('/favorite');
                 },
               },
+              {
+                label: 'Test',
+                key: 'test',
+                icon: <UserOutlined />,
+                onClick(ev) {
+                  navigate('/test');
+                },
+              },
             ]}
           />
         </Sider>
@@ -139,6 +148,7 @@ export default function App() {
           <Route path="world/:type" element={<WorldList />} />
           <Route path="favorite" element={<Navigate replace to="일반" />} />
           <Route path="favorite/:type" element={<Favorite />} />
+          <Route path="test" element={<Test />} />
         </Route>
       </Routes>
     </Router>
