@@ -1,5 +1,5 @@
-import openExternalLink from '@src/utils/ipc-renderer/openExternalLink';
-import { WorldData } from '@src/utils/types';
+import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
+import { WorldData } from '@src/types';
 import { useNavigate, useParams } from 'react-router-dom';
 
 interface HookMember {
