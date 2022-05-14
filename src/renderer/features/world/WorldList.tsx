@@ -1,45 +1,80 @@
 import { StarFilled } from '@ant-design/icons';
 import { Button, Table, Tabs, Tag } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
-import { useNavigate, useParams } from 'react-router-dom';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
-import openExternalLink from '@src/utils/ipc-renderer/openExternalLink';
 import simpleStringHash from '@src/utils/simpleStringHash';
 import { spacing } from '@src/utils/styling';
+import useWorldList from './hooks/useWorldList';
 
 const { TabPane } = Tabs;
+const { Column } = Table;
 
 export default function WorldList() {
-  const params = useParams();
-  const navigate = useNavigate();
-  const currentType = params.type || '일반';
-
-  const renderWorldList = (type: string) => {
-    return (
-      <Table
-        columns={columns}
-        dataSource={dataSource}
-        scroll={{
-          x: true,
-        }}
-      />
-    );
-  };
+  const hookMember = useWorldList();
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
       <Tabs
-        activeKey={currentType}
-        onChange={(key) => {
-          navigate('/world/' + key);
-        }}
+        activeKey={hookMember.currentType}
+        onChange={hookMember.onChangeSheetTab}
       >
         <TabPane tab="일반" key="일반" />
         <TabPane tab="풍경" key="풍경" />
         <TabPane tab="사이코" key="사이코" />
       </Tabs>
-      {params.type}
-      {renderWorldList(currentType)}
+      {hookMember.currentType}
+      <Table
+        dataSource={dataSource}
+        scroll={{
+          x: true,
+        }}
+      >
+        <Column title="Name" dataIndex="name" />
+        <Column title="Author" dataIndex="author" />
+        <Column title="Description" dataIndex="description" />
+        <Column
+          title="Tags"
+          dataIndex="tags"
+          render={(tags: any[]) => (
+            <>
+              {tags.map((tag) => {
+                const colorIndex =
+                  simpleStringHash(tag) % PresetColorTypes.length;
+                const color = PresetColorTypes[colorIndex];
+                return (
+                  <Tag color={color} key={tag}>
+                    {tag.toUpperCase()}
+                  </Tag>
+                );
+              })}
+            </>
+          )}
+        />
+        <Column
+          title="URL"
+          dataIndex="url"
+          render={(url: string) => (
+            <Button
+              type="link"
+              onClick={() => hookMember.onClickUrl(url)}
+              css={{ whiteSpace: 'normal' }}
+            >
+              {url}
+            </Button>
+          )}
+        />
+        <Column
+          title="별점"
+          dataIndex="score"
+          render={(score: number) => (
+            <FlexRow>
+              {new Array(score).fill(null).map((_, index) => (
+                <StarFilled key={index} />
+              ))}
+            </FlexRow>
+          )}
+        />
+      </Table>
     </Flex>
   );
 }
@@ -71,61 +106,5 @@ const dataSource = [
     tags: ['트리하우스', '풍경', '숲', '영상', '강', '집라인'],
     score: 5,
     url: 'https://vrchat.com/home/world/wrld_e58a10a8-5140-4286-a270-1cc4fc05a2a7',
-  },
-];
-
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-  },
-  {
-    title: 'Author',
-    dataIndex: 'author',
-  },
-  {
-    title: 'Description',
-    dataIndex: 'description',
-  },
-  {
-    title: 'Tags',
-    dataIndex: 'tags',
-    render: (tags: any[]) => (
-      <>
-        {tags.map((tag) => {
-          const colorIndex = simpleStringHash(tag) % PresetColorTypes.length;
-          const color = PresetColorTypes[colorIndex];
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: 'URL',
-    dataIndex: 'url',
-    render: (url: string) => (
-      <Button
-        type="link"
-        onClick={() => openExternalLink(url)}
-        css={{ whiteSpace: 'normal' }}
-      >
-        {url}
-      </Button>
-    ),
-  },
-  {
-    title: '별점',
-    dataIndex: 'score',
-    render: (score: number) => (
-      <FlexRow>
-        {new Array(score).fill(null).map((_, index) => (
-          <StarFilled key={index} />
-        ))}
-      </FlexRow>
-    ),
   },
 ];

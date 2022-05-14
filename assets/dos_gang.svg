@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 80px;
+        text-anchor: middle;
+        font-family: Micra;
+      }
+    </style>
+  </defs>
+  <text id="DOS_GANG" data-name="DOS GANG" class="cls-1" x="151.128" y="111.09"><tspan x="151.128">DOS</tspan><tspan x="151.128" dy="96">GANG</tspan></text>
+</svg>
