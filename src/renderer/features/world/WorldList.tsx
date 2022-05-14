@@ -2,8 +2,8 @@ import { StarFilled } from '@ant-design/icons';
 import { Button, Table, Tabs, Tag } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
-import simpleStringHash from '@src/utils/simpleStringHash';
-import { spacing } from '@src/utils/styling';
+import simpleStringHash from '@src/renderer/utils/simpleStringHash';
+import { spacing } from '@src/renderer/utils/styling';
 import useWorldList from './hooks/useWorldList';
 
 const { TabPane } = Tabs;
