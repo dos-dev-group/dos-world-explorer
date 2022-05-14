@@ -3,9 +3,9 @@ import { Button, Table, Tabs, Tag } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
-import openExternalLink from '@src/utils/ipc-renderer/openExternalLink';
-import simpleStringHash from '@src/utils/simpleStringHash';
-import { spacing } from '@src/utils/styling';
+import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
+import simpleStringHash from '@src/renderer/utils/simpleStringHash';
+import { spacing } from '@src/renderer/utils/styling';
 
 const { TabPane } = Tabs;
 

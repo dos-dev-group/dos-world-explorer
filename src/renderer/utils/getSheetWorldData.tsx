@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import axios, { AxiosError } from 'axios';
+import { World, WorldData } from '@src/types';
 import { NoDataError } from './error';
-import { World, WorldData } from './types';
 
 const sheetUrl =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5aaBlO_r5xaHXz7uac1ya_D_yTQTLMY7KrHinZVLobJ66l7f0999AIsCYoY5gAlhTEbzBIrmBbDA2/pubhtml';
@@ -20,6 +20,7 @@ const getHtml = async () => {
 };
 
 export default function getSheetWorldData() {
+  const worldData: WorldData = [];
   return getHtml()
     .then((html) => {
       if (!html) throw new NoDataError();
@@ -29,8 +30,6 @@ export default function getSheetWorldData() {
       const sheetList = doc
         .getElementById('sheet-menu')!
         .getElementsByTagName('li');
-
-      const worldData: WorldData = [];
       for (let i = 0; i < sheetList.length; i++) {
         const c_id = sheetList[i].getAttribute('id')?.split('-')[2]; // 1925914555
         const c_name = sheetList[i].getElementsByTagName('a')[0].textContent; // 풍경
@@ -83,6 +82,6 @@ export default function getSheetWorldData() {
       } else {
         console.warn('Error: Unknown Error', reason);
       }
-      return undefined;
+      return worldData;
     });
 }
