@@ -18,3 +18,9 @@ export interface WorldSheet {
 }
 
 export type WorldData = WorldSheet[];
+
+export enum WorldSortOrder {
+  NONE,
+  SCORE,
+  AUTHOR,
+}

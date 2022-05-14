@@ -14,6 +14,7 @@ module.exports = {
     'prefer-destructuring': 'off',
     'no-continue': 'off',
     'spaced-comment': 'off',
+    'promise/catch-or-return': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'import/prefer-default-export': 'warn',

@@ -1,5 +1,6 @@
 import { Image, Typography } from 'antd';
 import mainImage from '@assets/icon.png';
+import dosGangImage from '@assets/dos_gang.svg';
 import { Flex } from '@src/renderer/components/styledComponents';
 
 export default function Home() {
