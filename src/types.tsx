@@ -7,6 +7,7 @@ export interface World {
   score: number;
   url: string;
   imageUrl: string;
+  date: Date;
 }
 
 export type WorldPartial = Partial<World>;
