@@ -1,8 +1,10 @@
+import { worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
 import { WorldSortOrder, World, WorldData } from '@src/types';
 import { SortOrder } from 'antd/lib/table/interface';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 
 interface HookMember {
   currentType: string;
@@ -14,20 +16,24 @@ interface HookMember {
   onClickUrl: (url: string) => void;
 }
 const useWorldList = (): HookMember => {
+  const [worldData, setWorldData] = useRecoilState(worldDataState);
   const [currentType, setCurrentType] = useState<string>('풍경');
-  const [isLoading, setIsLoading] = useState(true);
-  const [worldData, setWorldData] = useState<WorldData>([]);
+  const [isLoading, setIsLoading] = useState(worldData === undefined);
 
-  const typeList = worldData.map((e) => e.type);
+  const wd = worldData || [];
+
+  const typeList = wd.map((e) => e.type);
   const currentTableData =
-    worldData.filter((e) => e.type === currentType)[0]?.worlds || [];
+    wd.filter((e) => e.type === currentType)[0]?.worlds || [];
 
   useEffect(() => {
-    getSheetWorldData().then((data) => {
-      setIsLoading(false);
-      return setWorldData(data);
-    });
-  }, []);
+    if (worldData === undefined) {
+      getSheetWorldData().then((data) => {
+        setIsLoading(false);
+        return setWorldData(data);
+      });
+    }
+  }, [setWorldData, worldData]);
 
   return {
     currentType,
