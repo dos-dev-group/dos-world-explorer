@@ -18,13 +18,13 @@
    (Github페이지에 Merge 버튼이 있음)
 
 ## GITHUB TAG NAME
-feat: (new feature for the user, not a new feature for build script)  
-fix: (bug fix for the user, not a fix to a build script)  
-docs: (changes to the documentation)  
-style: (formatting, missing semi colons, etc; no production code change)  
-refactor: (refactoring production code, eg. renaming a variable)  
-test: (adding missing tests, refactoring tests; no production code change)  
-chore: (updating grunt tasks etc; no production code change)  
+__feat__: (new feature for the user, not a new feature for build script)  
+__fix__: (bug fix for the user, not a fix to a build script)  
+__docs__: (changes to the documentation)  
+__style__: (formatting, missing semi colons, etc; no production code change)  
+__refactor__: (refactoring production code, eg. renaming a variable)  
+__test__: (adding missing tests, refactoring tests; no production code change)  
+__chore__: (updating grunt tasks etc; no production code change)  
 
 ## Environment
 NodeJS 16.13.*
