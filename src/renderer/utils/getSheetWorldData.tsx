@@ -31,7 +31,7 @@ export default function getSheetWorldData() {
         .getElementById('sheet-menu')!
         .getElementsByTagName('li');
       for (let i = 0; i < sheetList.length; i++) {
-        const c_id = sheetList[i].getAttribute('id')?.split('-')[2]; // 1925914555
+        const c_id = sheetList[i].getAttribute('id')?.split('-')[2] || '0'; // 1925914555
         const c_name = sheetList[i].getElementsByTagName('a')[0].textContent; // 풍경
         if (!c_name) continue;
 
@@ -45,9 +45,7 @@ export default function getSheetWorldData() {
           if (row_data[1].textContent === '') break;
           //console.log(row_data[0].getElementsByTagName('img')[0]);
           const world = {
-            key:
-              sheetData[j].getElementsByTagName('th')[0].getAttribute('id') +
-              '',
+            key: row_data[8].textContent || '',
             name: row_data[1].textContent || '',
             author: row_data[2].textContent || '',
             description: row_data[3].textContent || '',
@@ -60,12 +58,14 @@ export default function getSheetWorldData() {
               row_data[0]
                 ?.getElementsByTagName('img')[0]
                 ?.getAttribute('src') || '',
+            date: new Date(row_data[7].textContent + 'z' || ''),
           };
           // console.log(world);
           worlds.push(world);
         }
         const worldSheet = {
           type: c_name,
+          typeId: Number(c_id),
           worlds: worlds,
         };
 
