@@ -12,9 +12,10 @@ export function testEditSheetToMain(typeId: number) {
   });
 }
 
-export function addEditSheetToMain(world: World, typeId: number) {
+export function addEditSheetToMain(world: World, type: string, typeId: number) {
   window.electron.ipcRenderer.sendMessage('addEditSheetToMain', [
     world,
+    type,
     typeId,
   ]);
 
@@ -30,13 +31,13 @@ export function addEditSheetToMain(world: World, typeId: number) {
 
 export function reomoveEditSheetToMain(
   world: World,
+  type: string,
   typeId: number,
-  worldData: WorldData,
 ) {
   window.electron.ipcRenderer.sendMessage('reomoveEditSheetToMain', [
     world,
+    type,
     typeId,
-    worldData,
   ]);
 
   return new Promise<boolean>((resolve, reject) => {
@@ -53,13 +54,13 @@ export function modifyEditSheetToMain(
   world: World,
   newWorld: World,
   type: string,
-  worldData: WorldData,
+  typeId: number,
 ) {
   window.electron.ipcRenderer.sendMessage('modifyEditSheetToMain', [
     world,
     newWorld,
     type,
-    worldData,
+    typeId,
   ]);
 
   return new Promise<boolean>((resolve, reject) => {

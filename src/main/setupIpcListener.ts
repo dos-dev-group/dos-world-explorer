@@ -25,7 +25,10 @@ export default function setupIpcListener() {
   });
 
   ipcMain.on('addEditSheetToMain', async (event, arg) => {
-    event.reply('addEditSheetToRenderer', await addEditSheet(arg[0], arg[1]));
+    event.reply(
+      'addEditSheetToRenderer',
+      await addEditSheet(arg[0], arg[1], arg[2]),
+    );
   });
 
   ipcMain.on('reomoveEditSheetToMain', async (event, arg) => {
