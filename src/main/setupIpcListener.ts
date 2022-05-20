@@ -1,4 +1,10 @@
 import { ipcMain, shell } from 'electron';
+import {
+  testEditSheet,
+  addEditSheet,
+  removeEditSheet,
+  modifyEditSheet,
+} from './utils/editSheet';
 
 export default function setupIpcListener() {
   ipcMain.on('ipc-example', async (event, arg) => {
@@ -14,8 +20,28 @@ export default function setupIpcListener() {
     }
   });
 
-  // ipcMain.on('addEditSheet', async (event, arg) => {
-  //   //addEditSheet(arg[0], arg[1]);
-  //   event.reply('addEditSheet', printTest());
-  // });
+  ipcMain.on('testEditSheetToMain', async (event, arg) => {
+    event.reply('testEditSheetToMain', await testEditSheet(arg[0]));
+  });
+
+  ipcMain.on('addEditSheetToMain', async (event, arg) => {
+    event.reply(
+      'addEditSheetToRenderer',
+      await addEditSheet(arg[0], arg[1], arg[2]),
+    );
+  });
+
+  ipcMain.on('reomoveEditSheetToMain', async (event, arg) => {
+    event.reply(
+      'reomoveEditSheetToRenderer',
+      await removeEditSheet(arg[0], arg[1], arg[2]),
+    );
+  });
+
+  ipcMain.on('modifyEditSheetToMain', async (event, arg) => {
+    event.reply(
+      'modifyEditSheetToRenderer',
+      await modifyEditSheet(arg[0], arg[1], arg[2], arg[3]),
+    );
+  });
 }

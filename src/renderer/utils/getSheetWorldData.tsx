@@ -49,9 +49,10 @@ export default function getSheetWorldData() {
             name: row_data[1].textContent || '',
             author: row_data[2].textContent || '',
             description: row_data[3].textContent || '',
-            tags:
-              row_data[4].textContent?.replace(' ', '').slice(1).split('#') ||
-              [],
+            tags: row_data[4]
+              .textContent!.replaceAll(' ', '')
+              .slice(1)
+              .split('#'),
             score: row_data[5].textContent?.length || 0,
             url: row_data[6].textContent || '소실',
             imageUrl:
