@@ -8,17 +8,14 @@ export interface World {
   url: string;
   imageUrl: string;
   date: Date;
+  type: string;
 }
 
 export type WorldPartial = Partial<World>;
+export type WorldInput = Pick<World, 'url' | 'description' | 'tags' | 'score'>;
+export type WorldOutput = Omit<World, 'url' | 'description' | 'tags' | 'score'>;
 
-export interface WorldSheet {
-  type: string; // ex: 풍경담화탐험기능VRMV게임아바타사이코소실
-  typeId: number;
-  worlds: World[];
-}
-
-export type WorldData = WorldSheet[];
+export type WorldData = World[];
 
 export enum WorldSortOrder {
   NONE,
