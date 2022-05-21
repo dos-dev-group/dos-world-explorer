@@ -1,4 +1,10 @@
-import { World, WorldData } from '@src/types';
+import {
+  World,
+  WorldData,
+  WorldInput,
+  WorldOutput,
+  EditResult,
+} from '@src/types';
 
 export function testEditSheetToMain(typeId: number) {
   window.electron.ipcRenderer.sendMessage('testEditSheetToMain', [typeId]);
@@ -12,62 +18,55 @@ export function testEditSheetToMain(typeId: number) {
   });
 }
 
-export function addEditSheetToMain(world: World, type: string, typeId: number) {
-  window.electron.ipcRenderer.sendMessage('addEditSheetToMain', [
-    world,
-    type,
-    typeId,
-  ]);
+export function addEditSheetToMain(worldInput: WorldInput) {
+  window.electron.ipcRenderer.sendMessage('addEditSheetToMain', [worldInput]);
 
-  return new Promise<boolean>((resolve, reject) => {
+  return new Promise<EditResult>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'addEditSheetToRenderer',
       (result: unknown) => {
-        resolve(result as boolean);
+        resolve(result as EditResult);
       },
     );
   });
 }
 
-export function reomoveEditSheetToMain(
-  world: World,
-  type: string,
-  typeId: number,
-) {
-  window.electron.ipcRenderer.sendMessage('reomoveEditSheetToMain', [
-    world,
-    type,
-    typeId,
-  ]);
+export function reomoveEditSheetToMain(key: string) {
+  window.electron.ipcRenderer.sendMessage('reomoveEditSheetToMain', [key]);
 
-  return new Promise<boolean>((resolve, reject) => {
+  return new Promise<EditResult>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'reomoveEditSheetToRenderer',
       (result: unknown) => {
-        resolve(result as boolean);
+        resolve(result as EditResult);
       },
     );
   });
 }
 
-export function modifyEditSheetToMain(
-  world: World,
-  newWorld: World,
-  type: string,
-  typeId: number,
-) {
+export function modifyEditSheetToMain(key: string, worldInput: WorldInput) {
   window.electron.ipcRenderer.sendMessage('modifyEditSheetToMain', [
-    world,
-    newWorld,
-    type,
-    typeId,
+    key,
+    worldInput,
   ]);
 
-  return new Promise<boolean>((resolve, reject) => {
+  return new Promise<EditResult>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'modifyEditSheetToRenderer',
       (result: unknown) => {
-        resolve(result as boolean);
+        resolve(result as EditResult);
+      },
+    );
+  });
+}
+
+export function autoFileToMain(worldUrl: string) {
+  window.electron.ipcRenderer.sendMessage('autoFileToMain', [worldUrl]);
+  return new Promise<WorldOutput>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'autoFileToRenderer',
+      (result: unknown) => {
+        resolve(result as WorldOutput);
       },
     );
   });
