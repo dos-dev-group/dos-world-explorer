@@ -56,7 +56,7 @@ export async function autoFile(worldUrl: string): Promise<WorldOutput> {
   };
 }
 
-async function getWorldData(): Promise<WorldData> {
+export async function getWorldData(): Promise<WorldData> {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
   //console.log(types);
