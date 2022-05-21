@@ -1,9 +1,25 @@
 import { google } from 'googleapis';
-import { World, WorldData } from '@src/types';
+import * as vrchat from 'vrchat';
+import {
+  World,
+  WorldData,
+  WorldInput,
+  WorldOutput,
+  EditResult,
+} from '../../types';
 import keys from '../../../secret/sheetAuth.json';
-import admins from '../../../secret/admins.json';
+import vrckey from '../../../secret/vrc.json';
+import sheetData from '../../../secret/sheetData.json';
+import protectList from '../../../secret/protectList.json';
 
-const sheetId = '1I21zFSuifsHAYs0mZe0ZoEhwXb35AfNSt6P9HcOizCo';
+const configuration = new vrchat.Configuration({
+  username: vrckey.id,
+  password: vrckey.pw,
+});
+
+const spreadsheetId = sheetData.spreadsheetId;
+const sheetId = sheetData.sheetId;
+const sheetName = sheetData.sheetName;
 
 const client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
   'https://www.googleapis.com/auth/drive',
@@ -11,89 +27,83 @@ const client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
   'https://www.googleapis.com/auth/spreadsheets',
 ]);
 
-enum EditResult {
-  success = 0,
-  protected = 1,
-  unknown = 2,
-}
-
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function testEditSheet(typeId: number) {
-  const worldData = await getWorldData();
-  console.log(worldData.length);
-  for (let i = 0; i < worldData.length; i++) {
-    console.log(worldData[i].type, worldData[i].worlds[0]);
-  }
+export async function testEditSheet() {
+  // console.log(await getWorldData());
+}
+
+export async function autoFile(worldUrl: string): Promise<WorldOutput> {
+  const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
+  const WorldsApi = new vrchat.WorldsApi(configuration);
+  await AuthenticationApi.getCurrentUser();
+  const worldId = worldUrl.replace('https://vrchat.com/home/world/', '');
+  const worldData = (await WorldsApi.getWorld(worldId)).data;
+  const nowTime = new Date();
+  console.log(worldId);
+  console.log(worldData.thumbnailImageUrl);
+  console.log(worldData.name);
+  console.log(worldData.authorName);
+  console.log(nowTime.toISOString().replace('T', ' ').split('.')[0]);
+  return {
+    key: worldId,
+    name: worldData.name,
+    author: worldData.authorName,
+    imageUrl: worldData.thumbnailImageUrl,
+    date: nowTime,
+  };
 }
 
 async function getWorldData(): Promise<WorldData> {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
-  const request = {
-    spreadsheetId: sheetId,
-  };
-  const response = (await sheets.spreadsheets.get(request)).data;
-  // TODO: Change code below to process the `response` object:
-  //console.log(JSON.stringify(response.sheets, null, 2));
-  const types = response.sheets || [];
   //console.log(types);
-  const worldData: WorldData = [];
-  const promises = types.map(async (item, index) => {
-    const type = item.properties!.title || '';
-    const typeId = item.properties!.sheetId || -1;
-    //console.log(type, typeId);
-    const sheetRequest = {
-      spreadsheetId: sheetId,
-      range: type,
-      valueRenderOption: 'FORMULA',
-      dateTimeRenderOption: 'FORMATTED_STRING',
+  const sheetRequest = {
+    spreadsheetId: spreadsheetId,
+    range: 'sheet1',
+    valueRenderOption: 'FORMULA',
+    dateTimeRenderOption: 'FORMATTED_STRING',
+  };
+  const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
+  const worldData: World[] = [];
+  const vaules = sheetResponse.data.values || [[]];
+  vaules.slice(1).forEach((vaule) => {
+    const world: World = {
+      key: vaule[9], // 월드 고유ID
+      name: vaule[1],
+      author: vaule[2],
+      description: vaule[3],
+      tags: vaule[4].replace(' ', '').substr(1).split('#'),
+      score: vaule[5].length,
+      url: vaule[6],
+      imageUrl: vaule[0].slice(8, -4),
+      date: new Date(vaule[8] + 'z'),
+      type: vaule[7],
     };
-    const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
-    const worlds: World[] = [];
-    const vaules = sheetResponse.data.values || [[]];
-    vaules.slice(1).forEach((vaule) => {
-      const world: World = {
-        key: vaule[8], // 월드 고유ID
-        name: vaule[1],
-        author: vaule[2],
-        description: vaule[3],
-        tags: vaule[4].replace(' ', '').substr(1).split('#'),
-        score: vaule[5].length,
-        url: vaule[6],
-        imageUrl: vaule[0].slice(8, -4),
-        date: new Date(vaule[7] + 'z'),
-      };
-      worlds.push(world);
-    });
-    worldData[index] = {
-      type: type,
-      typeId: typeId,
-      worlds: worlds,
-    };
-    // console.log(worldData[index].type);
+    // console.log(world);
+    worldData.push(world);
   });
-  await Promise.all(promises);
   return worldData;
 }
-async function protectSheet(typeId: number): Promise<number> {
-  console.log(typeId, 'protectSheet!!');
+
+async function protectSheet(sheetID: number): Promise<number> {
+  console.log(sheetID, 'protectSheet!!');
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
   const request = {
-    spreadsheetId: sheetId,
+    spreadsheetId: spreadsheetId,
     resource: {
       requests: [
         {
           addProtectedRange: {
             protectedRange: {
               range: {
-                sheetId: typeId,
+                sheetId: sheetID,
               },
               editors: {
-                users: [admins.admin_email.concat([keys.client_email])],
+                users: [sheetData.admin_email.concat([keys.client_email])],
               },
             },
           },
@@ -123,7 +133,7 @@ async function unprotectSheet(protectedRangeId: number) {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
   const request = {
-    spreadsheetId: sheetId,
+    spreadsheetId: spreadsheetId,
     resource: {
       requests: [
         {
@@ -149,159 +159,163 @@ async function unprotectSheet(protectedRangeId: number) {
   return 0;
 }
 
-export async function addEditSheet(
-  world: World,
-  type: string,
-  typeId: number,
-): Promise<boolean> {
-  const protectedRangeId = await protectSheet(typeId);
-  //console.log(protectedRangeId);
-  if (protectedRangeId < 0) {
-    console.log('시트 수정중');
-    return false;
-  }
-  const sheets = google.sheets({ version: 'v4', auth: client });
-  const authClient = client.authorize();
-  const values = [
-    [
-      '=Image("' + world.imageUrl + '",2)',
-      world.name,
-      world.author,
-      world.description,
-      '#' + world.tags.join(' #'),
-      '★'.repeat(world.score),
-      world.url,
-      world.date.toISOString().replace('T', ' ').split('.')[0],
-      world.key,
-    ],
-  ];
-  console.log('test');
-  const addrequest = {
-    spreadsheetId: sheetId,
-    range: type,
-    valueInputOption: 'USER_ENTERED',
-    resource: {
-      values: values,
-    },
-  };
-
-  await sheets.spreadsheets.values.append(addrequest);
-
-  await unprotectSheet(protectedRangeId);
-
-  return true;
-}
-
-export async function removeEditSheet(
-  world: World,
-  type: string,
-  typeId: number,
-): Promise<boolean> {
-  const protectedRangeId = await protectSheet(typeId);
-  const sheets = google.sheets({ version: 'v4', auth: client });
-  const authClient = client.authorize();
-  let index = -1;
-  //console.log(world);
-  //console.log('===============================');
-  const worldData = await getWorldData();
-  worldData.forEach((worldSheet) => {
-    if (typeId === worldSheet.typeId) {
-      for (let i = 0; i < worldSheet.worlds.length; i++) {
-        if (world.key === worldSheet.worlds[i].key) {
-          index = i;
-          break;
-        }
-      }
+function overLapCheck(worldData: WorldData, key: string) {
+  for (let i = 0; i < worldData.length; i++) {
+    if (key === worldData[i].key) {
+      return true;
     }
-  });
-
-  if (index !== -1) {
-    if (protectedRangeId < 0) return false;
-    const request = {
-      spreadsheetId: sheetId,
-      resource: {
-        requests: [
-          {
-            cutPaste: {
-              source: {
-                sheetId: typeId,
-                startColumnIndex: 0,
-                startRowIndex: index + 2,
-              },
-              destination: {
-                sheetId: typeId,
-                columnIndex: 0,
-                rowIndex: index + 1,
-              },
-              pasteType: 'PASTE_NORMAL',
-            },
-          },
-        ],
-      },
-    };
-    await sheets.spreadsheets.batchUpdate(request);
-    await unprotectSheet(protectedRangeId);
-    return true;
   }
-  await unprotectSheet(protectedRangeId);
   return false;
 }
 
-export async function modifyEditSheet(
-  world: World,
-  newWorld: World,
-  type: string,
-  typeId: number,
-): Promise<boolean> {
-  const protectedRangeId = await protectSheet(typeId);
+export async function addEditSheet(
+  worldInput: WorldInput,
+): Promise<EditResult> {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
-  let index = -1;
-  //console.log(world);
-  //console.log('===============================');
+  const protectedRangeId = await protectSheet(sheetId);
+  if (protectedRangeId < 0) {
+    console.log('시트 수정중');
+    return EditResult.PROTECTED;
+  }
   const worldData = await getWorldData();
-  worldData.forEach((worldSheet) => {
-    if (typeId === worldSheet.typeId) {
-      console.log('sheet find !!!!!');
-      for (let i = 0; i < worldSheet.worlds.length; i++) {
-        console.log(worldSheet.worlds[i]);
-        if (world.key === worldSheet.worlds[i].key) {
-          index = i;
-          console.log('world find !!!!!');
-          break;
-        }
-      }
-    }
-  });
-
-  if (index !== -1) {
+  const worldOutput = await autoFile(worldInput.url);
+  if (overLapCheck(worldData, worldOutput.key)) {
+    return EditResult.ALREADYEXIST;
+  }
+  try {
     const values = [
       [
-        '=Image("' + newWorld.imageUrl + '",2)',
-        newWorld.name,
-        newWorld.author,
-        newWorld.description,
-        '#' + newWorld.tags.join(' #'),
-        '★'.repeat(newWorld.score),
-        newWorld.url,
-        newWorld.date.toISOString().replace('T', ' ').split('.')[0],
-        newWorld.key,
+        '=Image("' + worldOutput.imageUrl + '",2)',
+        worldOutput.name,
+        worldOutput.author,
+        worldInput.description,
+        '#' + worldInput.tags.join(' #'),
+        '★'.repeat(worldInput.score),
+        worldInput.url,
+        worldInput.type,
+        worldOutput.date.toISOString().replace('T', ' ').split('.')[0],
+        worldOutput.key,
       ],
     ];
-
-    const request = {
-      spreadsheetId: sheetId,
-      range: type + '!A' + index + ':I' + index,
+    console.log('test');
+    const addrequest = {
+      spreadsheetId: spreadsheetId,
+      range: sheetName,
       valueInputOption: 'USER_ENTERED',
       resource: {
         values: values,
       },
     };
-    await sheets.spreadsheets.values.update(request);
+    await sheets.spreadsheets.values.append(addrequest);
     await unprotectSheet(protectedRangeId);
-    return true;
+    return EditResult.SUCCESS;
+  } catch (e) {
+    console.log(e);
+    await unprotectSheet(protectedRangeId);
+    return EditResult.UNKNOWN;
   }
-  await unprotectSheet(protectedRangeId);
-  //console.log(world);
-  return false;
+}
+
+export async function removeEditSheet(key: string): Promise<EditResult> {
+  const sheets = google.sheets({ version: 'v4', auth: client });
+  const authClient = client.authorize();
+  const protectedRangeId = await protectSheet(sheetId);
+  if (protectedRangeId < 0) {
+    console.log('시트 수정중');
+    return EditResult.PROTECTED;
+  }
+  const worldData = await getWorldData();
+  let index = -1;
+  for (let i = 0; i < worldData.length; i++) {
+    if (key === worldData[i].key) {
+      index = i;
+      break;
+    }
+  }
+
+  try {
+    if (index !== -1) {
+      const request = {
+        spreadsheetId: spreadsheetId,
+        resource: {
+          requests: [
+            {
+              deleteDimension: {
+                range: {
+                  dimension: 'ROWS',
+                  sheetId: sheetId,
+                  startIndex: index + 1,
+                  endIndex: index + 2,
+                },
+              },
+            },
+          ],
+        },
+      };
+      await sheets.spreadsheets.batchUpdate(request);
+      await unprotectSheet(protectedRangeId);
+      return EditResult.SUCCESS;
+    }
+    await unprotectSheet(protectedRangeId);
+    return EditResult.NOTEXIST;
+  } catch (e) {
+    await unprotectSheet(protectedRangeId);
+    console.log(e);
+    return EditResult.UNKNOWN;
+  }
+}
+
+export async function modifyEditSheet(
+  key: string,
+  worldInput: WorldInput,
+): Promise<EditResult> {
+  const sheets = google.sheets({ version: 'v4', auth: client });
+  const authClient = client.authorize();
+  const protectedRangeId = await protectSheet(sheetId);
+  if (protectedRangeId < 0) {
+    console.log('시트 수정중');
+    return EditResult.PROTECTED;
+  }
+  const worldData = await getWorldData();
+  let index = -1;
+  for (let i = 0; i < worldData.length; i++) {
+    if (key === worldData[i].key) {
+      index = i;
+      break;
+    }
+  }
+
+  try {
+    if (index !== -1) {
+      const values = [
+        [
+          worldInput.description,
+          '#' + worldInput.tags.join(' #'),
+          '★'.repeat(worldInput.score),
+          worldInput.url,
+          worldInput.type,
+        ],
+      ];
+
+      const request = {
+        spreadsheetId: spreadsheetId,
+        range: sheetName + '!D' + (index + 2) + ':H' + (index + 2),
+        valueInputOption: 'USER_ENTERED',
+        resource: {
+          values: values,
+        },
+      };
+      await sheets.spreadsheets.values.update(request);
+      await unprotectSheet(protectedRangeId);
+      return EditResult.SUCCESS;
+    }
+    await unprotectSheet(protectedRangeId);
+    //console.log(world);
+    return EditResult.NOTEXIST;
+  } catch (e) {
+    await unprotectSheet(protectedRangeId);
+    console.log(e);
+    return EditResult.UNKNOWN;
+  }
 }

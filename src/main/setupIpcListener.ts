@@ -4,6 +4,7 @@ import {
   addEditSheet,
   removeEditSheet,
   modifyEditSheet,
+  autoFile,
 } from './utils/editSheet';
 
 export default function setupIpcListener() {
@@ -21,27 +22,25 @@ export default function setupIpcListener() {
   });
 
   ipcMain.on('testEditSheetToMain', async (event, arg) => {
-    event.reply('testEditSheetToMain', await testEditSheet(arg[0]));
+    event.reply('testEditSheetToMain', await testEditSheet());
   });
 
   ipcMain.on('addEditSheetToMain', async (event, arg) => {
-    event.reply(
-      'addEditSheetToRenderer',
-      await addEditSheet(arg[0], arg[1], arg[2]),
-    );
+    event.reply('addEditSheetToRenderer', await addEditSheet(arg[0]));
   });
 
   ipcMain.on('reomoveEditSheetToMain', async (event, arg) => {
-    event.reply(
-      'reomoveEditSheetToRenderer',
-      await removeEditSheet(arg[0], arg[1], arg[2]),
-    );
+    event.reply('reomoveEditSheetToRenderer', await removeEditSheet(arg[0]));
   });
 
   ipcMain.on('modifyEditSheetToMain', async (event, arg) => {
     event.reply(
       'modifyEditSheetToRenderer',
-      await modifyEditSheet(arg[0], arg[1], arg[2], arg[3]),
+      await modifyEditSheet(arg[0], arg[1]),
     );
+  });
+
+  ipcMain.on('autoFileToMain', async (event, arg) => {
+    event.reply('autoFileToRenderer', await autoFile(arg[0]));
   });
 }
