@@ -7,20 +7,32 @@ export interface World {
   score: number;
   url: string;
   imageUrl: string;
+  date: Date;
+  type: string;
 }
 
 export type WorldPartial = Partial<World>;
+export type WorldInput = Pick<
+  World,
+  'url' | 'description' | 'tags' | 'score' | 'type'
+>;
+export type WorldOutput = Omit<
+  World,
+  'url' | 'description' | 'tags' | 'score' | 'type'
+>;
 
-export interface WorldSheet {
-  type: string; // ex: 풍경담화탐험기능VRMV게임아바타사이코소실
-  typeId: number;
-  worlds: World[];
-}
-
-export type WorldData = WorldSheet[];
+export type WorldData = World[];
 
 export enum WorldSortOrder {
   NONE,
   SCORE,
   AUTHOR,
+}
+
+export enum EditResult {
+  SUCCESS = 0,
+  UNKNOWN = 1,
+  PROTECTED = 2,
+  ALREADYEXIST = 3,
+  NOTEXIST = 4,
 }

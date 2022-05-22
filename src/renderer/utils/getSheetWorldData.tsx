@@ -8,7 +8,7 @@ const sheetUrl =
 
 const domparser = new DOMParser();
 // eslint-disable-next-line consistent-return
-const getHtml = async () => {
+export const getHtml = async () => {
   // console.log(sheetUrl + '?_=' + new Date().getTime());
   try {
     const html = await axios.get(sheetUrl + '?_=' + new Date().getTime());
@@ -19,6 +19,16 @@ const getHtml = async () => {
   }
 };
 
+export async function test() {
+  try {
+    const html = await axios.get(sheetUrl + '?_=' + new Date().getTime());
+    console.log(html.data);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 export default function getSheetWorldData() {
   const worldData: WorldData = [];
   return getHtml()
@@ -27,51 +37,29 @@ export default function getSheetWorldData() {
 
       const doc = domparser.parseFromString(html.data, 'text/html');
       // console.log(doc);
-      const sheetList = doc
-        .getElementById('sheet-menu')!
-        .getElementsByTagName('li');
-      for (let i = 0; i < sheetList.length; i++) {
-        const c_id = sheetList[i].getAttribute('id')?.split('-')[2]; // 1925914555
-        const c_name = sheetList[i].getElementsByTagName('a')[0].textContent; // 풍경
-        if (!c_name) continue;
-
-        const worlds: World[] = [];
-        const sheetData = doc
-          .getElementById(c_id!)!
-          .getElementsByTagName('tbody')[0]
-          .getElementsByTagName('tr');
-        for (let j = 1; j < sheetData.length; j++) {
-          const row_data = sheetData[j].getElementsByTagName('td');
-          if (row_data[1].textContent === '') break;
-          //console.log(row_data[0].getElementsByTagName('img')[0]);
-          const world = {
-            key:
-              sheetData[j].getElementsByTagName('th')[0].getAttribute('id') +
-              '',
-            name: row_data[1].textContent || '',
-            author: row_data[2].textContent || '',
-            description: row_data[3].textContent || '',
-            tags:
-              row_data[4].textContent?.replace(' ', '').slice(1).split('#') ||
-              [],
-            score: row_data[5].textContent?.length || 0,
-            url: row_data[6].textContent || '소실',
-            imageUrl:
-              row_data[0]
-                ?.getElementsByTagName('img')[0]
-                ?.getAttribute('src') || '',
-          };
-          // console.log(world);
-          worlds.push(world);
-        }
-        const worldSheet = {
-          type: c_name,
-          worlds: worlds,
+      const raws = doc
+        .getElementsByTagName('tbody')[0]
+        .getElementsByTagName('tr');
+      for (let i = 1; i < raws.length; i++) {
+        const row = raws[i].getElementsByTagName('td');
+        // console.log(rows);
+        const world: World = {
+          key: row[9].textContent || '', // 키 값
+          name: row[1].textContent || '', // 월드 이름
+          author: row[2].textContent || '', // 제작자 이름
+          description: row[3].textContent || '', // 설명
+          tags:
+            row[4].textContent!.replaceAll(' ', '').slice(1).split('#') || [], // 태그
+          score: row[5].textContent?.length || 0, // 별점
+          url: row[6].textContent || '', // 링크
+          imageUrl:
+            row[0].getElementsByTagName('img')[0].getAttribute('src') || '', // 이미지
+          date: new Date(row[8].textContent + 'z' || ''), // 기록 날짜
+          type: row[7].textContent || '', // 카테고리
         };
-
-        worldData.push(worldSheet);
+        // console.log(world);
+        worldData.push(world);
       }
-      // console.log('worldData', worldData);
       return worldData;
     })
     .catch((reason) => {

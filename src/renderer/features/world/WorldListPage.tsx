@@ -5,7 +5,7 @@ import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World, WorldSortOrder } from '@src/types';
-import useWorldListPage from './hooks/useWorldList';
+import useWorldListPage from './hooks/useWorldListPage';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
