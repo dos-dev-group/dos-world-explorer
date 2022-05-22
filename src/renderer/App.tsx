@@ -18,7 +18,7 @@ import {
 import { Flex } from './components/styledComponents';
 import Favorite from './features/favorite/Favorite';
 import Home from './features/home/Home';
-import WorldList from './features/world/WorldList';
+import WorldListPage from './features/world/WorldList';
 
 const { Sider } = Layout;
 const { Title } = Typography;
@@ -135,8 +135,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MenuLayout />}>
           <Route index element={<Home />} />
-          <Route path="world" element={<Navigate replace to="일반" />} />
-          <Route path="world/:type" element={<WorldList />} />
+          <Route path="world" element={<WorldListPage />} />
           <Route path="favorite" element={<Navigate replace to="일반" />} />
           <Route path="favorite/:type" element={<Favorite />} />
         </Route>

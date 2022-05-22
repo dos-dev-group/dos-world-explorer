@@ -13,7 +13,7 @@ interface HookMember {
   onChangeSheetTab: (tabKey: string) => void;
   onClickUrl: (url: string) => void;
 }
-const useWorldList = (): HookMember => {
+const useWorldListPage = (): HookMember => {
   const [currentType, setCurrentType] = useState<string>('풍경');
   const [isLoading, setIsLoading] = useState(true);
   const [worldData, setWorldData] = useState<WorldData>([]);
@@ -44,4 +44,4 @@ const useWorldList = (): HookMember => {
   };
 };
 
-export default useWorldList;
+export default useWorldListPage;
