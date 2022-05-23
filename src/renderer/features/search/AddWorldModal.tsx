@@ -29,7 +29,7 @@ function AddWorldModal(props: Props) {
   const [curUrl, setCurUrl] = useState<string>();
   const [curDesc, setCurDesc] = useState<string>();
   const [curTags, setCurTags] = useState<string[]>([]);
-  const [curScore, setCurScore] = useState<number>();
+  const [curScore, setCurScore] = useState<number>(1);
   const [inputTag, setInputTag] = useState<string>('');
   const [worldCheckInfo, setWorldCheckInfo] = useState<WorldEditOutput>();
   const [isChecking, setIsChecking] = useState(false);
@@ -40,7 +40,7 @@ function AddWorldModal(props: Props) {
       setCurUrl(undefined);
       setCurDesc(undefined);
       setCurTags([]);
-      setCurScore(undefined);
+      setCurScore(1);
       setInputTag('');
       setWorldCheckInfo(undefined);
     }
@@ -145,8 +145,9 @@ function AddWorldModal(props: Props) {
           }}
           max={6}
           min={1}
-          defaultValue={1}
+          value={curScore}
           onChange={(v) => setCurScore(v)}
+          precision={0}
         />
       </Input.Group>
       <Input.Group css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>

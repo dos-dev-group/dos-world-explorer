@@ -22,7 +22,8 @@ interface HookMember {
   onClickOpenAddWorldModal: () => void;
   onClickCloseAddWorldModal: () => void;
   onAddWorld: (world: WorldEditInput) => void;
-  onDeleteWorld: (key: string) => void;
+  onRemoveWorld: (key: string) => void;
+  onClickRefresh: () => void;
 }
 const useSearch = (): HookMember => {
   const [currentType, setCurrentType] = useState<string>('전체');
@@ -51,7 +52,7 @@ const useSearch = (): HookMember => {
       ['전체'],
     ) || [];
 
-  const currentTableData =
+  const currentTableData = (
     worldData
       ?.filter((w) => {
         if (currentType === '전체') {
@@ -61,7 +62,8 @@ const useSearch = (): HookMember => {
       })
       .filter(
         (e) => e.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
-      ) || [];
+      ) || []
+  ).reverse();
 
   return {
     currentType,
@@ -88,8 +90,15 @@ const useSearch = (): HookMember => {
     onAddWorld(world) {
       addEditSheetToMain(world);
     },
-    onDeleteWorld(key) {
+    onRemoveWorld(key) {
       reomoveEditSheetToMain(key);
+    },
+    onClickRefresh() {
+      setIsLoading(true);
+      getSheetWorldData().then((data) => {
+        setIsLoading(false);
+        return setWorldData(data);
+      });
     },
   };
 };

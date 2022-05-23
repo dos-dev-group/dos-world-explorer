@@ -1,4 +1,4 @@
-import { StarFilled } from '@ant-design/icons';
+import { ReloadOutlined, StarFilled } from '@ant-design/icons';
 import {
   Button,
   Image,
@@ -47,17 +47,26 @@ export default function SearchPage() {
         allowClear
         onSearch={hookMember.onSearchWorlds}
         css={{
-          marginTop: spacing(2),
+          marginTop: spacing(1),
         }}
         loading={hookMember.isLoading}
       />
+
+      <Tabs
+        activeKey={hookMember.currentType}
+        onChange={hookMember.onChangeSheetTab}
+      >
+        {renderedTabs}
+      </Tabs>
+      <Button
+        size="small"
+        css={{ marginLeft: 'auto', alignSelf: 'center' }}
+        icon={<ReloadOutlined />}
+        onClick={() => hookMember.onClickRefresh()}
+        loading={hookMember.isLoading}
+      />
+
       <Spin spinning={hookMember.isLoading}>
-        <Tabs
-          activeKey={hookMember.currentType}
-          onChange={hookMember.onChangeSheetTab}
-        >
-          {renderedTabs}
-        </Tabs>
         <Table<World>
           dataSource={hookMember.currentTableData}
           scroll={{
@@ -72,7 +81,7 @@ export default function SearchPage() {
                   hookMember.onClickOpenAddWorldModal();
                 }}
               >
-                Add World
+                월드 추가
               </Button>
             </FlexRow>
           )}
@@ -149,10 +158,11 @@ export default function SearchPage() {
           <Column
             width="5%"
             dataIndex="key"
-            render={(_, record) => (
+            render={(k, record) => (
               <Popconfirm
                 title="정말 월드를 삭제하시겠습니까?"
                 placement="topRight"
+                onConfirm={() => hookMember.onRemoveWorld(k)}
               >
                 <Button danger size="small">
                   삭제
