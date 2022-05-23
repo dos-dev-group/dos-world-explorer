@@ -50,4 +50,4 @@ const useWorldList = (): HookMember => {
   };
 };
 
-export default useWorldList;
+export default useWorldListPage;

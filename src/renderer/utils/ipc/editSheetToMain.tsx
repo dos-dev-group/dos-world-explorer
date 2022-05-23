@@ -1,8 +1,8 @@
 import {
   World,
   WorldData,
-  WorldInput,
-  WorldOutput,
+  WorldEditInput,
+  WorldEditOutput,
   EditResult,
 } from '@src/types';
 
@@ -18,7 +18,7 @@ export function testEditSheetToMain(typeId: number) {
   });
 }
 
-export function addEditSheetToMain(worldInput: WorldInput) {
+export function addEditSheetToMain(worldInput: WorldEditInput) {
   window.electron.ipcRenderer.sendMessage('addEditSheetToMain', [worldInput]);
 
   return new Promise<EditResult>((resolve, reject) => {
@@ -44,7 +44,7 @@ export function reomoveEditSheetToMain(key: string) {
   });
 }
 
-export function modifyEditSheetToMain(key: string, worldInput: WorldInput) {
+export function modifyEditSheetToMain(key: string, worldInput: WorldEditInput) {
   window.electron.ipcRenderer.sendMessage('modifyEditSheetToMain', [
     key,
     worldInput,
@@ -62,11 +62,11 @@ export function modifyEditSheetToMain(key: string, worldInput: WorldInput) {
 
 export function autoFileToMain(worldUrl: string) {
   window.electron.ipcRenderer.sendMessage('autoFileToMain', [worldUrl]);
-  return new Promise<WorldOutput>((resolve, reject) => {
+  return new Promise<WorldEditOutput>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'autoFileToRenderer',
       (result: unknown) => {
-        resolve(result as WorldOutput);
+        resolve(result as WorldEditOutput);
       },
     );
   });

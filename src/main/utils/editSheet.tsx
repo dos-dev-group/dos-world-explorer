@@ -3,8 +3,8 @@ import * as vrchat from 'vrchat';
 import {
   World,
   WorldData,
-  WorldInput,
-  WorldOutput,
+  WorldEditInput,
+  WorldEditOutput,
   EditResult,
 } from '../../types';
 import keys from '../../../secret/sheetAuth.json';
@@ -35,7 +35,7 @@ export async function testEditSheet() {
   // console.log(await getWorldData());
 }
 
-export async function autoFile(worldUrl: string): Promise<WorldOutput> {
+export async function autoFile(worldUrl: string): Promise<WorldEditOutput> {
   const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
   const WorldsApi = new vrchat.WorldsApi(configuration);
   await AuthenticationApi.getCurrentUser();
@@ -169,7 +169,7 @@ function overLapCheck(worldData: WorldData, key: string) {
 }
 
 export async function addEditSheet(
-  worldInput: WorldInput,
+  worldInput: WorldEditInput,
 ): Promise<EditResult> {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
@@ -268,7 +268,7 @@ export async function removeEditSheet(key: string): Promise<EditResult> {
 
 export async function modifyEditSheet(
   key: string,
-  worldInput: WorldInput,
+  worldInput: WorldEditInput,
 ): Promise<EditResult> {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
