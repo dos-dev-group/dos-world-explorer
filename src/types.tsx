@@ -12,11 +12,11 @@ export interface World {
 }
 
 export type WorldPartial = Partial<World>;
-export type WorldInput = Pick<
+export type WorldEditInput = Pick<
   World,
   'url' | 'description' | 'tags' | 'score' | 'type'
 >;
-export type WorldOutput = Omit<
+export type WorldEditOutput = Omit<
   World,
   'url' | 'description' | 'tags' | 'score' | 'type'
 >;
