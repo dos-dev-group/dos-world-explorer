@@ -1,7 +1,11 @@
 import { searchTextState, worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
+import {
+  addEditSheetToMain,
+  reomoveEditSheetToMain,
+} from '@src/renderer/utils/ipc/editSheetToMain';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
-import { WorldSortOrder, World, WorldData } from '@src/types';
+import { WorldSortOrder, World, WorldData, WorldEditInput } from '@src/types';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
@@ -17,6 +21,8 @@ interface HookMember {
   onSearchWorlds: (text: string) => void;
   onClickOpenAddWorldModal: () => void;
   onClickCloseAddWorldModal: () => void;
+  onAddWorld: (world: WorldEditInput) => void;
+  onDeleteWorld: (key: string) => void;
 }
 const useSearch = (): HookMember => {
   const [currentType, setCurrentType] = useState<string>('전체');
@@ -78,6 +84,12 @@ const useSearch = (): HookMember => {
     },
     onClickCloseAddWorldModal() {
       setVisibleAddWorldModal(false);
+    },
+    onAddWorld(world) {
+      addEditSheetToMain(world);
+    },
+    onDeleteWorld(key) {
+      reomoveEditSheetToMain(key);
     },
   };
 };

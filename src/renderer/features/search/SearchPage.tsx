@@ -1,5 +1,15 @@
 import { StarFilled } from '@ant-design/icons';
-import { Button, Image, Input, Select, Spin, Table, Tabs, Tag } from 'antd';
+import {
+  Button,
+  Image,
+  Input,
+  Popconfirm,
+  Select,
+  Spin,
+  Table,
+  Tabs,
+  Tag,
+} from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
@@ -22,20 +32,15 @@ export default function SearchPage() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
-      <Button
-        type="primary"
-        css={{ marginLeft: 'auto' }}
-        onClick={(e) => {
-          hookMember.onClickOpenAddWorldModal();
-        }}
-      >
-        Add World
-      </Button>
       <AddWorldModal
         onCancel={() => {
           hookMember.onClickCloseAddWorldModal();
         }}
+        onOk={(w) => {
+          hookMember.onAddWorld(w);
+        }}
         visible={hookMember.visibleAddWorldModal}
+        types={hookMember.typeList}
       />
       <Search
         placeholder="Type Search Text"
@@ -140,6 +145,20 @@ export default function SearchPage() {
               </FlexRow>
             )}
             sorter={(a: World, b: World) => a.score - b.score}
+          />
+          <Column
+            width="5%"
+            dataIndex="key"
+            render={(_, record) => (
+              <Popconfirm
+                title="정말 월드를 삭제하시겠습니까?"
+                placement="topRight"
+              >
+                <Button danger size="small">
+                  삭제
+                </Button>
+              </Popconfirm>
+            )}
           />
         </Table>
       </Spin>

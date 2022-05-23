@@ -8,21 +8,24 @@ import {
   Col,
   Image,
   Input,
+  InputNumber,
   Modal,
   Row,
+  Select,
   Space,
   Tag,
   Typography,
 } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   onOk?: (e: WorldEditInput) => void;
   onCancel?: () => void;
   visible: boolean;
-  curType?: string;
+  types: string[];
 }
 function AddWorldModal(props: Props) {
+  const [curType, setCurType] = useState<string>();
   const [curUrl, setCurUrl] = useState<string>();
   const [curDesc, setCurDesc] = useState<string>();
   const [curTags, setCurTags] = useState<string[]>([]);
@@ -31,28 +34,56 @@ function AddWorldModal(props: Props) {
   const [worldCheckInfo, setWorldCheckInfo] = useState<WorldEditOutput>();
   const [isChecking, setIsChecking] = useState(false);
 
+  useEffect(() => {
+    if (props.visible === false) {
+      setCurType(undefined);
+      setCurUrl(undefined);
+      setCurDesc(undefined);
+      setCurTags([]);
+      setCurScore(undefined);
+      setInputTag('');
+      setWorldCheckInfo(undefined);
+    }
+  }, [props.visible]);
+
+  const renderedOptions = props.types
+    .filter((e) => e !== '전체')
+    .map((e) => <Select.Option key={e}>{e}</Select.Option>);
+
   return (
     <Modal
       title="Add World"
-      onOk={() =>
-        props.onOk &&
-        props.onOk({
-          description: curDesc,
-          type: props.curType,
-          score: curScore,
+      onOk={() => {
+        props.onOk?.({
+          description: curDesc || '',
+          type: curType || '',
+          score: curScore!,
           tags: curTags,
-          url: curUrl,
-        })
-      }
+          url: curUrl!,
+        });
+        props.onCancel?.();
+      }}
+      destroyOnClose
       onCancel={props.onCancel}
       visible={props.visible}
-      destroyOnClose
       width="80%"
       okButtonProps={{
-        disabled: worldCheckInfo === undefined ? true : false,
+        disabled:
+          !URL_REGEX.test(curUrl || '') || worldCheckInfo === undefined
+            ? true
+            : false,
       }}
     >
-      <Input.Group>
+      <Typography.Title level={5}>타입</Typography.Title>
+      <Select
+        css={{
+          width: 200,
+        }}
+        onSelect={(e: string) => setCurType(e)}
+      >
+        {renderedOptions}
+      </Select>
+      <Input.Group css={{ marginTop: spacing(1) }}>
         <Typography.Title level={5}>URL</Typography.Title>
         <Input
           css={{ width: 'calc(100% - 200px)' }}
@@ -68,6 +99,7 @@ function AddWorldModal(props: Props) {
           onClick={() => {
             setIsChecking(true);
             autoFileToMain(curUrl!).then((info) => {
+              console.log('autoFileToMain');
               setWorldCheckInfo(info);
               setIsChecking(false);
             });
@@ -76,7 +108,7 @@ function AddWorldModal(props: Props) {
           Check
         </Button>
       </Input.Group>
-      <Input.Group>
+      <Input.Group css={{ marginTop: spacing(1) }}>
         <Space size="small" direction="vertical">
           <Row gutter={8}>
             <Image src={worldCheckInfo?.imageUrl} />
@@ -104,9 +136,22 @@ function AddWorldModal(props: Props) {
           </Row>
         </Space>
       </Input.Group>
+
+      <Input.Group css={{ marginTop: spacing(1) }}>
+        <Typography.Title level={5}>별점</Typography.Title>
+        <InputNumber
+          css={{
+            width: 200,
+          }}
+          max={6}
+          min={1}
+          defaultValue={1}
+          onChange={(v) => setCurScore(v)}
+        />
+      </Input.Group>
       <Input.Group css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>
         <Typography.Title level={5}>설명</Typography.Title>
-        <Input />
+        <Input onChange={(e) => setCurDesc(e.target.value)} />
       </Input.Group>
       <div css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>
         <Typography.Title level={5}>태그</Typography.Title>
@@ -146,7 +191,6 @@ function AddWorldModal(props: Props) {
           }}
         />
       </div>
-      <div>{JSON.stringify(worldCheckInfo, null, 2)}</div>
     </Modal>
   );
 }
