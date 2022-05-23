@@ -1,6 +1,7 @@
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import { URL_REGEX } from '@src/renderer/utils/constants';
 import { autoFileToMain } from '@src/renderer/utils/ipc/editSheetToMain';
+import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World, WorldEditInput, WorldEditOutput } from '@src/types';
 import {
@@ -16,6 +17,7 @@ import {
   Tag,
   Typography,
 } from 'antd';
+import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -156,18 +158,27 @@ function AddWorldModal(props: Props) {
       </Input.Group>
       <div css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>
         <Typography.Title level={5}>태그</Typography.Title>
-        {curTags.map((tag) => (
-          <Tag
-            key={tag}
-            onClose={() => {
-              const newTags = curTags.filter((e) => tag !== e);
-              setCurTags(newTags);
-            }}
-            closable
-          >
-            {tag}
-          </Tag>
-        ))}
+        {curTags.map((tag) => {
+          let color;
+          if (tag) {
+            const colorIndex = simpleStringHash(tag) % PresetColorTypes.length;
+            color = PresetColorTypes[colorIndex];
+          }
+
+          return (
+            <Tag
+              color={color}
+              key={tag}
+              onClose={() => {
+                const newTags = curTags.filter((e) => tag !== e);
+                setCurTags(newTags);
+              }}
+              closable
+            >
+              {tag}
+            </Tag>
+          );
+        })}
         <Input
           type="text"
           size="small"
