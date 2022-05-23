@@ -1,16 +1,17 @@
 import { StarFilled } from '@ant-design/icons';
-import { Button, Image, Select, Spin, Table, Tabs, Tag } from 'antd';
+import { Button, Image, Input, Select, Spin, Table, Tabs, Tag } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World, WorldSortOrder } from '@src/types';
-import Search from 'antd/lib/input/Search';
 import useSearchPage from './hooks/useSearchPage';
+import AddWorldModal from './AddWorldModal';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
+const { Search } = Input;
 
 export default function SearchPage() {
   const hookMember = useSearchPage();
@@ -21,6 +22,21 @@ export default function SearchPage() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+      <Button
+        type="primary"
+        css={{ marginLeft: 'auto' }}
+        onClick={(e) => {
+          hookMember.onClickOpenAddWorldModal();
+        }}
+      >
+        Add World
+      </Button>
+      <AddWorldModal
+        onCancel={() => {
+          hookMember.onClickCloseAddWorldModal();
+        }}
+        visible={hookMember.visibleAddWorldModal}
+      />
       <Search
         placeholder="Type Search Text"
         allowClear
@@ -28,6 +44,7 @@ export default function SearchPage() {
         css={{
           marginTop: spacing(2),
         }}
+        loading={hookMember.isLoading}
       />
       <Spin spinning={hookMember.isLoading}>
         <Tabs
@@ -41,6 +58,19 @@ export default function SearchPage() {
           scroll={{
             x: true,
           }}
+          footer={(data) => (
+            <FlexRow>
+              <Button
+                type="primary"
+                css={{ marginLeft: 'auto' }}
+                onClick={(e) => {
+                  hookMember.onClickOpenAddWorldModal();
+                }}
+              >
+                Add World
+              </Button>
+            </FlexRow>
+          )}
         >
           <Column
             width="10%"
