@@ -1,16 +1,27 @@
-import { StarFilled } from '@ant-design/icons';
-import { Button, Image, Select, Spin, Table, Tabs, Tag } from 'antd';
+import { ReloadOutlined, StarFilled } from '@ant-design/icons';
+import {
+  Button,
+  Image,
+  Input,
+  Popconfirm,
+  Select,
+  Spin,
+  Table,
+  Tabs,
+  Tag,
+} from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World, WorldSortOrder } from '@src/types';
-import Search from 'antd/lib/input/Search';
 import useSearchPage from './hooks/useSearchPage';
+import AddWorldModal from './AddWorldModal';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
+const { Search } = Input;
 
 export default function SearchPage() {
   const hookMember = useSearchPage();
@@ -21,26 +32,59 @@ export default function SearchPage() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+      <AddWorldModal
+        onCancel={() => {
+          hookMember.onClickCloseAddWorldModal();
+        }}
+        onOk={(w) => {
+          hookMember.onAddWorld(w);
+        }}
+        visible={hookMember.visibleAddWorldModal}
+        types={hookMember.typeList}
+      />
       <Search
         placeholder="Type Search Text"
         allowClear
         onSearch={hookMember.onSearchWorlds}
         css={{
-          marginTop: spacing(2),
+          marginTop: spacing(1),
         }}
+        loading={hookMember.isLoading}
       />
+
+      <Tabs
+        activeKey={hookMember.currentType}
+        onChange={hookMember.onChangeSheetTab}
+      >
+        {renderedTabs}
+      </Tabs>
+      <Button
+        size="small"
+        css={{ marginLeft: 'auto', alignSelf: 'center' }}
+        icon={<ReloadOutlined />}
+        onClick={() => hookMember.onClickRefresh()}
+        loading={hookMember.isLoading}
+      />
+
       <Spin spinning={hookMember.isLoading}>
-        <Tabs
-          activeKey={hookMember.currentType}
-          onChange={hookMember.onChangeSheetTab}
-        >
-          {renderedTabs}
-        </Tabs>
         <Table<World>
           dataSource={hookMember.currentTableData}
           scroll={{
             x: true,
           }}
+          footer={(data) => (
+            <FlexRow>
+              <Button
+                type="primary"
+                css={{ marginLeft: 'auto' }}
+                onClick={(e) => {
+                  hookMember.onClickOpenAddWorldModal();
+                }}
+              >
+                월드 추가
+              </Button>
+            </FlexRow>
+          )}
         >
           <Column
             width="10%"
@@ -110,6 +154,21 @@ export default function SearchPage() {
               </FlexRow>
             )}
             sorter={(a: World, b: World) => a.score - b.score}
+          />
+          <Column
+            width="5%"
+            dataIndex="key"
+            render={(k, record) => (
+              <Popconfirm
+                title="정말 월드를 삭제하시겠습니까?"
+                placement="topRight"
+                onConfirm={() => hookMember.onRemoveWorld(k)}
+              >
+                <Button danger size="small">
+                  삭제
+                </Button>
+              </Popconfirm>
+            )}
           />
         </Table>
       </Spin>
