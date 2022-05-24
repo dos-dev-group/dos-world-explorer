@@ -31,8 +31,8 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "DosWorldExplorer",
+    "appId": "com.dos.DosWorldExplorer",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

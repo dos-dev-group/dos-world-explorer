@@ -15,6 +15,7 @@ module.exports = {
     'no-continue': 'off',
     'spaced-comment': 'off',
     'no-unneeded-ternary': 'off',
+    'no-bitwise': 'off',
     'import/prefer-default-export': 'off',
     'promise/catch-or-return': 'off',
     'promise/always-return': 'off',

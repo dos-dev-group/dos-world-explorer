@@ -1,3 +1,4 @@
+import { worldFavoritesState } from '@src/renderer/data/favorites';
 import { searchTextState, worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
@@ -25,6 +26,9 @@ interface HookMember {
   onAddWorld: (world: WorldEditInput) => void;
   onRemoveWorld: (key: string) => void;
   onClickRefresh: () => void;
+  onClickFavorite: (world: World) => void;
+
+  checkIsFavorite: (world: World) => boolean;
 }
 const useSearch = (): HookMember => {
   const [currentType, setCurrentType] = useState<string>('전체');
@@ -32,6 +36,7 @@ const useSearch = (): HookMember => {
   const [searchText, setSearchText] = useRecoilState(searchTextState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [visibleAddWorldModal, setVisibleAddWorldModal] = useState(false);
+  const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
 
   useEffect(() => {
     if (worldData === undefined) {
@@ -106,6 +111,29 @@ const useSearch = (): HookMember => {
         setIsLoading(false);
         return setWorldData(data);
       });
+    },
+    onClickFavorite(world) {
+      if (!favorites) {
+        message.loading('Favorite 불러오는 중');
+        return;
+      }
+      setFavorites((v) => {
+        const val = { ...v };
+        if (val.favorite1.find((e) => e.key === world.key)) {
+          val.favorite1 = val.favorite1.filter((e) => e.key !== world.key);
+          return val;
+        }
+        val.favorite1.push(world);
+        return val;
+      });
+    },
+    checkIsFavorite(world) {
+      if (favorites?.favorite1) {
+        return favorites.favorite1.find((e) => e.key === world.key)
+          ? true
+          : false;
+      }
+      return false;
     },
   };
 };
