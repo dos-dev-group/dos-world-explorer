@@ -117,13 +117,13 @@ function AddWorldModal(props: Props) {
           </Row>
           <Row gutter={8}>
             <Col span={12}>
-              <Input disabled value={worldCheckInfo?.name} addonBefore="Name" />
+              <Input disabled value={worldCheckInfo?.name} addonBefore="이름" />
             </Col>
             <Col span={12}>
               <Input
                 disabled
                 value={worldCheckInfo?.author}
-                addonBefore="Author"
+                addonBefore="제작자"
               />
             </Col>
           </Row>
@@ -132,7 +132,7 @@ function AddWorldModal(props: Props) {
               <Input
                 disabled
                 value={worldCheckInfo?.key}
-                addonBefore="World Key"
+                addonBefore="월드 ID"
               />
             </Col>
           </Row>
