@@ -1,4 +1,9 @@
-import { ReloadOutlined, StarFilled } from '@ant-design/icons';
+import {
+  HeartFilled,
+  HeartOutlined,
+  ReloadOutlined,
+  StarFilled,
+} from '@ant-design/icons';
 import {
   Button,
   Image,
@@ -88,6 +93,25 @@ export default function SearchPage() {
             </FlexRow>
           )}
         >
+          <Column
+            width="5%"
+            title=""
+            key="favorite"
+            render={(_, record: World) => {
+              if (hookMember.checkIsFavorite(record)) {
+                return (
+                  <HeartFilled
+                    onClick={() => hookMember.onClickFavorite(record)}
+                  />
+                );
+              }
+              return (
+                <HeartOutlined
+                  onClick={() => hookMember.onClickFavorite(record)}
+                />
+              );
+            }}
+          />
           <Column
             width="10%"
             title="이미지"
@@ -182,15 +206,17 @@ export default function SearchPage() {
             width="5%"
             dataIndex="key"
             render={(k, record) => (
-              <Popconfirm
-                title="정말 월드를 삭제하시겠습니까?"
-                placement="topRight"
-                onConfirm={() => hookMember.onRemoveWorld(k)}
-              >
-                <Button danger size="small">
-                  삭제
-                </Button>
-              </Popconfirm>
+              <Flex>
+                <Popconfirm
+                  title="정말 월드를 삭제하시겠습니까?"
+                  placement="topRight"
+                  onConfirm={() => hookMember.onRemoveWorld(k)}
+                >
+                  <Button danger size="small">
+                    삭제
+                  </Button>
+                </Popconfirm>
+              </Flex>
             )}
           />
         </Table>

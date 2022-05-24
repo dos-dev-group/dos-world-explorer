@@ -1,4 +1,9 @@
-import { GlobalOutlined, HomeOutlined, StarOutlined } from '@ant-design/icons';
+import {
+  GlobalOutlined,
+  HeartOutlined,
+  HomeOutlined,
+  StarOutlined,
+} from '@ant-design/icons';
 import { Layout, Menu, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
 import {
@@ -106,7 +111,7 @@ function MenuLayout() {
               {
                 label: 'Favorites',
                 key: 'favorite',
-                icon: <StarOutlined />,
+                icon: <HeartOutlined />,
                 onClick(ev) {
                   navigate('/favorite');
                 },
