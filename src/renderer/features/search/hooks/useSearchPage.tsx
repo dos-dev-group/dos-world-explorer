@@ -60,8 +60,10 @@ const useSearch = (): HookMember => {
         }
         return w.type === currentType;
       })
-      .filter(
-        (e) => e.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
+      .filter((e) =>
+        searchText.trim() === ''
+          ? true
+          : e.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
       ) || []
   ).reverse();
 
