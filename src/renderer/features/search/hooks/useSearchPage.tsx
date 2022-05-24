@@ -6,6 +6,7 @@ import {
 } from '@src/renderer/utils/ipc/editSheetToMain';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
 import { WorldSortOrder, World, WorldData, WorldEditInput } from '@src/types';
+import { message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
@@ -60,8 +61,10 @@ const useSearch = (): HookMember => {
         }
         return w.type === currentType;
       })
-      .filter(
-        (e) => e.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
+      .filter((e) =>
+        searchText.trim() === ''
+          ? true
+          : e.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
       ) || []
   ).reverse();
 
@@ -88,10 +91,14 @@ const useSearch = (): HookMember => {
       setVisibleAddWorldModal(false);
     },
     onAddWorld(world) {
-      addEditSheetToMain(world);
+      addEditSheetToMain(world).then(() => {
+        message.info('월드가 추가되었습니다');
+      });
     },
     onRemoveWorld(key) {
-      reomoveEditSheetToMain(key);
+      reomoveEditSheetToMain(key).then(() => {
+        message.info('월드가 삭제되었습니다');
+      });
     },
     onClickRefresh() {
       setIsLoading(true);

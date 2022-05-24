@@ -1,9 +1,4 @@
-import {
-  DesktopOutlined,
-  PieChartOutlined,
-  SearchOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { GlobalOutlined, HomeOutlined, StarOutlined } from '@ant-design/icons';
 import { Layout, Menu, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
 import {
@@ -95,7 +90,7 @@ function MenuLayout() {
               {
                 label: 'Home',
                 key: 'home',
-                icon: <PieChartOutlined />,
+                icon: <HomeOutlined />,
                 onClick(ev) {
                   navigate('/');
                 },
@@ -103,7 +98,7 @@ function MenuLayout() {
               {
                 label: 'World',
                 key: 'world',
-                icon: <DesktopOutlined />,
+                icon: <GlobalOutlined />,
                 onClick(ev) {
                   navigate('/world');
                 },
@@ -111,7 +106,7 @@ function MenuLayout() {
               {
                 label: 'Favorites',
                 key: 'favorite',
-                icon: <UserOutlined />,
+                icon: <StarOutlined />,
                 onClick(ev) {
                   navigate('/favorite');
                 },
