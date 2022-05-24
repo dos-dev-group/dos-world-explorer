@@ -1,16 +1,7 @@
-import {
-  FlexCenter,
-  FlexRow,
-} from '@src/renderer/components/styledComponents';
+import { FlexCenter, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { WorldEditInput } from '@src/types';
-import {
-  Button,
-  Image,
-  Modal,
-  Tag,
-  Typography,
-} from 'antd';
+import { Button, Image, Modal, Tag, Typography } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { useEffect, useState } from 'react';
 import useSearchPage from './hooks/useSearchPage';
@@ -83,11 +74,11 @@ function WorldInfoModal(props: Props) {
       <FlexRow>
         <div css={{ flex: 1 }}>
           <Typography.Title level={5}>
-            <div>Author: {worldAuthor}</div>
+            <div>제작자: {worldAuthor}</div>
             <div>
-              Score: <StarScore score={worldScore} />
+              별점: <StarScore score={worldScore} />
             </div>
-            Type: {worldType}
+            타입: {worldType}
             <div>
               {worldTags.map((tag) => {
                 const colorIndex =
