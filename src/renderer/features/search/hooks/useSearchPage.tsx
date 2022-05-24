@@ -20,6 +20,8 @@ interface HookMember {
   typeList: string[];
   currentTableData: World[];
   visibleAddWorldModal: boolean;
+  visibleWorldInfoModal: boolean;
+  keyOfWorldInfoModal: string;
   searchOptions: SearchOptions;
 
   onChangeSheetTab: (tabKey: string) => void;
@@ -30,8 +32,9 @@ interface HookMember {
   onAddWorld: (world: WorldEditInput) => void;
   onRemoveWorld: (key: string) => void;
   onClickRefresh: () => void;
+  onClickOpenWorldInfoModal: (key: string) => void;
+  onClickCloseWorldInfoModal: () => void;
   onClickFavorite: (world: World) => void;
-
   checkIsFavorite: (world: World) => boolean;
 }
 const useSearch = (): HookMember => {
@@ -40,6 +43,8 @@ const useSearch = (): HookMember => {
   const [searchText, setSearchText] = useRecoilState(searchTextState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [visibleAddWorldModal, setVisibleAddWorldModal] = useState(false);
+  const [visibleWorldInfoModal, setVisibleWorldInfoModal] = useState(false);
+  const [keyOfWorldInfoModal, setKeyOfWorldInfoModal] = useState<string>('');
   const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
 
   useEffect(() => {
@@ -83,6 +88,8 @@ const useSearch = (): HookMember => {
     typeList,
     currentTableData,
     visibleAddWorldModal,
+    visibleWorldInfoModal,
+    keyOfWorldInfoModal,
     searchOptions: SEARCH_OPTIONS,
 
     onChangeSheetTab(tabKey) {
@@ -116,6 +123,13 @@ const useSearch = (): HookMember => {
         setIsLoading(false);
         return setWorldData(data);
       });
+    },
+    onClickOpenWorldInfoModal(worldKey) {
+      setVisibleWorldInfoModal(true);
+      setKeyOfWorldInfoModal(worldKey);
+    },
+    onClickCloseWorldInfoModal() {
+      setVisibleWorldInfoModal(false);
     },
     onClickFavorite(world) {
       if (!favorites) {

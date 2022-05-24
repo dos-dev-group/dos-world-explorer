@@ -24,6 +24,8 @@ import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import useSearchPage from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
+import WorldInfoModal from './WorldInfoModal';
+import { css } from '@emotion/react';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -48,6 +50,17 @@ export default function SearchPage() {
         }}
         visible={hookMember.visibleAddWorldModal}
         types={hookMember.typeList}
+      />
+      <WorldInfoModal
+        onCancel={() => {
+          hookMember.onClickCloseWorldInfoModal();
+        }}
+        onOk={() => {
+          hookMember.onClickCloseWorldInfoModal();
+        }}
+        visible={hookMember.visibleWorldInfoModal}
+        types={hookMember.typeList}
+        worldKey={hookMember.keyOfWorldInfoModal}
       />
       <Search
         placeholder="Type Search Text"
@@ -135,6 +148,17 @@ export default function SearchPage() {
                 wordBreak: 'keep-all',
               },
             })}
+            render={(_, world) => (
+              <>
+                <a
+                  onClick={(e) => {
+                    hookMember.onClickOpenWorldInfoModal(world.key);
+                  }}
+                >
+                  {world.name}
+                </a>
+              </>
+            )}
           />
           <Column
             width="10%"
