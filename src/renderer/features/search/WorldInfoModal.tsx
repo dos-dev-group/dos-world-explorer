@@ -1,9 +1,8 @@
 import { FlexCenter, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
-import { WorldEditInput } from '@src/types';
+import { World, WorldEditInput } from '@src/types';
 import { Button, Image, Modal, Tag, Typography } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
-import { useEffect, useState } from 'react';
 import useSearchPage from './hooks/useSearchPage';
 import { format } from 'date-fns';
 
@@ -12,75 +11,38 @@ interface Props {
   onCancel?: () => void;
   visible: boolean;
   types: string[];
-  worldKey: string;
+  world: World;
 }
 
 function WorldInfoModal(props: Props) {
   const hookMember = useSearchPage();
 
-  const [worldKey, setWorldKey] = useState<string>();
-  const [worldName, setWorldName] = useState<string>();
-  const [worldAuthor, setWorldAuthor] = useState<string>();
-  const [worldType, setWorldType] = useState<string>();
-  const [worldUrl, setWorldUrl] = useState<string>('');
-  const [worldImageUrl, setWorldImageUrl] = useState<string>();
-  const [worldDate, setWorldDate] = useState<Date>(new Date());
-  const [worldDesc, setWorldDesc] = useState<string>();
-  const [worldTags, setWorldTags] = useState<string[]>([]);
-  const [worldScore, setWorldScore] = useState<number>(0);
-
-  useEffect(() => {
-    if (props.visible === true) {
-      setWorldKey(props.worldKey);
-      const world = hookMember.currentTableData.find((world) => {
-        return world.key === props.worldKey;
-      });
-      //const world = hookMember.worldrentTableData.find( world => {return world.key.toString() === worldKey?.toString()}); // 왜 안됨?
-      if (world !== undefined && world !== null) {
-        setWorldName(world?.name);
-        setWorldAuthor(world?.author);
-        setWorldType(world?.type);
-        if (world.url !== undefined) {
-          setWorldUrl(world.url);
-        }
-        setWorldImageUrl(world?.imageUrl);
-        setWorldDate(world?.date);
-        setWorldDesc(world?.description);
-        setWorldTags(world?.tags);
-        if (world?.score !== undefined) {
-          setWorldScore(world.score);
-        }
-      } else {
-      }
-    }
-  }, [props.visible]);
-
   return (
     <Modal
-      title={worldName}
+      title={props.world.name}
       onOk={() => {
         props.onCancel?.();
       }}
       destroyOnClose
       onCancel={props.onCancel}
       visible={props.visible}
-      width="80%"
+      width="60%"
       footer={[]}
     >
       <FlexCenter>
-        <Image src={worldImageUrl} width="60%"></Image>
+        <Image src={props.world.imageUrl} width="70%"></Image>
       </FlexCenter>
       <br />
       <FlexRow>
         <div css={{ flex: 1 }}>
           <Typography.Title level={5}>
-            <div>제작자: {worldAuthor}</div>
+            <div>제작자: {props.world.author}</div>
             <div>
-              별점: <StarScore score={worldScore} />
+              별점: <StarScore score={props.world.score} />
             </div>
-            타입: {worldType}
+            타입: {props.world.type}
             <div>
-              {worldTags.map((tag) => {
+              {props.world.tags.map((tag) => {
                 const colorIndex =
                   simpleStringHash(tag) % PresetColorTypes.length;
                 const color = PresetColorTypes[colorIndex];
@@ -94,24 +56,19 @@ function WorldInfoModal(props: Props) {
           </Typography.Title>
           <div css={{ marginTop: 20 }}>
             <Typography.Text>
-              Recorded Date: {format(worldDate, 'yyyy-MM-dd HH:mm:ss')} GMT{' '}
-              {worldDate.getTimezoneOffset() / 60}
+              Recorded Date: {format(props.world.date, 'yyyy-MM-dd HH:mm:ss')}{' '}
+              GMT {props.world.date.getTimezoneOffset() / 60}
               <br />
-              ID: {worldKey}
+              ID: {props.world.key}
             </Typography.Text>
           </div>
         </div>
 
         <div css={{ flex: 1 }}>
-          <Button
-            type="default"
-            onClick={() => hookMember.onClickUrl(worldUrl.toString())}
-          >
-            World Link
-          </Button>
+          <WorldLink worldKey={props.world.key} url={props.world.url} />
           <br />
           <Typography.Paragraph css={{ marginTop: 20 }}>
-            {worldDesc}
+            {props.world.description}
           </Typography.Paragraph>
         </div>
       </FlexRow>
@@ -128,4 +85,16 @@ function StarScore(props: { score: number }) {
   }
 
   return <>{stars}</>;
+}
+
+function WorldLink(props: { worldKey: string; url: string }) {
+  if (props.worldKey.charAt(0) === 'n' && props.worldKey.charAt(1) === 'o') {
+    return <Button disabled>World Link</Button>;
+  } else {
+    return (
+      <Typography.Link target="_blank" href={props.url}>
+        <Button>World Link</Button>
+      </Typography.Link>
+    );
+  }
 }

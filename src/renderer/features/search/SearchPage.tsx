@@ -51,17 +51,7 @@ export default function SearchPage() {
         visible={hookMember.visibleAddWorldModal}
         types={hookMember.typeList}
       />
-      <WorldInfoModal
-        onCancel={() => {
-          hookMember.onClickCloseWorldInfoModal();
-        }}
-        onOk={() => {
-          hookMember.onClickCloseWorldInfoModal();
-        }}
-        visible={hookMember.visibleWorldInfoModal}
-        types={hookMember.typeList}
-        worldKey={hookMember.keyOfWorldInfoModal}
-      />
+
       <Search
         placeholder="Type Search Text"
         allowClear
@@ -152,11 +142,22 @@ export default function SearchPage() {
               <>
                 <a
                   onClick={(e) => {
-                    hookMember.onClickOpenWorldInfoModal(world.key);
+                    hookMember.onClickOpenWorldInfoModal(world);
                   }}
                 >
                   {world.name}
                 </a>
+                <WorldInfoModal
+                  onCancel={() => {
+                    hookMember.onClickCloseWorldInfoModal();
+                  }}
+                  onOk={() => {
+                    hookMember.onClickCloseWorldInfoModal();
+                  }}
+                  visible={hookMember.infoModalWorld?.key === world.key}
+                  types={hookMember.typeList}
+                  world={world}
+                />
               </>
             )}
           />
