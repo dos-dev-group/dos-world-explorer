@@ -1,4 +1,9 @@
-import { GlobalOutlined, HomeOutlined, StarOutlined } from '@ant-design/icons';
+import {
+  GlobalOutlined,
+  HeartOutlined,
+  HomeOutlined,
+  StarOutlined,
+} from '@ant-design/icons';
 import { Layout, Menu, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
 import {
@@ -10,9 +15,11 @@ import {
   useLocation,
   Navigate,
 } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 // import './App.css';
 import { Flex } from './components/styledComponents';
-import Favorite from './features/favorite/Favorite';
+import { worldFavoritesState } from './data/favorites';
+import FavoritePage from './features/favorite/FavoritePage';
 import Home from './features/home/Home';
 import SearchPage from './features/search/SearchPage';
 
@@ -106,7 +113,7 @@ function MenuLayout() {
               {
                 label: 'Favorites',
                 key: 'favorite',
-                icon: <StarOutlined />,
+                icon: <HeartOutlined />,
                 onClick(ev) {
                   navigate('/favorite');
                 },
@@ -126,6 +133,8 @@ function MenuLayout() {
 }
 
 export default function App() {
+  useRecoilValue(worldFavoritesState);
+
   return (
     <Router>
       <Routes>
@@ -133,7 +142,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="world" element={<SearchPage />} />
           <Route path="favorite" element={<Navigate replace to="일반" />} />
-          <Route path="favorite/:type" element={<Favorite />} />
+          <Route path="favorite/:type" element={<FavoritePage />} />
         </Route>
       </Routes>
     </Router>

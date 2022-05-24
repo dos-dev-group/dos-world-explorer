@@ -1,4 +1,9 @@
-import { ReloadOutlined, StarFilled } from '@ant-design/icons';
+import {
+  HeartFilled,
+  HeartOutlined,
+  ReloadOutlined,
+  StarFilled,
+} from '@ant-design/icons';
 import {
   Button,
   Image,
@@ -11,12 +16,12 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { gold } from '@ant-design/colors';
+import { gold, red } from '@ant-design/colors';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
-import { World, WorldSortOrder } from '@src/types';
+import { World } from '@src/types';
 import useSearchPage from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 
@@ -88,6 +93,27 @@ export default function SearchPage() {
             </FlexRow>
           )}
         >
+          <Column
+            width="5%"
+            title=""
+            key="favorite"
+            render={(_, record: World) => {
+              if (hookMember.checkIsFavorite(record)) {
+                return (
+                  <HeartFilled
+                    css={{ color: red.primary }}
+                    onClick={() => hookMember.onClickFavorite(record)}
+                  />
+                );
+              }
+              return (
+                <HeartOutlined
+                  css={{ color: red.primary }}
+                  onClick={() => hookMember.onClickFavorite(record)}
+                />
+              );
+            }}
+          />
           <Column
             width="10%"
             title="이미지"
@@ -182,15 +208,17 @@ export default function SearchPage() {
             width="5%"
             dataIndex="key"
             render={(k, record) => (
-              <Popconfirm
-                title="정말 월드를 삭제하시겠습니까?"
-                placement="topRight"
-                onConfirm={() => hookMember.onRemoveWorld(k)}
-              >
-                <Button danger size="small">
-                  삭제
-                </Button>
-              </Popconfirm>
+              <Flex>
+                <Popconfirm
+                  title="정말 월드를 삭제하시겠습니까?"
+                  placement="topRight"
+                  onConfirm={() => hookMember.onRemoveWorld(k)}
+                >
+                  <Button danger size="small">
+                    삭제
+                  </Button>
+                </Popconfirm>
+              </Flex>
             )}
           />
         </Table>
