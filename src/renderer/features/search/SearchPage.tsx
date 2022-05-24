@@ -11,6 +11,7 @@ import {
   Tag,
   Typography,
 } from 'antd';
+import { gold } from '@ant-design/colors';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
@@ -68,7 +69,7 @@ export default function SearchPage() {
       />
 
       <Spin spinning={hookMember.isLoading}>
-        <Table<World>
+        <Table
           dataSource={hookMember.currentTableData}
           scroll={{
             x: true,
@@ -96,14 +97,18 @@ export default function SearchPage() {
                 <Image src={imageUrl} width={130} />
               </>
             )}
-            ellipsis
           />
           <Column
             width="10%"
             title="이름"
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
-            ellipsis
+            onCell={(w) => ({
+              style: {
+                width: 200,
+                wordBreak: 'keep-all',
+              },
+            })}
           />
           <Column
             width="10%"
@@ -113,11 +118,14 @@ export default function SearchPage() {
             ellipsis
           />
           <Column
-            width="20%"
+            width="30%"
             title="설명"
             dataIndex="description"
             render={(value) => (
-              <Typography.Paragraph css={{ wordBreak: 'keep-all' }}>
+              <Typography.Paragraph
+                css={{ wordBreak: 'keep-all', width: 180 }}
+                ellipsis={{ rows: 3, expandable: true }}
+              >
                 {value}
               </Typography.Paragraph>
             )}
@@ -146,13 +154,13 @@ export default function SearchPage() {
             ellipsis
           />
           <Column
-            width="5%"
+            width="10%"
             title="별점"
             dataIndex="score"
             render={(score: number) => (
               <FlexRow>
                 {new Array(score).fill(null).map((_, index) => (
-                  <StarFilled key={index} />
+                  <StarFilled key={index} css={{ color: gold.primary }} />
                 ))}
               </FlexRow>
             )}
