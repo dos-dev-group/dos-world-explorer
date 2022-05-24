@@ -1,6 +1,6 @@
 import { Favorites } from '@src/types';
 import { atom, AtomEffect } from 'recoil';
-import { loadFavorites, saveFavorites } from '../utils/ipc/favorites';
+import { loadFavorites, saveFavorites } from '../utils/ipc/favoritesUtils';
 
 const favoriteEffect =
   (): AtomEffect<Favorites | undefined> =>
