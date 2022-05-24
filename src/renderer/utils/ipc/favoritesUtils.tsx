@@ -6,7 +6,6 @@ export function saveFavorites(favorites: Favorites) {
   return new Promise<Favorites>((resolve, reject) => {
     window.electron.ipcRenderer.once('saveFavorites', (result: unknown) => {
       if (result === null) reject(new Error('Fail to Save Favorites'));
-      console.log('saveFavorites', result);
       resolve(result as Favorites);
     });
   });
