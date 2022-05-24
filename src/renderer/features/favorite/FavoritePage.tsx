@@ -142,14 +142,12 @@ export default function FavoritePage() {
                   simpleStringHash(tag) % PresetColorTypes.length;
                 const color = PresetColorTypes[colorIndex];
                 return (
-                  <>
-                    <Tag color={color} key={tag}>
-                      {tag.toUpperCase()}
-                    </Tag>
+                  <span key={tag}>
+                    <Tag color={color}>{tag.toUpperCase()}</Tag>
                     {(index + 1) / 4 > 0 && (index + 1) % 4 === 0 ? (
                       <br />
                     ) : undefined}
-                  </>
+                  </span>
                 );
               })}
             </>
