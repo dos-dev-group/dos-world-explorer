@@ -15,6 +15,8 @@ interface HookMember {
   typeList: string[];
   currentTableData: World[];
   visibleAddWorldModal: boolean;
+  visibleWorldInfoModal: boolean;
+  keyOfWorldInfoModal: string;
 
   onChangeSheetTab: (tabKey: string) => void;
   onClickUrl: (url: string) => void;
@@ -24,6 +26,8 @@ interface HookMember {
   onAddWorld: (world: WorldEditInput) => void;
   onRemoveWorld: (key: string) => void;
   onClickRefresh: () => void;
+  onClickOpenWorldInfoModal: (key: string) => void;
+  onClickCloseWorldInfoModal: () => void;
 }
 const useSearch = (): HookMember => {
   const [currentType, setCurrentType] = useState<string>('전체');
@@ -31,6 +35,8 @@ const useSearch = (): HookMember => {
   const [searchText, setSearchText] = useRecoilState(searchTextState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [visibleAddWorldModal, setVisibleAddWorldModal] = useState(false);
+  const [visibleWorldInfoModal, setVisibleWorldInfoModal] = useState(false);
+  const [keyOfWorldInfoModal, setKeyOfWorldInfoModal] = useState<string>('');
 
   useEffect(() => {
     if (worldData === undefined) {
@@ -71,6 +77,8 @@ const useSearch = (): HookMember => {
     typeList,
     currentTableData,
     visibleAddWorldModal,
+    visibleWorldInfoModal,
+    keyOfWorldInfoModal,
 
     onChangeSheetTab(tabKey) {
       setCurrentType(tabKey);
@@ -99,6 +107,13 @@ const useSearch = (): HookMember => {
         setIsLoading(false);
         return setWorldData(data);
       });
+    },
+    onClickOpenWorldInfoModal(worldKey) {
+      setVisibleWorldInfoModal(true);
+      setKeyOfWorldInfoModal(worldKey);
+    },
+    onClickCloseWorldInfoModal() {
+      setVisibleWorldInfoModal(false);
     },
   };
 };
