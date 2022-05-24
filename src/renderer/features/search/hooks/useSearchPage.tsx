@@ -79,7 +79,7 @@ const useSearch = (): HookMember => {
       setCurrentType(tabKey);
     },
     onClickUrl(url) {
-      openExternalLink(url);
+      // openExternalLink(url);
     },
     onSearchWorlds(text) {
       setSearchText(text);

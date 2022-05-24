@@ -9,6 +9,7 @@ import {
   Table,
   Tabs,
   Tag,
+  Typography,
 } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
@@ -88,62 +89,64 @@ export default function SearchPage() {
         >
           <Column
             width="10%"
-            title="Image"
+            title="이미지"
             dataIndex="imageUrl"
             render={(imageUrl) => (
               <>
-                <Image src={imageUrl} />
+                <Image src={imageUrl} width={130} />
               </>
+            )}
+            ellipsis
+          />
+          <Column
+            width="10%"
+            title="이름"
+            dataIndex="name"
+            sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
+            ellipsis
+          />
+          <Column
+            width="10%"
+            title="제작자"
+            dataIndex="author"
+            sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
+            ellipsis
+          />
+          <Column
+            width="20%"
+            title="설명"
+            dataIndex="description"
+            render={(value) => (
+              <Typography.Paragraph css={{ wordBreak: 'keep-all' }}>
+                {value}
+              </Typography.Paragraph>
             )}
           />
           <Column
             width="15%"
-            title="Name"
-            dataIndex="name"
-            sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
-          />
-          <Column
-            width="10%"
-            title="Author"
-            dataIndex="author"
-            sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
-          />
-          <Column width="25%" title="Description" dataIndex="description" />
-          <Column
-            width="10%"
-            title="Tags"
+            title="태그"
             dataIndex="tags"
             render={(tags: any[]) => (
               <>
-                {tags.map((tag) => {
+                {tags.map((tag, index) => {
                   const colorIndex =
                     simpleStringHash(tag) % PresetColorTypes.length;
                   const color = PresetColorTypes[colorIndex];
                   return (
-                    <Tag color={color} key={tag}>
-                      {tag.toUpperCase()}
-                    </Tag>
+                    <>
+                      <Tag color={color} key={tag}>
+                        {tag.toUpperCase()}
+                      </Tag>
+                      {index / 3 > 0 && index % 3 === 0 ? <br /> : undefined}
+                    </>
                   );
                 })}
               </>
             )}
+            ellipsis
           />
           <Column
-            width="20%"
-            title="URL"
-            dataIndex="url"
-            render={(url: string) => (
-              <Button
-                type="link"
-                onClick={() => hookMember.onClickUrl(url)}
-                css={{ whiteSpace: 'normal' }}
-              >
-                {url}
-              </Button>
-            )}
-          />
-          <Column
-            width="10%"
+            width="5%"
             title="별점"
             dataIndex="score"
             render={(score: number) => (
@@ -154,6 +157,16 @@ export default function SearchPage() {
               </FlexRow>
             )}
             sorter={(a: World, b: World) => a.score - b.score}
+          />
+          <Column
+            width="15%"
+            title="URL"
+            dataIndex="url"
+            render={(url: string) => (
+              <Typography.Link href={url} target="_blank">
+                {url}
+              </Typography.Link>
+            )}
           />
           <Column
             width="5%"

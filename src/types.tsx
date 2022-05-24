@@ -23,6 +23,10 @@ export type WorldEditOutput = Omit<
 
 export type WorldData = World[];
 
+export interface Favorites {
+  [favName: string]: World[];
+}
+
 export enum WorldSortOrder {
   NONE,
   SCORE,
