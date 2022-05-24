@@ -95,8 +95,9 @@ const createWindow = async () => {
     mainWindow = null;
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  // const menuBuilder = new MenuBuilder(mainWindow);
+  // menuBuilder.buildMenu();
+  mainWindow.removeMenu();
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -106,7 +107,7 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
 };
 
 /**

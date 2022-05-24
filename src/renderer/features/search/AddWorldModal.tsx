@@ -11,6 +11,7 @@ import {
   Input,
   InputNumber,
   Modal,
+  Rate,
   Row,
   Select,
   Space,
@@ -117,13 +118,13 @@ function AddWorldModal(props: Props) {
           </Row>
           <Row gutter={8}>
             <Col span={12}>
-              <Input disabled value={worldCheckInfo?.name} addonBefore="Name" />
+              <Input disabled value={worldCheckInfo?.name} addonBefore="이름" />
             </Col>
             <Col span={12}>
               <Input
                 disabled
                 value={worldCheckInfo?.author}
-                addonBefore="Author"
+                addonBefore="제작자"
               />
             </Col>
           </Row>
@@ -132,7 +133,7 @@ function AddWorldModal(props: Props) {
               <Input
                 disabled
                 value={worldCheckInfo?.key}
-                addonBefore="World Key"
+                addonBefore="월드 ID"
               />
             </Col>
           </Row>
@@ -141,15 +142,11 @@ function AddWorldModal(props: Props) {
 
       <Input.Group css={{ marginTop: spacing(1) }}>
         <Typography.Title level={5}>별점</Typography.Title>
-        <InputNumber
-          css={{
-            width: 200,
-          }}
-          max={6}
-          min={1}
+        <Rate
+          allowClear={false}
+          count={6}
           value={curScore}
-          onChange={(v) => setCurScore(v)}
-          precision={0}
+          onChange={(n) => setCurScore(n)}
         />
       </Input.Group>
       <Input.Group css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>

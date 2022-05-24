@@ -1,4 +1,9 @@
-import { ReloadOutlined, StarFilled } from '@ant-design/icons';
+import {
+  HeartFilled,
+  HeartOutlined,
+  ReloadOutlined,
+  StarFilled,
+} from '@ant-design/icons';
 import {
   Button,
   Image,
@@ -9,12 +14,14 @@ import {
   Table,
   Tabs,
   Tag,
+  Typography,
 } from 'antd';
+import { gold, red } from '@ant-design/colors';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
-import { World, WorldSortOrder } from '@src/types';
+import { World } from '@src/types';
 import useSearchPage from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 import WorldInfoModal from './WorldInfoModal';
@@ -80,7 +87,7 @@ export default function SearchPage() {
       />
 
       <Spin spinning={hookMember.isLoading}>
-        <Table<World>
+        <Table
           dataSource={hookMember.currentTableData}
           scroll={{
             x: true,
@@ -100,20 +107,47 @@ export default function SearchPage() {
           )}
         >
           <Column
+            width="5%"
+            title=""
+            key="favorite"
+            render={(_, record: World) => {
+              if (hookMember.checkIsFavorite(record)) {
+                return (
+                  <HeartFilled
+                    css={{ color: red.primary }}
+                    onClick={() => hookMember.onClickFavorite(record)}
+                  />
+                );
+              }
+              return (
+                <HeartOutlined
+                  css={{ color: red.primary }}
+                  onClick={() => hookMember.onClickFavorite(record)}
+                />
+              );
+            }}
+          />
+          <Column
             width="10%"
-            title="Image"
+            title="이미지"
             dataIndex="imageUrl"
             render={(imageUrl) => (
               <>
-                <Image src={imageUrl} />
+                <Image src={imageUrl} width={130} />
               </>
             )}
           />
           <Column
-            width="15%"
-            title="Name"
+            width="10%"
+            title="이름"
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
+            onCell={(w) => ({
+              style: {
+                width: 200,
+                wordBreak: 'keep-all',
+              },
+            })}
             render={(_, world) => (
               <>
                 <a
@@ -128,43 +162,48 @@ export default function SearchPage() {
           />
           <Column
             width="10%"
-            title="Author"
+            title="제작자"
             dataIndex="author"
             sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
+            ellipsis
           />
-          <Column width="25%" title="Description" dataIndex="description" />
           <Column
-            width="10%"
-            title="Tags"
+            width="30%"
+            title="설명"
+            dataIndex="description"
+            render={(value) => (
+              <Typography.Paragraph
+                css={{ wordBreak: 'keep-all', width: 180 }}
+                ellipsis={{ rows: 3, expandable: true }}
+              >
+                {value}
+              </Typography.Paragraph>
+            )}
+          />
+          <Column
+            width="15%"
+            title="태그"
             dataIndex="tags"
             render={(tags: any[]) => (
               <>
-                {tags.map((tag) => {
+                {tags.map((tag, index) => {
                   const colorIndex =
                     simpleStringHash(tag) % PresetColorTypes.length;
                   const color = PresetColorTypes[colorIndex];
                   return (
-                    <Tag color={color} key={tag}>
-                      {tag.toUpperCase()}
-                    </Tag>
+                    <>
+                      <Tag color={color} key={tag}>
+                        {tag.toUpperCase()}
+                      </Tag>
+                      {(index + 1) / 4 > 0 && (index + 1) % 4 === 0 ? (
+                        <br />
+                      ) : undefined}
+                    </>
                   );
                 })}
               </>
             )}
-          />
-          <Column
-            width="20%"
-            title="URL"
-            dataIndex="url"
-            render={(url: string) => (
-              <Button
-                type="link"
-                onClick={() => hookMember.onClickUrl(url)}
-                css={{ whiteSpace: 'normal' }}
-              >
-                {url}
-              </Button>
-            )}
+            ellipsis
           />
           <Column
             width="10%"
@@ -173,25 +212,37 @@ export default function SearchPage() {
             render={(score: number) => (
               <FlexRow>
                 {new Array(score).fill(null).map((_, index) => (
-                  <StarFilled key={index} />
+                  <StarFilled key={index} css={{ color: gold.primary }} />
                 ))}
               </FlexRow>
             )}
             sorter={(a: World, b: World) => a.score - b.score}
           />
           <Column
+            width="15%"
+            title="URL"
+            dataIndex="url"
+            render={(url: string) => (
+              <Typography.Link href={url} target="_blank">
+                {url}
+              </Typography.Link>
+            )}
+          />
+          <Column
             width="5%"
             dataIndex="key"
             render={(k, record) => (
-              <Popconfirm
-                title="정말 월드를 삭제하시겠습니까?"
-                placement="topRight"
-                onConfirm={() => hookMember.onRemoveWorld(k)}
-              >
-                <Button danger size="small">
-                  삭제
-                </Button>
-              </Popconfirm>
+              <Flex>
+                <Popconfirm
+                  title="정말 월드를 삭제하시겠습니까?"
+                  placement="topRight"
+                  onConfirm={() => hookMember.onRemoveWorld(k)}
+                >
+                  <Button danger size="small">
+                    삭제
+                  </Button>
+                </Popconfirm>
+              </Flex>
             )}
           />
         </Table>

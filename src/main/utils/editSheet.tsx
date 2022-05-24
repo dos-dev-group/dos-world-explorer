@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import * as vrchat from 'vrchat';
+import axios, { AxiosError } from 'axios';
 import {
   World,
   WorldData,
@@ -30,9 +31,28 @@ const client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+async function transeImageUrl(imageUrl: string): Promise<string> {
+  try {
+    const html = await axios.get(imageUrl);
+    console.log(html.request.res.responseUrl);
+    return html.request.res.responseUrl;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
 export async function testEditSheet() {
   // console.log(await getWorldData());
+  try {
+    const html = await axios.get(
+      'https://api.vrchat.cloud/api/1/file/file_d277663f-b174-4cd7-aec4-f109608d558e/2/file',
+    );
+    console.log(html.request.res.responseUrl);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function autoFile(worldUrl: string): Promise<WorldEditOutput> {
@@ -43,7 +63,7 @@ export async function autoFile(worldUrl: string): Promise<WorldEditOutput> {
   const worldData = (await WorldsApi.getWorld(worldId)).data;
   const nowTime = new Date();
   console.log(worldId);
-  console.log(worldData.thumbnailImageUrl);
+  console.log(transeImageUrl(worldData.thumbnailImageUrl));
   console.log(worldData.name);
   console.log(worldData.authorName);
   console.log(nowTime.toISOString().replace('T', ' ').split('.')[0]);
@@ -51,7 +71,7 @@ export async function autoFile(worldUrl: string): Promise<WorldEditOutput> {
     key: worldId,
     name: worldData.name,
     author: worldData.authorName,
-    imageUrl: worldData.thumbnailImageUrl,
+    imageUrl: await transeImageUrl(worldData.thumbnailImageUrl),
     date: nowTime,
   };
 }

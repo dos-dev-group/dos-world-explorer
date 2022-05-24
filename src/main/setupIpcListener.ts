@@ -6,6 +6,7 @@ import {
   modifyEditSheet,
   autoFile,
 } from './utils/editSheet';
+import { loadFavorites, saveFavorites } from './utils/filesystem';
 
 export default function setupIpcListener() {
   ipcMain.on('ipc-example', async (event, arg) => {
@@ -42,5 +43,20 @@ export default function setupIpcListener() {
 
   ipcMain.on('autoFileToMain', async (event, arg) => {
     event.reply('autoFileToRenderer', await autoFile(arg[0]));
+  });
+
+  ipcMain.on('saveFavorites', async (event, arg) => {
+    try {
+      event.reply('saveFavorites', await saveFavorites(arg[0]));
+    } catch {
+      event.reply('saveFavorites', null);
+    }
+  });
+  ipcMain.on('loadFavorites', async (event, arg) => {
+    try {
+      event.reply('loadFavorites', await loadFavorites());
+    } catch {
+      event.reply('loadFavorites', null);
+    }
   });
 }
