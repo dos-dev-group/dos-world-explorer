@@ -11,6 +11,7 @@ import {
   Input,
   InputNumber,
   Modal,
+  Rate,
   Row,
   Select,
   Space,
@@ -141,15 +142,11 @@ function AddWorldModal(props: Props) {
 
       <Input.Group css={{ marginTop: spacing(1) }}>
         <Typography.Title level={5}>별점</Typography.Title>
-        <InputNumber
-          css={{
-            width: 200,
-          }}
-          max={6}
-          min={1}
+        <Rate
+          allowClear={false}
+          count={6}
           value={curScore}
-          onChange={(v) => setCurScore(v)}
-          precision={0}
+          onChange={(n) => setCurScore(n)}
         />
       </Input.Group>
       <Input.Group css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>

@@ -2,7 +2,7 @@ import { Favorites } from '@src/types';
 import { atom, AtomEffect } from 'recoil';
 import { loadFavorites, saveFavorites } from '../utils/ipc/favorites';
 
-const saveEffect =
+const favoriteEffect =
   (): AtomEffect<Favorites | undefined> =>
   ({ trigger, onSet, setSelf }) => {
     if (trigger === 'get') {
@@ -19,5 +19,5 @@ const saveEffect =
 export const worldFavoritesState = atom<Favorites | undefined>({
   key: 'worldFavoritesState',
   default: undefined,
-  effects: [saveEffect()],
+  effects: [favoriteEffect()],
 });

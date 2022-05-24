@@ -19,7 +19,8 @@ export function loadFavorites() {
       if (result === null) {
         reject(new NoDataError('Fail Load Favorites'));
       }
-      resolve(JSON.parse(JSON.stringify(result)) as Favorites);
+      // eslint-disable-next-line no-new-object
+      resolve(new Object(result) as Favorites);
     });
   });
 }

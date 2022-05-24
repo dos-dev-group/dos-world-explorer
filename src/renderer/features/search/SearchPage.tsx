@@ -16,12 +16,12 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { gold } from '@ant-design/colors';
+import { gold, red } from '@ant-design/colors';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
-import { World, WorldSortOrder } from '@src/types';
+import { World } from '@src/types';
 import useSearchPage from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 
@@ -101,12 +101,14 @@ export default function SearchPage() {
               if (hookMember.checkIsFavorite(record)) {
                 return (
                   <HeartFilled
+                    css={{ color: red.primary }}
                     onClick={() => hookMember.onClickFavorite(record)}
                   />
                 );
               }
               return (
                 <HeartOutlined
+                  css={{ color: red.primary }}
                   onClick={() => hookMember.onClickFavorite(record)}
                 />
               );

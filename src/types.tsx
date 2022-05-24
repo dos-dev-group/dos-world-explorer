@@ -27,12 +27,6 @@ export interface Favorites {
   [favName: string]: World[];
 }
 
-export enum WorldSortOrder {
-  NONE,
-  SCORE,
-  AUTHOR,
-}
-
 export enum EditResult {
   SUCCESS = 0,
   UNKNOWN = 1,

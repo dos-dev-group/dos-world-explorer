@@ -6,10 +6,13 @@ import {
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
-import { WorldSortOrder, World, WorldData, WorldEditInput } from '@src/types';
+import { World, WorldEditInput } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+
+const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
+type SearchOptions = typeof SEARCH_OPTIONS;
 
 interface HookMember {
   currentType: string;
@@ -17,6 +20,7 @@ interface HookMember {
   typeList: string[];
   currentTableData: World[];
   visibleAddWorldModal: boolean;
+  searchOptions: SearchOptions;
 
   onChangeSheetTab: (tabKey: string) => void;
   onClickUrl: (url: string) => void;
@@ -79,6 +83,7 @@ const useSearch = (): HookMember => {
     typeList,
     currentTableData,
     visibleAddWorldModal,
+    searchOptions: SEARCH_OPTIONS,
 
     onChangeSheetTab(tabKey) {
       setCurrentType(tabKey);
@@ -119,6 +124,7 @@ const useSearch = (): HookMember => {
       }
       setFavorites((v) => {
         const val = { ...v };
+        val.favorite1 = [...val.favorite1];
         if (val.favorite1.find((e) => e.key === world.key)) {
           val.favorite1 = val.favorite1.filter((e) => e.key !== world.key);
           return val;
