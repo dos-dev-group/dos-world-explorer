@@ -108,7 +108,7 @@ export default function SearchPage() {
         >
           <Column
             width="5%"
-            title=""
+            // title=""
             key="favorite"
             render={(_, record: World) => {
               if (hookMember.checkIsFavorite(record)) {
@@ -184,6 +184,7 @@ export default function SearchPage() {
             width="15%"
             title="태그"
             dataIndex="tags"
+            ellipsis
             render={(tags: any[]) => (
               <>
                 {tags.map((tag, index) => {
@@ -191,19 +192,16 @@ export default function SearchPage() {
                     simpleStringHash(tag) % PresetColorTypes.length;
                   const color = PresetColorTypes[colorIndex];
                   return (
-                    <>
-                      <Tag color={color} key={tag}>
-                        {tag.toUpperCase()}
-                      </Tag>
+                    <span key={tag}>
+                      <Tag color={color}>{tag.toUpperCase()}</Tag>
                       {(index + 1) / 4 > 0 && (index + 1) % 4 === 0 ? (
                         <br />
                       ) : undefined}
-                    </>
+                    </span>
                   );
                 })}
               </>
             )}
-            ellipsis
           />
           <Column
             width="10%"
