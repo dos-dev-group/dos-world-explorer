@@ -1,4 +1,5 @@
 import 'antd/dist/antd.css';
+import './global.css';
 import { createRoot } from 'react-dom/client';
 import { RecoilRoot } from 'recoil';
 import App from './App';

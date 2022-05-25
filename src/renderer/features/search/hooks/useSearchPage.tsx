@@ -1,3 +1,4 @@
+import { worldFavoritesState } from '@src/renderer/data/favorites';
 import { searchTextState, worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
@@ -5,9 +6,13 @@ import {
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
-import { WorldSortOrder, World, WorldData, WorldEditInput } from '@src/types';
+import { World, WorldEditInput } from '@src/types';
+import { message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+
+const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
+type SearchOptions = typeof SEARCH_OPTIONS;
 
 interface HookMember {
   currentType: string;
@@ -15,6 +20,8 @@ interface HookMember {
   typeList: string[];
   currentTableData: World[];
   visibleAddWorldModal: boolean;
+  infoModalWorld: World | undefined;
+  searchOptions: SearchOptions;
 
   onChangeSheetTab: (tabKey: string) => void;
   onClickUrl: (url: string) => void;
@@ -24,6 +31,10 @@ interface HookMember {
   onAddWorld: (world: WorldEditInput) => void;
   onRemoveWorld: (key: string) => void;
   onClickRefresh: () => void;
+  onClickOpenWorldInfoModal: (world: World) => void;
+  onClickCloseWorldInfoModal: () => void;
+  onClickFavorite: (world: World) => void;
+  checkIsFavorite: (world: World) => boolean;
 }
 const useSearch = (): HookMember => {
   const [currentType, setCurrentType] = useState<string>('전체');
@@ -31,6 +42,10 @@ const useSearch = (): HookMember => {
   const [searchText, setSearchText] = useRecoilState(searchTextState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [visibleAddWorldModal, setVisibleAddWorldModal] = useState(false);
+  const [infoModalWorld, setInfoModalWorld] = useState<
+    World | undefined
+  >(undefined);
+  const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
 
   useEffect(() => {
     if (worldData === undefined) {
@@ -60,8 +75,10 @@ const useSearch = (): HookMember => {
         }
         return w.type === currentType;
       })
-      .filter(
-        (e) => e.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
+      .filter((e) =>
+        searchText.trim() === ''
+          ? true
+          : e.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
       ) || []
   ).reverse();
 
@@ -71,12 +88,14 @@ const useSearch = (): HookMember => {
     typeList,
     currentTableData,
     visibleAddWorldModal,
+    infoModalWorld: infoModalWorld,
+    searchOptions: SEARCH_OPTIONS,
 
     onChangeSheetTab(tabKey) {
       setCurrentType(tabKey);
     },
     onClickUrl(url) {
-      openExternalLink(url);
+      // openExternalLink(url);
     },
     onSearchWorlds(text) {
       setSearchText(text);
@@ -88,10 +107,14 @@ const useSearch = (): HookMember => {
       setVisibleAddWorldModal(false);
     },
     onAddWorld(world) {
-      addEditSheetToMain(world);
+      addEditSheetToMain(world).then(() => {
+        message.info('월드가 추가되었습니다');
+      });
     },
     onRemoveWorld(key) {
-      reomoveEditSheetToMain(key);
+      reomoveEditSheetToMain(key).then(() => {
+        message.info('월드가 삭제되었습니다');
+      });
     },
     onClickRefresh() {
       setIsLoading(true);
@@ -99,6 +122,36 @@ const useSearch = (): HookMember => {
         setIsLoading(false);
         return setWorldData(data);
       });
+    },
+    onClickOpenWorldInfoModal(w) {
+      setInfoModalWorld(w);
+    },
+    onClickCloseWorldInfoModal() {
+      setInfoModalWorld(undefined);
+    },
+    onClickFavorite(world) {
+      if (!favorites) {
+        message.loading('Favorite 불러오는 중');
+        return;
+      }
+      setFavorites((v) => {
+        const val = { ...v };
+        val.favorite1 = [...val.favorite1];
+        if (val.favorite1.find((e) => e.key === world.key)) {
+          val.favorite1 = val.favorite1.filter((e) => e.key !== world.key);
+          return val;
+        }
+        val.favorite1.push(world);
+        return val;
+      });
+    },
+    checkIsFavorite(world) {
+      if (favorites?.favorite1) {
+        return favorites.favorite1.find((e) => e.key === world.key)
+          ? true
+          : false;
+      }
+      return false;
     },
   };
 };
