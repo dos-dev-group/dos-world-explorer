@@ -6,7 +6,7 @@ import {
   modifyEditSheet,
   autoFile,
 } from './utils/editSheet';
-import { loadFavorites, saveFavorites } from './utils/filesystem';
+import { loadFavorites, saveFavorites } from './utils/favorites';
 
 export default function setupIpcListener() {
   ipcMain.on('ipc-example', async (event, arg) => {
