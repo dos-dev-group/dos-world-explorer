@@ -24,7 +24,7 @@ import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
-import WorldInfoModal from './WorldInfoModal';
+import WorldInfoModal from '../../components/WorldInfoModal';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -59,6 +59,26 @@ export default function SearchPage() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+      <WorldInfoModal
+        onCancel={() => {
+          hookMember.onClickCloseWorldInfoModal();
+        }}
+        visible={hookMember.infoModalWorld ? true : false}
+        world={
+          hookMember.infoModalWorld || {
+            author: '',
+            date: new Date(),
+            description: '',
+            imageUrl: '',
+            key: '',
+            name: '',
+            score: 0,
+            tags: [],
+            type: '',
+            url: '',
+          }
+        }
+      />
       <AddWorldModal
         onCancel={() => {
           hookMember.onClickCloseAddWorldModal();
@@ -71,7 +91,7 @@ export default function SearchPage() {
       />
 
       <Search
-        placeholder="Type Search Text"
+        placeholder="검색어를 입력하세요"
         allowClear
         onSearch={hookMember.onSearchWorlds}
         css={{
@@ -150,8 +170,16 @@ export default function SearchPage() {
             width="10%"
             title="이미지"
             dataIndex="imageUrl"
-            render={(imageUrl, record) => (
-              <img src={imageUrl} width={130} alt={(record as World).key} />
+            render={(imageUrl, record: World) => (
+              <Image
+                src={imageUrl}
+                width={130}
+                alt={imageUrl}
+                preview={false}
+                onClick={(e) => {
+                  hookMember.onClickOpenWorldInfoModal(record);
+                }}
+              />
             )}
           />
           <Column
@@ -167,26 +195,13 @@ export default function SearchPage() {
             })}
             ellipsis
             render={(_, world) => (
-              <>
-                <Typography.Link
-                  onClick={(e) => {
-                    hookMember.onClickOpenWorldInfoModal(world);
-                  }}
-                >
-                  {world.name}
-                </Typography.Link>
-                <WorldInfoModal
-                  onCancel={() => {
-                    hookMember.onClickCloseWorldInfoModal();
-                  }}
-                  onOk={() => {
-                    hookMember.onClickCloseWorldInfoModal();
-                  }}
-                  visible={hookMember.infoModalWorld?.key === world.key}
-                  types={hookMember.typeList}
-                  world={world}
-                />
-              </>
+              <Typography.Link
+                onClick={(e) => {
+                  hookMember.onClickOpenWorldInfoModal(world);
+                }}
+              >
+                {world.name}
+              </Typography.Link>
             )}
           />
           <Column

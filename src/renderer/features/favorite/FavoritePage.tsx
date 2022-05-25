@@ -22,6 +22,7 @@ import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
+import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import useFavoritePage from './hooks/useFavoritePage';
 
 const { TabPane } = Tabs;
@@ -38,6 +39,27 @@ export default function FavoritePage() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+      <WorldInfoModal
+        onCancel={() => {
+          hookMember.onClickToggleInfoModal(undefined);
+        }}
+        visible={hookMember.modalWorldInfo ? true : false}
+        world={
+          hookMember.modalWorldInfo || {
+            author: '',
+            date: new Date(),
+            description: '',
+            imageUrl: '',
+            key: '',
+            name: '',
+            score: 0,
+            tags: [],
+            type: '',
+            url: '',
+          }
+        }
+      />
+
       {/* <Search
         placeholder="Type Search Text"
         allowClear
@@ -93,10 +115,16 @@ export default function FavoritePage() {
           width="10%"
           title="이미지"
           dataIndex="imageUrl"
-          render={(imageUrl) => (
-            <>
-              <Image src={imageUrl} width={130} />
-            </>
+          render={(imageUrl, record: World) => (
+            <Image
+              src={imageUrl}
+              width={130}
+              alt={imageUrl}
+              preview={false}
+              onClick={(e) => {
+                hookMember.onClickToggleInfoModal(record);
+              }}
+            />
           )}
         />
         <Column
@@ -110,6 +138,16 @@ export default function FavoritePage() {
               wordBreak: 'keep-all',
             },
           })}
+          ellipsis
+          render={(_, world) => (
+            <Typography.Link
+              onClick={(e) => {
+                hookMember.onClickToggleInfoModal(world);
+              }}
+            >
+              {world.name}
+            </Typography.Link>
+          )}
         />
         <Column
           width="10%"

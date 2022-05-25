@@ -4,13 +4,12 @@ import { World, WorldEditInput } from '@src/types';
 import { Button, Image, Modal, Tag, Typography } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { format } from 'date-fns';
-import useSearchPage from './hooks/useSearchPage';
+import useSearchPage from '../features/search/hooks/useSearchPage';
 
 interface Props {
   onOk?: (e: WorldEditInput) => void;
   onCancel?: () => void;
   visible: boolean;
-  types: string[];
   world: World;
 }
 

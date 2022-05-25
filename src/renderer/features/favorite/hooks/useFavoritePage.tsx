@@ -14,12 +14,14 @@ interface HookMember {
   typeList: string[];
   worldData: WorldData;
   searchOptions: SearchOptions;
+  modalWorldInfo: World | undefined;
 
   onChangeType: (tabKey: string) => void;
   onClickFavorite: (world: World) => void;
   checkIsFavorite: (world: World) => boolean;
   onSearchWorlds: (text: string) => void;
   onChangeSearchOption: (option: SearchOptions[number]) => void;
+  onClickToggleInfoModal: (world?: World) => void;
 }
 const useFavoritePage = (): HookMember => {
   const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
@@ -27,6 +29,7 @@ const useFavoritePage = (): HookMember => {
   const [curSearchText, setCurSearchText] = useState<string>();
   const [curSearchOption, setSearchOption] =
     useState<SearchOptions[number]>('NAME');
+  const [modalWorldInfo, setModalWorldInfo] = useState<World | undefined>();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedFavorites = useMemo(() => favorites, []);
@@ -48,7 +51,10 @@ const useFavoritePage = (): HookMember => {
     typeList: memoizedFavorites ? Object.keys(memoizedFavorites) : [],
     worldData: worldData,
     searchOptions: SEARCH_OPTIONS,
-
+    // FIXME date 제대로 나오게 변환할것
+    modalWorldInfo: modalWorldInfo
+      ? { ...modalWorldInfo, date: new Date(0) }
+      : undefined,
     onChangeType(tabKey) {
       setCurrentType(tabKey);
     },
@@ -67,6 +73,9 @@ const useFavoritePage = (): HookMember => {
         val.favorite1.push(world);
         return val;
       });
+    },
+    onClickToggleInfoModal(w) {
+      setModalWorldInfo(w);
     },
 
     onChangeSearchOption(option) {},
