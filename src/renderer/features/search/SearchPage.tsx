@@ -22,10 +22,9 @@ import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
-import useSearchPage from './hooks/useSearchPage';
+import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 import WorldInfoModal from './WorldInfoModal';
-import { css } from '@emotion/react';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -38,6 +37,25 @@ export default function SearchPage() {
   const renderedTabs = hookMember.typeList.map((e) => (
     <TabPane tab={e} key={e} />
   ));
+
+  const renderedOptions = hookMember.searchOptions.map((e) => {
+    let name;
+    switch (e) {
+      case 'AUTHOR':
+        name = '제작자';
+        break;
+      case 'DESCRIPTION':
+        name = '설명';
+        break;
+      case 'NAME':
+        name = '이름';
+        break;
+      case 'TAG':
+        name = '태그';
+        break;
+    }
+    return <Option key={e}>{name}</Option>;
+  });
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
@@ -60,6 +78,17 @@ export default function SearchPage() {
           marginTop: spacing(1),
         }}
         loading={hookMember.isLoading}
+        addonBefore={
+          <Select<SearchOptions[number]>
+            css={{ width: 100 }}
+            defaultValue="NAME"
+            onChange={(v) => {
+              hookMember.onChangeSearchOption(v);
+            }}
+          >
+            {renderedOptions}
+          </Select>
+        }
       />
 
       <Tabs
@@ -138,15 +167,16 @@ export default function SearchPage() {
                 wordBreak: 'keep-all',
               },
             })}
+            ellipsis
             render={(_, world) => (
               <>
-                <a
+                <Typography.Link
                   onClick={(e) => {
                     hookMember.onClickOpenWorldInfoModal(world);
                   }}
                 >
                   {world.name}
-                </a>
+                </Typography.Link>
                 <WorldInfoModal
                   onCancel={() => {
                     hookMember.onClickCloseWorldInfoModal();

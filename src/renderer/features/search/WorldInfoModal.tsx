@@ -3,8 +3,8 @@ import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { World, WorldEditInput } from '@src/types';
 import { Button, Image, Modal, Tag, Typography } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
-import useSearchPage from './hooks/useSearchPage';
 import { format } from 'date-fns';
+import useSearchPage from './hooks/useSearchPage';
 
 interface Props {
   onOk?: (e: WorldEditInput) => void;
@@ -15,8 +15,6 @@ interface Props {
 }
 
 function WorldInfoModal(props: Props) {
-  const hookMember = useSearchPage();
-
   return (
     <Modal
       title={props.world.name}
@@ -90,11 +88,10 @@ function StarScore(props: { score: number }) {
 function WorldLink(props: { worldKey: string; url: string }) {
   if (props.worldKey.charAt(0) === 'n' && props.worldKey.charAt(1) === 'o') {
     return <Button disabled>World Link</Button>;
-  } else {
-    return (
-      <Typography.Link target="_blank" href={props.url}>
-        <Button>World Link</Button>
-      </Typography.Link>
-    );
   }
+  return (
+    <Typography.Link target="_blank" href={props.url}>
+      <Button>World Link</Button>
+    </Typography.Link>
+  );
 }
