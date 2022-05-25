@@ -76,14 +76,14 @@ export default function FavoritePage() {
             if (hookMember.checkIsFavorite(record)) {
               return (
                 <HeartFilled
-                  css={{ color: red.primary }}
+                  css={{ color: red.primary, fontSize: 20 }}
                   onClick={() => hookMember.onClickFavorite(record)}
                 />
               );
             }
             return (
               <HeartOutlined
-                css={{ color: red.primary }}
+                css={{ color: red.primary, fontSize: 20 }}
                 onClick={() => hookMember.onClickFavorite(record)}
               />
             );

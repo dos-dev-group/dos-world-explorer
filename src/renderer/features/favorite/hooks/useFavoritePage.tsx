@@ -6,18 +6,27 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 
+const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
+export type SearchOptions = typeof SEARCH_OPTIONS;
+
 interface HookMember {
   currentType: string;
   typeList: string[];
   worldData: WorldData;
+  searchOptions: SearchOptions;
 
   onChangeType: (tabKey: string) => void;
   onClickFavorite: (world: World) => void;
   checkIsFavorite: (world: World) => boolean;
+  onSearchWorlds: (text: string) => void;
+  onChangeSearchOption: (option: SearchOptions[number]) => void;
 }
 const useFavoritePage = (): HookMember => {
   const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
   const [currentType, setCurrentType] = useState<string>();
+  const [curSearchText, setCurSearchText] = useState<string>();
+  const [curSearchOption, setSearchOption] =
+    useState<SearchOptions[number]>('NAME');
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedFavorites = useMemo(() => favorites, []);
@@ -38,6 +47,7 @@ const useFavoritePage = (): HookMember => {
     currentType: currentType || '',
     typeList: memoizedFavorites ? Object.keys(memoizedFavorites) : [],
     worldData: worldData,
+    searchOptions: SEARCH_OPTIONS,
 
     onChangeType(tabKey) {
       setCurrentType(tabKey);
@@ -58,6 +68,10 @@ const useFavoritePage = (): HookMember => {
         return val;
       });
     },
+
+    onChangeSearchOption(option) {},
+    onSearchWorlds(text) {},
+
     checkIsFavorite(world) {
       if (favorites?.favorite1) {
         return favorites.favorite1.find((e) => e.key === world.key)
