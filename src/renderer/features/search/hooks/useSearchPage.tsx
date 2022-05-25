@@ -27,7 +27,6 @@ interface HookMember {
 
   onChangeSheetTab: (tabKey: string) => void;
   onClickUrl: (url: string) => void;
-  onSearchWorlds: (text: string) => void;
   onClickOpenAddWorldModal: () => void;
   onClickCloseAddWorldModal: () => void;
   onAddWorld: (world: WorldEditInput) => void;
@@ -36,6 +35,7 @@ interface HookMember {
   onClickOpenWorldInfoModal: (world: World) => void;
   onClickCloseWorldInfoModal: () => void;
   onClickFavorite: (world: World) => void;
+  onSearchWorlds: (text: string) => void;
   onChangeSearchOption: (option: SearchOptions[number]) => void;
 
   checkIsFavorite: (world: World) => boolean;

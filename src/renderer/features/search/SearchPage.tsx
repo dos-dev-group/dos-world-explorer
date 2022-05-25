@@ -133,14 +133,14 @@ export default function SearchPage() {
               if (hookMember.checkIsFavorite(record)) {
                 return (
                   <HeartFilled
-                    css={{ color: red.primary }}
+                    css={{ color: red.primary, fontSize: 20 }}
                     onClick={() => hookMember.onClickFavorite(record)}
                   />
                 );
               }
               return (
                 <HeartOutlined
-                  css={{ color: red.primary }}
+                  css={{ color: red.primary, fontSize: 20 }}
                   onClick={() => hookMember.onClickFavorite(record)}
                 />
               );
@@ -150,10 +150,8 @@ export default function SearchPage() {
             width="10%"
             title="이미지"
             dataIndex="imageUrl"
-            render={(imageUrl) => (
-              <>
-                <Image src={imageUrl} width={130} />
-              </>
+            render={(imageUrl, record) => (
+              <img src={imageUrl} width={130} alt={(record as World).key} />
             )}
           />
           <Column
