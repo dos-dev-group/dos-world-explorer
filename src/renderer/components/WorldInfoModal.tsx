@@ -14,11 +14,9 @@ interface Props {
 }
 
 function WorldInfoModal(props: Props) {
-  if (!props.world) return <></>;
-
   return (
     <Modal
-      title={props.world.name}
+      title={props.world?.name}
       onOk={() => {
         props.onCancel?.();
       }}
@@ -28,49 +26,54 @@ function WorldInfoModal(props: Props) {
       width="60%"
       footer={[]}
     >
-      <FlexCenter>
-        <Image src={props.world.imageUrl} width="70%"></Image>
-      </FlexCenter>
-      <br />
-      <FlexRow>
-        <div css={{ flex: 1 }}>
-          <Typography.Title level={5}>
-            <div>제작자: {props.world.author}</div>
-            <div>
-              별점: <StarScore score={props.world.score} />
-            </div>
-            타입: {props.world.type}
-            <div>
-              {props.world.tags.map((tag) => {
-                const colorIndex =
-                  simpleStringHash(tag) % PresetColorTypes.length;
-                const color = PresetColorTypes[colorIndex];
-                return (
-                  <Tag color={color} key={tag}>
-                    {tag.toUpperCase()}
-                  </Tag>
-                );
-              })}
-            </div>
-          </Typography.Title>
-          <div css={{ marginTop: 20 }}>
-            <Typography.Text>
-              Recorded Date: {format(props.world.date, 'yyyy-MM-dd HH:mm:ss')}{' '}
-              GMT {props.world.date.getTimezoneOffset() / 60}
-              <br />
-              ID: {props.world.key}
-            </Typography.Text>
-          </div>
-        </div>
-
-        <div css={{ flex: 1 }}>
-          <WorldLink worldKey={props.world.key} url={props.world.url} />
+      {props.world && (
+        <>
+          <FlexCenter>
+            <Image src={props.world.imageUrl} width="70%"></Image>
+          </FlexCenter>
           <br />
-          <Typography.Paragraph css={{ marginTop: 20 }}>
-            {props.world.description}
-          </Typography.Paragraph>
-        </div>
-      </FlexRow>
+          <FlexRow>
+            <div css={{ flex: 1 }}>
+              <Typography.Title level={5}>
+                <div>제작자: {props.world.author}</div>
+                <div>
+                  별점: <StarScore score={props.world.score} />
+                </div>
+                타입: {props.world.type}
+                <div>
+                  {props.world.tags.map((tag) => {
+                    const colorIndex =
+                      simpleStringHash(tag) % PresetColorTypes.length;
+                    const color = PresetColorTypes[colorIndex];
+                    return (
+                      <Tag color={color} key={tag}>
+                        {tag.toUpperCase()}
+                      </Tag>
+                    );
+                  })}
+                </div>
+              </Typography.Title>
+              <div css={{ marginTop: 20 }}>
+                <Typography.Text>
+                  Recorded Date:{' '}
+                  {format(props.world.date, 'yyyy-MM-dd HH:mm:ss')} GMT{' '}
+                  {props.world.date.getTimezoneOffset() / 60}
+                  <br />
+                  ID: {props.world.key}
+                </Typography.Text>
+              </div>
+            </div>
+
+            <div css={{ flex: 1 }}>
+              <WorldLink worldKey={props.world.key} url={props.world.url} />
+              <br />
+              <Typography.Paragraph css={{ marginTop: 20 }}>
+                {props.world.description}
+              </Typography.Paragraph>
+            </div>
+          </FlexRow>
+        </>
+      )}
     </Modal>
   );
 }
