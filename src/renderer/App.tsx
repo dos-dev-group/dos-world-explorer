@@ -133,8 +133,6 @@ function MenuLayout() {
 }
 
 export default function App() {
-  useRecoilValue(worldFavoritesState);
-
   return (
     <Router>
       <Routes>
