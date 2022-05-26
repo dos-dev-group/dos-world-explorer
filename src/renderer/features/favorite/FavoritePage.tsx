@@ -85,6 +85,9 @@ export default function FavoritePage() {
           scroll={{
             x: true,
           }}
+          pagination={{
+            pageSize: 100,
+          }}
         >
           <Column
             width="5%"
