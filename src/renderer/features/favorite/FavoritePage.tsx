@@ -157,7 +157,7 @@ export default function FavoritePage() {
             dataIndex="description"
             render={(value) => (
               <Typography.Paragraph
-                css={{ wordBreak: 'keep-all', width: 180 }}
+                css={{ wordBreak: 'keep-all', width: '24vw' }}
                 ellipsis={{ rows: 3, expandable: true }}
               >
                 {value}
