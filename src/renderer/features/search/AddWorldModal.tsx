@@ -185,7 +185,7 @@ function AddWorldModal(props: Props) {
             verticalAlign: 'top',
           }}
           value={inputTag}
-          onChange={(e) => setInputTag(e.target.value)}
+          onChange={(e) => setInputTag(e.target.value.trim())}
           onBlur={(e) => {
             if (inputTag && curTags.indexOf(inputTag) === -1) {
               setCurTags([...curTags, inputTag]);

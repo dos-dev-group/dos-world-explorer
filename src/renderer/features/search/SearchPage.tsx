@@ -64,20 +64,7 @@ export default function SearchPage() {
           hookMember.onClickCloseWorldInfoModal();
         }}
         visible={hookMember.infoModalWorld ? true : false}
-        world={
-          hookMember.infoModalWorld || {
-            author: '',
-            date: new Date(),
-            description: '',
-            imageUrl: '',
-            key: '',
-            name: '',
-            score: 0,
-            tags: [],
-            type: '',
-            url: '',
-          }
-        }
+        world={hookMember.infoModalWorld}
       />
       <AddWorldModal
         onCancel={() => {
@@ -174,7 +161,6 @@ export default function SearchPage() {
               <Image
                 src={imageUrl}
                 width={130}
-                alt={imageUrl}
                 preview={false}
                 onClick={(e) => {
                   hookMember.onClickOpenWorldInfoModal(record);
@@ -212,12 +198,12 @@ export default function SearchPage() {
             ellipsis
           />
           <Column
-            width="30%"
+            width="20%"
             title="설명"
             dataIndex="description"
             render={(value) => (
               <Typography.Paragraph
-                css={{ wordBreak: 'keep-all', width: 180 }}
+                css={{ wordBreak: 'keep-all', width: '24vw' }}
                 ellipsis={{ rows: 3, expandable: true }}
               >
                 {value}
