@@ -106,7 +106,6 @@ export default function FavoritePage() {
             <Image
               src={imageUrl}
               width={130}
-              alt={imageUrl}
               preview={false}
               onClick={(e) => {
                 hookMember.onClickToggleInfoModal(record);
@@ -144,7 +143,7 @@ export default function FavoritePage() {
           ellipsis
         />
         <Column
-          width="30%"
+          width="20%"
           title="설명"
           dataIndex="description"
           render={(value) => (

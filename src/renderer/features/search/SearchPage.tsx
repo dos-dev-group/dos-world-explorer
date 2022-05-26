@@ -161,7 +161,6 @@ export default function SearchPage() {
               <Image
                 src={imageUrl}
                 width={130}
-                alt={imageUrl}
                 preview={false}
                 onClick={(e) => {
                   hookMember.onClickOpenWorldInfoModal(record);
@@ -199,12 +198,12 @@ export default function SearchPage() {
             ellipsis
           />
           <Column
-            width="30%"
+            width="20%"
             title="설명"
             dataIndex="description"
             render={(value) => (
               <Typography.Paragraph
-                css={{ wordBreak: 'keep-all', width: 180 }}
+                css={{ wordBreak: 'keep-all', width: '24vw' }}
                 ellipsis={{ rows: 3, expandable: true }}
               >
                 {value}
