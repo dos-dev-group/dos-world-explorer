@@ -44,20 +44,7 @@ export default function FavoritePage() {
           hookMember.onClickToggleInfoModal(undefined);
         }}
         visible={hookMember.modalWorldInfo ? true : false}
-        world={
-          hookMember.modalWorldInfo || {
-            author: '',
-            date: new Date(),
-            description: '',
-            imageUrl: '',
-            key: '',
-            name: '',
-            score: 0,
-            tags: [],
-            type: '',
-            url: '',
-          }
-        }
+        world={hookMember.modalWorldInfo}
       />
 
       {/* <Search

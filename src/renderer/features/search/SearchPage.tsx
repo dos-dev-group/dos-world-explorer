@@ -64,20 +64,7 @@ export default function SearchPage() {
           hookMember.onClickCloseWorldInfoModal();
         }}
         visible={hookMember.infoModalWorld ? true : false}
-        world={
-          hookMember.infoModalWorld || {
-            author: '',
-            date: new Date(),
-            description: '',
-            imageUrl: '',
-            key: '',
-            name: '',
-            score: 0,
-            tags: [],
-            type: '',
-            url: '',
-          }
-        }
+        world={hookMember.infoModalWorld}
       />
       <AddWorldModal
         onCancel={() => {
