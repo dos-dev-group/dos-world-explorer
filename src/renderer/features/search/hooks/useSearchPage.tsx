@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable array-callback-return */
 import { worldFavoritesState } from '@src/renderer/data/favorites';
 import { searchTextState, worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
@@ -12,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
-type SearchOptions = typeof SEARCH_OPTIONS;
+export type SearchOptions = typeof SEARCH_OPTIONS;
 
 interface HookMember {
   currentType: string;
@@ -25,7 +27,6 @@ interface HookMember {
 
   onChangeSheetTab: (tabKey: string) => void;
   onClickUrl: (url: string) => void;
-  onSearchWorlds: (text: string) => void;
   onClickOpenAddWorldModal: () => void;
   onClickCloseAddWorldModal: () => void;
   onAddWorld: (world: WorldEditInput) => void;
@@ -34,6 +35,9 @@ interface HookMember {
   onClickOpenWorldInfoModal: (world: World) => void;
   onClickCloseWorldInfoModal: () => void;
   onClickFavorite: (world: World) => void;
+  onSearchWorlds: (text: string) => void;
+  onChangeSearchOption: (option: SearchOptions[number]) => void;
+
   checkIsFavorite: (world: World) => boolean;
 }
 const useSearch = (): HookMember => {
@@ -42,10 +46,12 @@ const useSearch = (): HookMember => {
   const [searchText, setSearchText] = useRecoilState(searchTextState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [visibleAddWorldModal, setVisibleAddWorldModal] = useState(false);
-  const [infoModalWorld, setInfoModalWorld] = useState<
-    World | undefined
-  >(undefined);
+  const [infoModalWorld, setInfoModalWorld] = useState<World | undefined>(
+    undefined,
+  );
   const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
+  const [curSearchOption, setCurSearchOption] =
+    useState<SearchOptions[number]>('NAME');
 
   useEffect(() => {
     if (worldData === undefined) {
@@ -67,7 +73,7 @@ const useSearch = (): HookMember => {
       ['전체'],
     ) || [];
 
-  const currentTableData = (
+  const currentTableData =
     worldData
       ?.filter((w) => {
         if (currentType === '전체') {
@@ -75,12 +81,32 @@ const useSearch = (): HookMember => {
         }
         return w.type === currentType;
       })
-      .filter((e) =>
-        searchText.trim() === ''
-          ? true
-          : e.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
-      ) || []
-  ).reverse();
+      .filter((e) => {
+        if (searchText.trim() === '') {
+          return true;
+        }
+        const words = searchText.split(' ');
+
+        switch (curSearchOption) {
+          case 'NAME':
+            return e.name.toLowerCase().search(searchText.toLowerCase()) !== -1;
+          case 'AUTHOR':
+            return (
+              e.author.toLowerCase().search(searchText.toLowerCase()) !== -1
+            );
+          case 'DESCRIPTION':
+            return (
+              e.description.toLowerCase().search(searchText.toLowerCase()) !==
+              -1
+            );
+          case 'TAG':
+            return (
+              e.tags.filter((t) => words.lastIndexOf(t) !== -1).length ===
+              words.length
+            );
+        }
+      })
+      .reverse() || [];
 
   return {
     currentType,
@@ -137,21 +163,22 @@ const useSearch = (): HookMember => {
       setFavorites((v) => {
         const val = { ...v };
         val.favorite1 = [...val.favorite1];
-        if (val.favorite1.find((e) => e.key === world.key)) {
-          val.favorite1 = val.favorite1.filter((e) => e.key !== world.key);
+        if (val.favorite1.find((e) => e === world.key)) {
+          val.favorite1 = val.favorite1.filter((e) => e !== world.key);
           return val;
         }
-        val.favorite1.push(world);
+        val.favorite1.push(world.key);
         return val;
       });
     },
     checkIsFavorite(world) {
       if (favorites?.favorite1) {
-        return favorites.favorite1.find((e) => e.key === world.key)
-          ? true
-          : false;
+        return favorites.favorite1.find((e) => e === world.key) ? true : false;
       }
       return false;
+    },
+    onChangeSearchOption(option) {
+      setCurSearchOption(option);
     },
   };
 };

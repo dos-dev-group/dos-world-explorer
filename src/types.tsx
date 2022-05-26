@@ -24,7 +24,7 @@ export type WorldEditOutput = Omit<
 export type WorldData = World[];
 
 export interface Favorites {
-  [favName: string]: World[];
+  [worldKeys: string]: string[];
 }
 
 export enum EditResult {

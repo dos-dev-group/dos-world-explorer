@@ -22,10 +22,9 @@ import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
-import useSearchPage from './hooks/useSearchPage';
+import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
-import WorldInfoModal from './WorldInfoModal';
-import { css } from '@emotion/react';
+import WorldInfoModal from '../../components/WorldInfoModal';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -39,8 +38,34 @@ export default function SearchPage() {
     <TabPane tab={e} key={e} />
   ));
 
+  const renderedOptions = hookMember.searchOptions.map((e) => {
+    let name;
+    switch (e) {
+      case 'AUTHOR':
+        name = '제작자';
+        break;
+      case 'DESCRIPTION':
+        name = '설명';
+        break;
+      case 'NAME':
+        name = '이름';
+        break;
+      case 'TAG':
+        name = '태그';
+        break;
+    }
+    return <Option key={e}>{name}</Option>;
+  });
+
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+      <WorldInfoModal
+        onCancel={() => {
+          hookMember.onClickCloseWorldInfoModal();
+        }}
+        visible={hookMember.infoModalWorld ? true : false}
+        world={hookMember.infoModalWorld}
+      />
       <AddWorldModal
         onCancel={() => {
           hookMember.onClickCloseAddWorldModal();
@@ -53,13 +78,24 @@ export default function SearchPage() {
       />
 
       <Search
-        placeholder="Type Search Text"
+        placeholder="검색어를 입력하세요"
         allowClear
         onSearch={hookMember.onSearchWorlds}
         css={{
           marginTop: spacing(1),
         }}
         loading={hookMember.isLoading}
+        addonBefore={
+          <Select<SearchOptions[number]>
+            css={{ width: 100 }}
+            defaultValue="NAME"
+            onChange={(v) => {
+              hookMember.onChangeSearchOption(v);
+            }}
+          >
+            {renderedOptions}
+          </Select>
+        }
       />
 
       <Tabs
@@ -104,14 +140,14 @@ export default function SearchPage() {
               if (hookMember.checkIsFavorite(record)) {
                 return (
                   <HeartFilled
-                    css={{ color: red.primary }}
+                    css={{ color: red.primary, fontSize: 20 }}
                     onClick={() => hookMember.onClickFavorite(record)}
                   />
                 );
               }
               return (
                 <HeartOutlined
-                  css={{ color: red.primary }}
+                  css={{ color: red.primary, fontSize: 20 }}
                   onClick={() => hookMember.onClickFavorite(record)}
                 />
               );
@@ -121,10 +157,15 @@ export default function SearchPage() {
             width="10%"
             title="이미지"
             dataIndex="imageUrl"
-            render={(imageUrl) => (
-              <>
-                <Image src={imageUrl} width={130} />
-              </>
+            render={(imageUrl, record: World) => (
+              <Image
+                src={imageUrl}
+                width={130}
+                preview={false}
+                onClick={(e) => {
+                  hookMember.onClickOpenWorldInfoModal(record);
+                }}
+              />
             )}
           />
           <Column
@@ -138,27 +179,15 @@ export default function SearchPage() {
                 wordBreak: 'keep-all',
               },
             })}
+            ellipsis
             render={(_, world) => (
-              <>
-                <a
-                  onClick={(e) => {
-                    hookMember.onClickOpenWorldInfoModal(world);
-                  }}
-                >
-                  {world.name}
-                </a>
-                <WorldInfoModal
-                  onCancel={() => {
-                    hookMember.onClickCloseWorldInfoModal();
-                  }}
-                  onOk={() => {
-                    hookMember.onClickCloseWorldInfoModal();
-                  }}
-                  visible={hookMember.infoModalWorld?.key === world.key}
-                  types={hookMember.typeList}
-                  world={world}
-                />
-              </>
+              <Typography.Link
+                onClick={(e) => {
+                  hookMember.onClickOpenWorldInfoModal(world);
+                }}
+              >
+                {world.name}
+              </Typography.Link>
             )}
           />
           <Column
@@ -169,12 +198,12 @@ export default function SearchPage() {
             ellipsis
           />
           <Column
-            width="30%"
+            width="20%"
             title="설명"
             dataIndex="description"
             render={(value) => (
               <Typography.Paragraph
-                css={{ wordBreak: 'keep-all', width: 180 }}
+                css={{ wordBreak: 'keep-all', width: '24vw' }}
                 ellipsis={{ rows: 3, expandable: true }}
               >
                 {value}

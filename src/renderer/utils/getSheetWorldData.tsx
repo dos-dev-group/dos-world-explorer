@@ -11,7 +11,11 @@ const domparser = new DOMParser();
 export const getHtml = async () => {
   // console.log(sheetUrl + '?_=' + new Date().getTime());
   try {
-    const html = await axios.get(sheetUrl + '?_=' + new Date().getTime());
+    const html = await axios.get(sheetUrl + '?_=' + new Date().getTime(), {
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    });
     return html;
   } catch (error) {
     console.error(error);
