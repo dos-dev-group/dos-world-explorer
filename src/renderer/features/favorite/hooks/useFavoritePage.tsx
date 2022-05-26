@@ -1,4 +1,6 @@
 import { worldFavoritesState } from '@src/renderer/data/favorites';
+import { worldDataState } from '@src/renderer/data/world';
+import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
 import { WorldData, World } from '@src/types';
 import { message } from 'antd';
@@ -15,6 +17,7 @@ interface HookMember {
   worldData: WorldData;
   searchOptions: SearchOptions;
   modalWorldInfo: World | undefined;
+  isLoading: boolean;
 
   onChangeType: (tabKey: string) => void;
   onClickFavorite: (world: World) => void;
@@ -22,9 +25,12 @@ interface HookMember {
   onSearchWorlds: (text: string) => void;
   onChangeSearchOption: (option: SearchOptions[number]) => void;
   onClickToggleInfoModal: (world?: World) => void;
+  onClickRefresh: () => void;
 }
 const useFavoritePage = (): HookMember => {
   const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
+  const [worldData, setWorldData] = useRecoilState(worldDataState);
+  const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [currentType, setCurrentType] = useState<string>();
   const [curSearchText, setCurSearchText] = useState<string>();
   const [curSearchOption, setSearchOption] =
@@ -32,7 +38,7 @@ const useFavoritePage = (): HookMember => {
   const [modalWorldInfo, setModalWorldInfo] = useState<World | undefined>();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const memoizedFavorites = useMemo(() => favorites, []);
+  const memoizedFavorites = useMemo(() => favorites, [worldData]);
 
   useEffect(() => {
     if (favorites && Object.keys(favorites).length > 0) {
@@ -40,21 +46,33 @@ const useFavoritePage = (): HookMember => {
     }
   }, [favorites]);
 
-  const worldData = (
-    memoizedFavorites && currentType ? memoizedFavorites[currentType] : []
-  )
-    .concat()
-    .reverse();
+  useEffect(() => {
+    if (worldData === undefined) {
+      getSheetWorldData().then((data) => {
+        setIsLoading(false);
+        return setWorldData(data);
+      });
+    }
+  }, [setWorldData, worldData]);
+
+  const favKeys =
+    memoizedFavorites && currentType ? memoizedFavorites[currentType] : [];
+  const worldTableData =
+    worldData?.filter((w) =>
+      favKeys.find((e) => e === w.key) ? true : false,
+    ) || [];
 
   return {
     currentType: currentType || '',
     typeList: memoizedFavorites ? Object.keys(memoizedFavorites) : [],
-    worldData: worldData,
+    worldData: worldTableData,
     searchOptions: SEARCH_OPTIONS,
     // FIXME date 제대로 나오게 변환할것
     modalWorldInfo: modalWorldInfo
       ? { ...modalWorldInfo, date: new Date(0) }
       : undefined,
+    isLoading,
+
     onChangeType(tabKey) {
       setCurrentType(tabKey);
     },
@@ -66,16 +84,23 @@ const useFavoritePage = (): HookMember => {
       setFavorites((v) => {
         const val = { ...v };
         val.favorite1 = [...val.favorite1];
-        if (val.favorite1.find((e) => e.key === world.key)) {
-          val.favorite1 = val.favorite1.filter((e) => e.key !== world.key);
+        if (val.favorite1.find((e) => e === world.key)) {
+          val.favorite1 = val.favorite1.filter((e) => e !== world.key);
           return val;
         }
-        val.favorite1.push(world);
+        val.favorite1.push(world.key);
         return val;
       });
     },
     onClickToggleInfoModal(w) {
       setModalWorldInfo(w);
+    },
+    onClickRefresh() {
+      setIsLoading(true);
+      getSheetWorldData().then((data) => {
+        setIsLoading(false);
+        return setWorldData(data);
+      });
     },
 
     onChangeSearchOption(option) {},
@@ -83,9 +108,7 @@ const useFavoritePage = (): HookMember => {
 
     checkIsFavorite(world) {
       if (favorites?.favorite1) {
-        return favorites.favorite1.find((e) => e.key === world.key)
-          ? true
-          : false;
+        return favorites.favorite1.find((e) => e === world.key) ? true : false;
       }
       return false;
     },

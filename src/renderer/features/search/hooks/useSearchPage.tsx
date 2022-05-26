@@ -163,19 +163,17 @@ const useSearch = (): HookMember => {
       setFavorites((v) => {
         const val = { ...v };
         val.favorite1 = [...val.favorite1];
-        if (val.favorite1.find((e) => e.key === world.key)) {
-          val.favorite1 = val.favorite1.filter((e) => e.key !== world.key);
+        if (val.favorite1.find((e) => e === world.key)) {
+          val.favorite1 = val.favorite1.filter((e) => e !== world.key);
           return val;
         }
-        val.favorite1.push(world);
+        val.favorite1.push(world.key);
         return val;
       });
     },
     checkIsFavorite(world) {
       if (favorites?.favorite1) {
-        return favorites.favorite1.find((e) => e.key === world.key)
-          ? true
-          : false;
+        return favorites.favorite1.find((e) => e === world.key) ? true : false;
       }
       return false;
     },
