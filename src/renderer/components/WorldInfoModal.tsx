@@ -10,10 +10,12 @@ interface Props {
   onOk?: (e: WorldEditInput) => void;
   onCancel?: () => void;
   visible: boolean;
-  world: World;
+  world?: World;
 }
 
 function WorldInfoModal(props: Props) {
+  if (!props.world) return <></>;
+
   return (
     <Modal
       title={props.world.name}
