@@ -57,10 +57,13 @@ const useFavoritePage = (): HookMember => {
 
   const favKeys =
     memoizedFavorites && currentType ? memoizedFavorites[currentType] : [];
-  const worldTableData =
+  const worldTableData = (
     worldData?.filter((w) =>
       favKeys.find((e) => e === w.key) ? true : false,
-    ) || [];
+    ) || []
+  )
+    .concat()
+    .reverse();
 
   return {
     currentType: currentType || '',

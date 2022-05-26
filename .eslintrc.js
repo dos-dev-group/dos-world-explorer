@@ -28,6 +28,7 @@ module.exports = {
     'react/jsx-curly-brace-presence': 'off',
     'react/destructuring-assignment': 'off',
     'react/no-array-index-key': 'off',
+    'react/jsx-boolean-value': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
