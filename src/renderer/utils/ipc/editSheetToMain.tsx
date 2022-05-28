@@ -18,6 +18,18 @@ export function testEditSheetToMain(typeId: number) {
   });
 }
 
+export function getWorldDataToMain() {
+  window.electron.ipcRenderer.sendMessage('getWorldDataToMain', []);
+  return new Promise<WorldData>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'getWorldDataToRenderer',
+      (result: unknown) => {
+        resolve(result as WorldData);
+      },
+    );
+  });
+}
+
 export function addEditSheetToMain(worldInput: WorldEditInput) {
   window.electron.ipcRenderer.sendMessage('addEditSheetToMain', [worldInput]);
 

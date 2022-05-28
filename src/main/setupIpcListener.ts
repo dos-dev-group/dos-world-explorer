@@ -1,6 +1,7 @@
 import { ipcMain, shell } from 'electron';
 import {
   testEditSheet,
+  getWorldData,
   addEditSheet,
   removeEditSheet,
   modifyEditSheet,
@@ -24,6 +25,10 @@ export default function setupIpcListener() {
 
   ipcMain.on('testEditSheetToMain', async (event, arg) => {
     event.reply('testEditSheetToMain', await testEditSheet());
+  });
+
+  ipcMain.on('getWorldDataToMain', async (event, arg) => {
+    event.reply('getWorldDataToMain', await getWorldData());
   });
 
   ipcMain.on('addEditSheetToMain', async (event, arg) => {
