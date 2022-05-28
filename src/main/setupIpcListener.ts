@@ -7,6 +7,7 @@ import {
   modifyEditSheet,
   autoFile,
 } from './utils/editSheet';
+import { testVrchatAPI, getVrchatRencentWorlds } from './utils/vrchatAPI';
 import { loadFavorites, saveFavorites } from './utils/favorites';
 
 export default function setupIpcListener() {
@@ -21,6 +22,18 @@ export default function setupIpcListener() {
     if (arg.length > 0) {
       shell.openExternal(arg[0]);
     }
+  });
+
+  ipcMain.on('testVrchatAPIToMain', async (event, arg) => {
+    // testVrchatAPI();
+    event.reply('testVrchatAPIToRenderer', await testVrchatAPI());
+  });
+  ipcMain.on('getVrchatRencentWorldsToMain', async (event, arg) => {
+    // testVrchatAPI();
+    event.reply(
+      'getVrchatRencentWorldsToRenderer',
+      await getVrchatRencentWorlds(),
+    );
   });
 
   ipcMain.on('testEditSheetToMain', async (event, arg) => {

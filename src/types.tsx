@@ -23,7 +23,7 @@ export type WorldEditOutput = Omit<
 
 export type WorldVrcRaw = Omit<
   World,
-  'description' | 'tags' | 'score' | 'type'
+  'description' | 'tags' | 'score' | 'date' | 'type'
 >;
 
 export type WorldData = World[];
