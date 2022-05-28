@@ -24,11 +24,11 @@ export default function setupIpcListener() {
   });
 
   ipcMain.on('testEditSheetToMain', async (event, arg) => {
-    event.reply('testEditSheetToMain', await testEditSheet());
+    event.reply('testEditSheetToRenderer', await testEditSheet());
   });
 
   ipcMain.on('getWorldDataToMain', async (event, arg) => {
-    event.reply('getWorldDataToMain', await getWorldData());
+    event.reply('getWorldDataToRenderer', await getWorldData());
   });
 
   ipcMain.on('addEditSheetToMain', async (event, arg) => {
