@@ -57,10 +57,13 @@ const useFavoritePage = (): HookMember => {
 
   const favKeys =
     memoizedFavorites && currentType ? memoizedFavorites[currentType] : [];
-  const worldTableData =
+  const worldTableData = (
     worldData?.filter((w) =>
       favKeys.find((e) => e === w.key) ? true : false,
-    ) || [];
+    ) || []
+  )
+    .concat()
+    .reverse();
 
   return {
     currentType: currentType || '',
@@ -68,9 +71,7 @@ const useFavoritePage = (): HookMember => {
     worldData: worldTableData,
     searchOptions: SEARCH_OPTIONS,
     // FIXME date 제대로 나오게 변환할것
-    modalWorldInfo: modalWorldInfo
-      ? { ...modalWorldInfo, date: new Date(0) }
-      : undefined,
+    modalWorldInfo: modalWorldInfo,
     isLoading,
 
     onChangeType(tabKey) {

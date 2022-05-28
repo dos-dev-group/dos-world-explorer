@@ -201,6 +201,7 @@ export async function addEditSheet(
   const worldData = await getWorldData();
   const worldOutput = await autoFile(worldInput.url);
   if (overLapCheck(worldData, worldOutput.key)) {
+    await unprotectSheet(sheetId);
     return EditResult.ALREADYEXIST;
   }
   try {
