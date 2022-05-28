@@ -21,6 +21,11 @@ export type WorldEditOutput = Omit<
   'url' | 'description' | 'tags' | 'score' | 'type'
 >;
 
+export type WorldVrcRaw = Omit<
+  World,
+  'description' | 'tags' | 'score' | 'type'
+>;
+
 export type WorldData = World[];
 
 export interface Favorites {
