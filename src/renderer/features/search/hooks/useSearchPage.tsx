@@ -13,7 +13,7 @@ import {
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
 import { World, WorldEditInput } from '@src/types';
 import { message } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
@@ -49,7 +49,7 @@ interface HookMember {
 const useSearch = (): HookMember => {
   const [currentType, setCurrentType] = useState<string>('전체');
   const [worldData, setWorldData] = useRecoilState(worldDataState);
-  const [searchText, setSearchText] = useRecoilState(searchTextState);
+  const [searchText, setSearchText] = useState<string>();
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [visibleAddWorldModal, setVisibleAddWorldModal] = useState(false);
   const [infoModalWorld, setInfoModalWorld] = useState<World | undefined>(
@@ -63,63 +63,69 @@ const useSearch = (): HookMember => {
   useEffect(() => {
     if (worldData === undefined) {
       // TODO 공개용은 이걸로
-      // getSheetWorldData().then((data) => {
-      //   setIsLoading(false);
-      //   return setWorldData(data);
-      // });
-      getWorldDataToMain().then((data) => {
+      getSheetWorldData().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
+      // getWorldDataToMain().then((data) => {
+      //   setIsLoading(false);
+      //   return setWorldData(data);
+      // });
     }
   }, [setWorldData, worldData]);
 
-  const typeList =
-    worldData?.reduce(
-      (acc, cur) => {
-        if (acc.find((e) => e === cur.type)) {
-          return acc;
-        }
-        return acc.concat(cur.type);
-      },
-      ['전체'],
-    ) || [];
+  const typeList = useMemo(
+    () =>
+      worldData?.reduce(
+        (acc, cur) => {
+          if (acc.find((e) => e === cur.type)) {
+            return acc;
+          }
+          return acc.concat(cur.type);
+        },
+        ['전체'],
+      ) || [],
+    [worldData],
+  );
+  const currentTableData = useMemo(
+    () =>
+      worldData
+        ?.filter((w) => {
+          if (currentType === '전체') {
+            return true;
+          }
+          return w.type === currentType;
+        })
+        .filter((e) => {
+          if (!searchText || searchText.trim() === '') {
+            return true;
+          }
+          const words = searchText.split(' ');
 
-  const currentTableData =
-    worldData
-      ?.filter((w) => {
-        if (currentType === '전체') {
-          return true;
-        }
-        return w.type === currentType;
-      })
-      .filter((e) => {
-        if (searchText.trim() === '') {
-          return true;
-        }
-        const words = searchText.split(' ');
-
-        switch (curSearchOption) {
-          case 'NAME':
-            return e.name.toLowerCase().search(searchText.toLowerCase()) !== -1;
-          case 'AUTHOR':
-            return (
-              e.author.toLowerCase().search(searchText.toLowerCase()) !== -1
-            );
-          case 'DESCRIPTION':
-            return (
-              e.description.toLowerCase().search(searchText.toLowerCase()) !==
-              -1
-            );
-          case 'TAG':
-            return (
-              e.tags.filter((t) => words.lastIndexOf(t) !== -1).length ===
-              words.length
-            );
-        }
-      })
-      .reverse() || [];
-
+          switch (curSearchOption) {
+            case 'NAME':
+              return (
+                e.name.toLowerCase().search(searchText.toLowerCase()) !== -1
+              );
+            case 'AUTHOR':
+              return (
+                e.author.toLowerCase().search(searchText.toLowerCase()) !== -1
+              );
+            case 'DESCRIPTION':
+              return (
+                e.description.toLowerCase().search(searchText.toLowerCase()) !==
+                -1
+              );
+            case 'TAG':
+              return (
+                e.tags.filter((t) => words.lastIndexOf(t) !== -1).length ===
+                words.length
+              );
+          }
+        })
+        .reverse() || [],
+    [curSearchOption, currentType, searchText, worldData],
+  );
   return {
     currentType,
     isLoading,
@@ -159,7 +165,7 @@ const useSearch = (): HookMember => {
             setWorldData(data);
           });
         })
-        .catch((e: Error) => message.error(e))
+        .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onEditWorld(key, world) {
@@ -173,7 +179,7 @@ const useSearch = (): HookMember => {
             setWorldData(data);
           });
         })
-        .catch((e: Error) => message.error(e))
+        .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onRemoveWorld(key) {
@@ -187,7 +193,7 @@ const useSearch = (): HookMember => {
             setWorldData(data);
           });
         })
-        .catch((e: Error) => message.error(e))
+        .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onClickRefresh() {
