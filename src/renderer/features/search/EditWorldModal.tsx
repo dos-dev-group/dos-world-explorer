@@ -22,12 +22,12 @@ import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { useEffect, useState } from 'react';
 
 interface Props {
-  onOk?: (e: WorldEditInput) => void;
+  onEdit?: (key: string, e: WorldEditInput) => void;
   onCancel?: () => void;
-  visible: boolean;
   types: string[];
+  world?: World;
 }
-function AddWorldModal(props: Props) {
+function EditWorldModal(props: Props) {
   const [curType, setCurType] = useState<string>();
   const [curUrl, setCurUrl] = useState<string>();
   const [curDesc, setCurDesc] = useState<string>();
@@ -38,7 +38,7 @@ function AddWorldModal(props: Props) {
   const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
-    if (props.visible === false) {
+    if (props.world === undefined) {
       setCurType(undefined);
       setCurUrl(undefined);
       setCurDesc(undefined);
@@ -46,8 +46,21 @@ function AddWorldModal(props: Props) {
       setCurScore(1);
       setInputTag('');
       setWorldCheckInfo(undefined);
+    } else {
+      setCurType(props.world.type);
+      setCurUrl(props.world.url);
+      setCurDesc(props.world.description);
+      setCurTags(props.world.tags);
+      setCurScore(props.world.score);
+      setWorldCheckInfo({
+        author: props.world.author,
+        date: props.world.date,
+        key: props.world.key,
+        name: props.world.name,
+        imageUrl: props.world.imageUrl,
+      });
     }
-  }, [props.visible]);
+  }, [props.world]);
 
   const renderedOptions = props.types
     .filter((e) => e !== '전체')
@@ -55,9 +68,9 @@ function AddWorldModal(props: Props) {
 
   return (
     <Modal
-      title="월드 추가하기"
+      title="월드 변경하기"
       onOk={() => {
-        props.onOk?.({
+        props.onEdit?.(props.world?.key || '', {
           description: curDesc || '',
           type: curType || '',
           score: curScore!,
@@ -68,7 +81,7 @@ function AddWorldModal(props: Props) {
       }}
       destroyOnClose
       onCancel={props.onCancel}
-      visible={props.visible}
+      visible={props.world ? true : false}
       width="80%"
       okButtonProps={{
         disabled:
@@ -83,6 +96,7 @@ function AddWorldModal(props: Props) {
           width: 200,
         }}
         onSelect={(e: string) => setCurType(e)}
+        value={curType}
       >
         {renderedOptions}
       </Select>
@@ -90,6 +104,7 @@ function AddWorldModal(props: Props) {
         <Typography.Title level={5}>URL</Typography.Title>
         <Input
           css={{ width: 'calc(100% - 200px)' }}
+          value={props.world?.url}
           onChange={(e) => {
             setCurUrl(e.target.value);
             setWorldCheckInfo(undefined);
@@ -151,7 +166,10 @@ function AddWorldModal(props: Props) {
       </Input.Group>
       <Input.Group css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>
         <Typography.Title level={5}>설명</Typography.Title>
-        <Input onChange={(e) => setCurDesc(e.target.value)} />
+        <Input
+          onChange={(e) => setCurDesc(e.target.value)}
+          value={props.world?.description}
+        />
       </Input.Group>
       <div css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>
         <Typography.Title level={5}>태그</Typography.Title>
@@ -203,7 +221,4 @@ function AddWorldModal(props: Props) {
     </Modal>
   );
 }
-export default AddWorldModal;
-
-type WorldModalData = Omit<World, keyof WorldEditOutput> &
-  Partial<WorldEditOutput>;
+export default EditWorldModal;
