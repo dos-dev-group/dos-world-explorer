@@ -25,6 +25,7 @@ import { World } from '@src/types';
 import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 import WorldInfoModal from '../../components/WorldInfoModal';
+import EditWorldModal from './EditWorldModal';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -68,13 +69,19 @@ export default function SearchPage() {
       />
       <AddWorldModal
         onCancel={() => {
-          hookMember.onClickCloseAddWorldModal();
+          hookMember.onCloseAddWorldModal();
         }}
         onOk={(w) => {
           hookMember.onAddWorld(w);
         }}
         visible={hookMember.visibleAddWorldModal}
         types={hookMember.typeList}
+      />
+      <EditWorldModal
+        onCancel={() => hookMember.onCloseEditWorldModal()}
+        onEdit={(key, w) => hookMember.onEditWorld(key, w)}
+        types={hookMember.typeList}
+        world={hookMember.editModalWorld}
       />
 
       <Search
@@ -124,7 +131,7 @@ export default function SearchPage() {
                 type="primary"
                 css={{ marginLeft: 'auto' }}
                 onClick={(e) => {
-                  hookMember.onClickOpenAddWorldModal();
+                  hookMember.onOpenAddWorldModal();
                 }}
               >
                 월드 추가
@@ -259,8 +266,16 @@ export default function SearchPage() {
           <Column
             width="5%"
             dataIndex="key"
-            render={(k, record) => (
+            render={(k, record: World) => (
               <Flex>
+                <Button
+                  type="primary"
+                  ghost
+                  size="small"
+                  onClick={() => hookMember.onOpenEditWorldModal(record)}
+                >
+                  수정
+                </Button>
                 <Popconfirm
                   title="정말 월드를 삭제하시겠습니까?"
                   placement="topRight"

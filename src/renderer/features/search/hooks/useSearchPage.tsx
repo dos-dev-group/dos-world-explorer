@@ -1,3 +1,4 @@
+/* eslint-disable promise/no-nesting */
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
 import { worldFavoritesState } from '@src/renderer/data/favorites';
@@ -5,6 +6,8 @@ import { searchTextState, worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
   addEditSheetToMain,
+  getWorldDataToMain,
+  modifyEditSheetToMain,
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
@@ -23,13 +26,16 @@ interface HookMember {
   currentTableData: World[];
   visibleAddWorldModal: boolean;
   infoModalWorld: World | undefined;
+  editModalWorld: World | undefined;
   searchOptions: SearchOptions;
 
   onChangeSheetTab: (tabKey: string) => void;
-  onClickUrl: (url: string) => void;
-  onClickOpenAddWorldModal: () => void;
-  onClickCloseAddWorldModal: () => void;
+  onOpenAddWorldModal: () => void;
+  onCloseAddWorldModal: () => void;
+  onOpenEditWorldModal: (world: World) => void;
+  onCloseEditWorldModal: () => void;
   onAddWorld: (world: WorldEditInput) => void;
+  onEditWorld: (key: string, world: WorldEditInput) => void;
   onRemoveWorld: (key: string) => void;
   onClickRefresh: () => void;
   onClickOpenWorldInfoModal: (world: World) => void;
@@ -49,13 +55,19 @@ const useSearch = (): HookMember => {
   const [infoModalWorld, setInfoModalWorld] = useState<World | undefined>(
     undefined,
   );
+  const [editModalWorld, setEditModalWorld] = useState<World | undefined>();
   const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
   const [curSearchOption, setCurSearchOption] =
     useState<SearchOptions[number]>('NAME');
 
   useEffect(() => {
     if (worldData === undefined) {
-      getSheetWorldData().then((data) => {
+      // TODO 공개용은 이걸로
+      // getSheetWorldData().then((data) => {
+      //   setIsLoading(false);
+      //   return setWorldData(data);
+      // });
+      getWorldDataToMain().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
@@ -115,39 +127,76 @@ const useSearch = (): HookMember => {
     currentTableData,
     visibleAddWorldModal,
     infoModalWorld: infoModalWorld,
+    editModalWorld: editModalWorld,
     searchOptions: SEARCH_OPTIONS,
 
     onChangeSheetTab(tabKey) {
       setCurrentType(tabKey);
     },
-    onClickUrl(url) {
-      // openExternalLink(url);
-    },
     onSearchWorlds(text) {
       setSearchText(text);
     },
-    onClickOpenAddWorldModal() {
+    onOpenAddWorldModal() {
       setVisibleAddWorldModal(true);
     },
-    onClickCloseAddWorldModal() {
+    onCloseAddWorldModal() {
       setVisibleAddWorldModal(false);
     },
+    onOpenEditWorldModal(world) {
+      setEditModalWorld(world);
+    },
+    onCloseEditWorldModal() {
+      setEditModalWorld(undefined);
+    },
     onAddWorld(world) {
-      addEditSheetToMain(world).then(() => {
-        message.info('월드가 추가되었습니다');
-      });
+      setIsLoading(true);
+      addEditSheetToMain(world)
+        .then(() => {
+          message.info('월드가 추가되었습니다');
+        })
+        .then(() => {
+          getSheetWorldData().then((data) => {
+            setWorldData(data);
+          });
+        })
+        .catch((e: Error) => message.error(e))
+        .finally(() => setIsLoading(false));
+    },
+    onEditWorld(key, world) {
+      setIsLoading(true);
+      modifyEditSheetToMain(key, world)
+        .then(() => {
+          message.info('월드가 변경되었습니다');
+        })
+        .then(() => {
+          getSheetWorldData().then((data) => {
+            setWorldData(data);
+          });
+        })
+        .catch((e: Error) => message.error(e))
+        .finally(() => setIsLoading(false));
     },
     onRemoveWorld(key) {
-      reomoveEditSheetToMain(key).then(() => {
-        message.info('월드가 삭제되었습니다');
-      });
+      setIsLoading(true);
+      reomoveEditSheetToMain(key)
+        .then(() => {
+          message.info('월드가 삭제되었습니다');
+        })
+        .then(() => {
+          getSheetWorldData().then((data) => {
+            setWorldData(data);
+          });
+        })
+        .catch((e: Error) => message.error(e))
+        .finally(() => setIsLoading(false));
     },
     onClickRefresh() {
       setIsLoading(true);
-      getSheetWorldData().then((data) => {
-        setIsLoading(false);
-        return setWorldData(data);
-      });
+      getSheetWorldData()
+        .then((data) => {
+          return setWorldData(data);
+        })
+        .finally(() => setIsLoading(false));
     },
     onClickOpenWorldInfoModal(w) {
       setInfoModalWorld(w);
