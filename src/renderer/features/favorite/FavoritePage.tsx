@@ -127,7 +127,7 @@ export default function FavoritePage() {
           />
           <Column
             width="10%"
-            title="이름"
+            title="제목"
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
             onCell={(w) => ({

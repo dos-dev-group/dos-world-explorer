@@ -49,7 +49,7 @@ export default function SearchPage() {
         name = '설명';
         break;
       case 'NAME':
-        name = '이름';
+        name = '제목';
         break;
       case 'TAG':
         name = '태그';
@@ -177,7 +177,7 @@ export default function SearchPage() {
           />
           <Column
             width="10%"
-            title="이름"
+            title="제목"
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
             onCell={(w) => ({

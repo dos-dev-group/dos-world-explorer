@@ -5,6 +5,7 @@ import {
   WorldEditOutput,
   EditResult,
 } from '@src/types';
+import { NoDataError } from '../error';
 
 export function testEditSheetToMain(typeId: number) {
   window.electron.ipcRenderer.sendMessage('testEditSheetToMain', [typeId]);
