@@ -63,14 +63,14 @@ const useSearch = (): HookMember => {
   useEffect(() => {
     if (worldData === undefined) {
       // TODO 공개용은 이걸로
-      // getSheetWorldData().then((data) => {
-      //   setIsLoading(false);
-      //   return setWorldData(data);
-      // });
-      getWorldDataToMain().then((data) => {
+      getSheetWorldData().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
+      // getWorldDataToMain().then((data) => {
+      //   setIsLoading(false);
+      //   return setWorldData(data);
+      // });
     }
   }, [setWorldData, worldData]);
 
