@@ -65,6 +65,13 @@ export default function SearchPage() {
         }}
         visible={hookMember.infoModalWorld ? true : false}
         world={hookMember.infoModalWorld}
+        onEdit={() => {
+          //todo: 나중에 월드수정함수 추가해야함
+        }}
+        onRemove={(worldKey?: string) => {
+          if (worldKey !== undefined)
+            hookMember.onRemoveWorld(worldKey);
+        }}
       />
       <AddWorldModal
         onCancel={() => {
