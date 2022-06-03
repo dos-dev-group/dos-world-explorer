@@ -22,6 +22,7 @@ import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
+import StarSelect from '@src/renderer/components/world/StarSelect';
 import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 import WorldInfoModal from '../../components/WorldInfoModal';
@@ -117,13 +118,20 @@ export default function SearchPage() {
       >
         {renderedTabs}
       </Tabs>
-      <Button
-        size="small"
-        css={{ marginLeft: 'auto', alignSelf: 'center' }}
-        icon={<ReloadOutlined />}
-        onClick={() => hookMember.onClickRefresh()}
-        loading={hookMember.isLoading}
-      />
+      <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
+        별점 필터:&nbsp;
+        <StarSelect
+          value={hookMember.currentScoreFilter}
+          onSelect={hookMember.onChangeScoreFilter}
+        />
+        <div css={{ marginLeft: spacing(1) }} />
+        <Button
+          size="small"
+          icon={<ReloadOutlined />}
+          onClick={() => hookMember.onClickRefresh()}
+          loading={hookMember.isLoading}
+        />
+      </FlexRow>
 
       <Spin spinning={hookMember.isLoading}>
         <Table
@@ -131,8 +139,15 @@ export default function SearchPage() {
           scroll={{
             x: true,
           }}
+          pagination={{
+            showQuickJumper: true,
+            onChange: (page, pageSize) => {
+              hookMember.onChangePage(page);
+            },
+            current: hookMember.currentPage,
+          }}
           footer={(data) => (
-            <FlexRow>
+            <FlexRow css={{ gap: spacing(2) }}>
               <Button
                 type="primary"
                 css={{ marginLeft: 'auto' }}

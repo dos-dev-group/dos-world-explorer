@@ -21,6 +21,8 @@ export type SearchOptions = typeof SEARCH_OPTIONS;
 
 interface HookMember {
   currentType: string;
+  currentPage: number;
+  currentScoreFilter: number | undefined;
   isLoading: boolean;
   typeList: string[];
   currentTableData: World[];
@@ -30,6 +32,8 @@ interface HookMember {
   searchOptions: SearchOptions;
 
   onChangeSheetTab: (tabKey: string) => void;
+  onChangePage: (page: number) => void;
+  onChangeScoreFilter: (score: number | undefined) => void;
   onOpenAddWorldModal: () => void;
   onCloseAddWorldModal: () => void;
   onOpenEditWorldModal: (world: World) => void;
@@ -46,8 +50,12 @@ interface HookMember {
 
   checkIsFavorite: (world: World) => boolean;
 }
-const useSearch = (): HookMember => {
+const useSearchPage = (): HookMember => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentType, setCurrentType] = useState<string>('전체');
+  const [currentScoreFilter, setCurrentScoreFilter] = useState<
+    number | undefined
+  >();
   const [worldData, setWorldData] = useRecoilState(worldDataState);
   const [searchText, setSearchText] = useState<string>();
   const [isLoading, setIsLoading] = useState(worldData === undefined);
@@ -87,8 +95,8 @@ const useSearch = (): HookMember => {
       ) || [],
     [worldData],
   );
-  const currentTableData = useMemo(
-    () =>
+  const currentTableData = useMemo(() => {
+    const searchedWorldData =
       worldData
         ?.filter((w) => {
           if (currentType === '전체') {
@@ -123,11 +131,21 @@ const useSearch = (): HookMember => {
               );
           }
         })
-        .reverse() || [],
-    [curSearchOption, currentType, searchText, worldData],
-  );
+        .reverse() || [];
+
+    if (currentScoreFilter) {
+      const starFilteredData = searchedWorldData.filter(
+        (w) => w.score === currentScoreFilter,
+      );
+      return starFilteredData;
+    }
+    return searchedWorldData;
+  }, [curSearchOption, currentScoreFilter, currentType, searchText, worldData]);
+
   return {
     currentType,
+    currentPage,
+    currentScoreFilter: currentScoreFilter,
     isLoading,
     typeList,
     currentTableData,
@@ -138,6 +156,13 @@ const useSearch = (): HookMember => {
 
     onChangeSheetTab(tabKey) {
       setCurrentType(tabKey);
+      setCurrentPage(1);
+    },
+    onChangePage(page) {
+      setCurrentPage(page);
+    },
+    onChangeScoreFilter(score) {
+      setCurrentScoreFilter(score);
     },
     onSearchWorlds(text) {
       setSearchText(text);
@@ -238,4 +263,4 @@ const useSearch = (): HookMember => {
   };
 };
 
-export default useSearch;
+export default useSearchPage;

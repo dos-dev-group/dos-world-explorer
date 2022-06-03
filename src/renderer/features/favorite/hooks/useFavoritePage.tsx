@@ -12,6 +12,7 @@ const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
 export type SearchOptions = typeof SEARCH_OPTIONS;
 
 interface HookMember {
+  currentScoreFilter: number | undefined;
   currentType: string;
   typeList: string[];
   worldData: WorldData;
@@ -19,6 +20,7 @@ interface HookMember {
   modalWorldInfo: World | undefined;
   isLoading: boolean;
 
+  onChangeScoreFilter: (score: number | undefined) => void;
   onChangeType: (tabKey: string) => void;
   onClickFavorite: (world: World) => void;
   checkIsFavorite: (world: World) => boolean;
@@ -32,6 +34,9 @@ const useFavoritePage = (): HookMember => {
   const [worldData, setWorldData] = useRecoilState(worldDataState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [currentType, setCurrentType] = useState<string>();
+  const [currentScoreFilter, setCurrentScoreFilter] = useState<
+    number | undefined
+  >();
   const [curSearchText, setCurSearchText] = useState<string>();
   const [curSearchOption, setSearchOption] =
     useState<SearchOptions[number]>('NAME');
@@ -55,18 +60,31 @@ const useFavoritePage = (): HookMember => {
     }
   }, [setWorldData, worldData]);
 
-  const favKeys =
-    memoizedFavorites && currentType ? memoizedFavorites[currentType] : [];
-  const worldTableData = (
-    worldData?.filter((w) =>
-      favKeys.find((e) => e === w.key) ? true : false,
-    ) || []
-  )
-    .concat()
-    .reverse();
+  const favKeys = useMemo(
+    () =>
+      memoizedFavorites && currentType ? memoizedFavorites[currentType] : [],
+    [currentType, memoizedFavorites],
+  );
+  const worldTableData = useMemo(() => {
+    const favWorlds = (
+      worldData?.filter((w) =>
+        favKeys.find((e) => e === w.key) ? true : false,
+      ) || []
+    )
+      .concat()
+      .reverse();
+    if (currentScoreFilter) {
+      const scoreFilteredData = favWorlds.filter(
+        (w) => w.score === currentScoreFilter,
+      );
+      return scoreFilteredData;
+    }
+    return favWorlds;
+  }, [currentScoreFilter, favKeys, worldData]);
 
   return {
     currentType: currentType || '',
+    currentScoreFilter: currentScoreFilter,
     typeList: memoizedFavorites ? Object.keys(memoizedFavorites) : [],
     worldData: worldTableData,
     searchOptions: SEARCH_OPTIONS,
@@ -76,6 +94,9 @@ const useFavoritePage = (): HookMember => {
 
     onChangeType(tabKey) {
       setCurrentType(tabKey);
+    },
+    onChangeScoreFilter(score) {
+      setCurrentScoreFilter(score);
     },
     onClickFavorite(world) {
       if (!favorites) {
