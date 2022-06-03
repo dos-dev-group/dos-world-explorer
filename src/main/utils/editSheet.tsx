@@ -1,6 +1,5 @@
 import { google } from 'googleapis';
-import * as vrchat from 'vrchat';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import {
   World,
   WorldData,
@@ -12,11 +11,7 @@ import keys from '../../../secret/sheetAuth.json';
 import vrckey from '../../../secret/vrc.json';
 import sheetData from '../../../secret/sheetData.json';
 import protectList from '../../../secret/protectList.json';
-
-const configuration = new vrchat.Configuration({
-  username: vrckey.id,
-  password: vrckey.pw,
-});
+import { getWorldInfo } from './vrchatAPI';
 
 const spreadsheetId = sheetData.spreadsheetId;
 const sheetId = sheetData.sheetId;
@@ -56,11 +51,8 @@ export async function testEditSheet() {
 }
 
 export async function autoFile(worldUrl: string): Promise<WorldEditOutput> {
-  const AuthenticationApi = new vrchat.AuthenticationApi(configuration);
-  const WorldsApi = new vrchat.WorldsApi(configuration);
-  await AuthenticationApi.getCurrentUser();
   const worldId = worldUrl.replace('https://vrchat.com/home/world/', '');
-  const worldData = (await WorldsApi.getWorld(worldId)).data;
+  const worldData = await getWorldInfo(worldId);
   const nowTime = new Date();
   console.log(worldId);
   console.log(transeImageUrl(worldData.thumbnailImageUrl));
