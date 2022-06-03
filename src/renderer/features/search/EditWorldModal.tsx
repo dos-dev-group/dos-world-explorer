@@ -166,10 +166,7 @@ function EditWorldModal(props: Props) {
       </Input.Group>
       <Input.Group css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>
         <Typography.Title level={5}>설명</Typography.Title>
-        <Input
-          onChange={(e) => setCurDesc(e.target.value)}
-          value={props.world?.description}
-        />
+        <Input onChange={(e) => setCurDesc(e.target.value)} value={curDesc} />
       </Input.Group>
       <div css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>
         <Typography.Title level={5}>태그</Typography.Title>
