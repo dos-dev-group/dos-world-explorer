@@ -1,17 +1,18 @@
 import { FlexCenter, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { World, WorldEditInput } from '@src/types';
-import { Button, Image, Modal, Tag, Typography } from 'antd';
+import { Button, Image, Modal, Popconfirm, Tag, Typography } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { spacing } from '../utils/styling';
 import WorldInstanceCreationModal from './WorldInstanceCreationModal';
 
 interface Props {
   onOk?: (e: WorldEditInput) => void;
   onCancel?: () => void;
-  onEdit?: (worldKey: string) => void;
-  onRemove?: (worldKey: string) => void;
+  onEdit?: (world: World) => void;
+  onRemove?: (world: World) => void;
   visible: boolean;
   world?: World;
 }
@@ -78,33 +79,37 @@ function WorldInfoModal(props: Props) {
             </div>
 
             <div css={{ flex: 1 }}>
-              <ButtonWorldLink
-                worldKey={props.world.key}
-                url={props.world.url}
-              />
-              <ButtonInstanceCreation
-                worldKey={props.world.key}
-                url={props.world.url}
-                onClickInstance={() => setVisibleInstanceModal(true)}
-              />
-              <Button
-                type="primary"
-                css={{ marginLeft: 'auto' }}
-                onClick={() => {
-                  props.onEdit?.(props.world!.key);
-                }}
-              >
-                수정
-              </Button>
-              <Button
-                danger
-                css={{ marginLeft: 'auto' }}
-                onClick={() => {
-                  props.onRemove?.(props.world!.key);
-                }}
-              >
-                삭제
-              </Button>
+              <FlexRow css={{ gap: spacing(1) }}>
+                <ButtonWorldLink
+                  worldKey={props.world.key}
+                  url={props.world.url}
+                />
+                <ButtonInstanceCreation
+                  worldKey={props.world.key}
+                  url={props.world.url}
+                  onClickInstance={() => setVisibleInstanceModal(true)}
+                />
+                <Button
+                  type="primary"
+                  ghost
+                  css={{ marginLeft: 'auto' }}
+                  onClick={() => {
+                    props.onEdit?.(props.world!);
+                  }}
+                >
+                  수정
+                </Button>
+                <Popconfirm
+                  title="정말 월드를 삭제하시겠습니까?"
+                  placement="topRight"
+                  onConfirm={() => props.onRemove?.(props.world!)}
+                >
+                  <Button danger css={{ marginLeft: 'auto' }}>
+                    삭제
+                  </Button>
+                </Popconfirm>
+              </FlexRow>
+
               <br />
               <Typography.Paragraph css={{ marginTop: 20 }}>
                 {props.world.description}

@@ -39,7 +39,7 @@ interface HookMember {
   onRemoveWorld: (key: string) => void;
   onClickRefresh: () => void;
   onClickOpenWorldInfoModal: (world: World) => void;
-  onClickCloseWorldInfoModal: () => void;
+  onCloseWorldInfoModal: () => void;
   onClickFavorite: (world: World) => void;
   onSearchWorlds: (text: string) => void;
   onChangeSearchOption: (option: SearchOptions[number]) => void;
@@ -207,7 +207,7 @@ const useSearch = (): HookMember => {
     onClickOpenWorldInfoModal(w) {
       setInfoModalWorld(w);
     },
-    onClickCloseWorldInfoModal() {
+    onCloseWorldInfoModal() {
       setInfoModalWorld(undefined);
     },
     onClickFavorite(world) {

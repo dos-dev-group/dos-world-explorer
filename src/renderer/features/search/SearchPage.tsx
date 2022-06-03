@@ -62,16 +62,15 @@ export default function SearchPage() {
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
       <WorldInfoModal
         onCancel={() => {
-          hookMember.onClickCloseWorldInfoModal();
+          hookMember.onCloseWorldInfoModal();
         }}
         visible={hookMember.infoModalWorld ? true : false}
         world={hookMember.infoModalWorld}
-        onEdit={() => {
-          //todo: 나중에 월드수정함수 추가해야함
+        onEdit={(world) => {
+          hookMember.onOpenEditWorldModal(world);
         }}
-        onRemove={(worldKey?: string) => {
-          if (worldKey !== undefined)
-            hookMember.onRemoveWorld(worldKey);
+        onRemove={(world) => {
+          hookMember.onRemoveWorld(world.key);
         }}
       />
       <AddWorldModal
@@ -260,7 +259,7 @@ export default function SearchPage() {
             )}
             sorter={(a: World, b: World) => a.score - b.score}
           />
-          <Column
+          {/* <Column
             width="15%"
             title="URL"
             dataIndex="url"
@@ -269,7 +268,7 @@ export default function SearchPage() {
                 {url}
               </Typography.Link>
             )}
-          />
+          /> */}
           <Column
             width="5%"
             dataIndex="key"
