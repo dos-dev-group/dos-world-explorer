@@ -36,15 +36,17 @@ async function transeImageUrl(imageUrl: string): Promise<string> {
 
 export async function testEditSheet() {
   // console.log(await getWorldData());
-  try {
-    const html = await axios.get(
-      'https://api.vrchat.cloud/api/1/file/file_d277663f-b174-4cd7-aec4-f109608d558e/2/file',
-    );
-    console.log(html.request.res.responseUrl);
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  // try {
+  //   const html = await axios.get(
+  //     'https://api.vrchat.cloud/api/1/file/file_d277663f-b174-4cd7-aec4-f109608d558e/2/file',
+  //   );
+  //   console.log(html.request.res.responseUrl);
+  // } catch (error) {
+  //   console.error(error);
+  //   throw error;
+  // }
+  const protectedRangeId = await protectSheet(sheetId);
+  await unprotectSheet(protectedRangeId);
 }
 
 export async function autoFile(worldUrl: string): Promise<WorldEditOutput> {
@@ -190,7 +192,7 @@ export async function addEditSheet(
   const worldData = await getWorldData();
   const worldOutput = await autoFile(worldInput.url);
   if (overLapCheck(worldData, worldOutput.key)) {
-    await unprotectSheet(sheetId);
+    await unprotectSheet(protectedRangeId);
     return EditResult.ALREADYEXIST;
   }
   try {
