@@ -23,9 +23,6 @@ const client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
   'https://www.googleapis.com/auth/spreadsheets',
 ]);
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 async function transeImageUrl(imageUrl: string): Promise<string> {
   try {
     const html = await axios.get(imageUrl);
@@ -61,8 +58,8 @@ export async function autoFile(worldUrl: string): Promise<WorldEditOutput> {
   console.log(nowTime.toISOString().replace('T', ' ').split('.')[0]);
   return {
     key: worldId,
-    name: worldData.name,
-    author: worldData.authorName,
+    name: String(worldData.name),
+    author: String(worldData.authorName),
     imageUrl: await transeImageUrl(worldData.thumbnailImageUrl),
     date: nowTime,
   };
@@ -84,9 +81,9 @@ export async function getWorldData(): Promise<WorldData> {
   vaules.slice(1).forEach((vaule) => {
     const world: World = {
       key: vaule[9], // 월드 고유ID
-      name: vaule[1],
-      author: vaule[2],
-      description: vaule[3],
+      name: String(vaule[1]),
+      author: String(vaule[2]),
+      description: String(vaule[3]),
       tags: vaule[4].replace(' ', '').substr(1).split('#'),
       score: vaule[5].length,
       url: vaule[6],
