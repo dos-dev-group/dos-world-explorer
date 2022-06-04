@@ -104,7 +104,7 @@ function EditWorldModal(props: Props) {
         <Typography.Title level={5}>URL</Typography.Title>
         <Input
           css={{ width: 'calc(100% - 200px)' }}
-          value={props.world?.url}
+          value={curUrl}
           onChange={(e) => {
             setCurUrl(e.target.value);
             setWorldCheckInfo(undefined);
