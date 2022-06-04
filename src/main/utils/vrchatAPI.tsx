@@ -7,7 +7,6 @@ import * as path from 'path';
 import { app, shell } from 'electron';
 import { User, UserState, WorldVrcRaw } from '../../types';
 import vrckey from '../../../secret/vrc.json';
-import { Header } from 'antd/lib/layout/layout';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -18,22 +17,17 @@ const FAV_PATH = path.join(
   'VRCToken.json',
 );
 
-export function saveToken(VRCToken: { token: string }) {
-  return fs
-    .access(FAV_PATH, constants.R_OK)
-    .catch(() => fs.mkdir(path.dirname(FAV_PATH), { recursive: true }))
-    .then(() => fs.writeFile(FAV_PATH, JSON.stringify(VRCToken, null, 2)))
-    .then(() => VRCToken);
-}
+// export function saveToken(VRCToken: { token: string }) {
+//   return fs
+//     .access(FAV_PATH, constants.R_OK)
+//     .catch(() => fs.mkdir(path.dirname(FAV_PATH), { recursive: true }))
+//     .then(() => fs.writeFile(FAV_PATH, JSON.stringify(VRCToken, null, 2)))
+//     .then(() => VRCToken);
+// }
 
-export function loadToken(): Promise<{ token: string }> {
-  return fs.readFile(FAV_PATH).then((v: Buffer) => JSON.parse(v.toString()));
-}
-let token = '';
-const configuration = new vrchat.Configuration({
-  apiKey: VRCHATAPIKEY,
-  accessToken: token,
-});
+// export function loadToken(): Promise<{ token: string }> {
+//   return fs.readFile(FAV_PATH).then((v: Buffer) => JSON.parse(v.toString()));
+// }
 
 let authenticationApi = new vrchat.AuthenticationApi();
 
@@ -56,11 +50,9 @@ export async function login(id: string, pw: string): Promise<boolean> {
     .getCurrentUser()
     .then(async (res) => {
       user = res.data;
-      token = JSON.stringify(res.headers).split('auth=')[1].split(';')[0];
-      configuration.accessToken = token;
+      console.log(user);
       console.log('login success');
-      console.log(res.data.displayName, token);
-      saveToken({ token: token });
+      console.log(res.data.displayName);
     })
     .catch((err) => {
       console.log(err.response.data);
@@ -88,7 +80,8 @@ function authCheck() {
 }
 
 export async function testVrchatAPI(): Promise<any> {
-  return getFriednList();
+  return true;
+  // return getFriednList();
   // return getFriednList(); // 친구 목록 로딩 TODO 1
 
   // return generatedWorldInstanceInfo('12345', 'friends', user.data.id, 'jp'); // 인스턴스 생성 TODO 2
