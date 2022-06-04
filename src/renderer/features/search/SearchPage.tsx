@@ -118,7 +118,13 @@ export default function SearchPage() {
       >
         {renderedTabs}
       </Tabs>
-      <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
+      <FlexRow
+        css={{
+          marginLeft: 'auto',
+          alignItems: 'center',
+          marginBottom: spacing(2),
+        }}
+      >
         별점 필터:&nbsp;
         <StarSelect
           value={hookMember.currentScoreFilter}
@@ -201,6 +207,7 @@ export default function SearchPage() {
             title="제목"
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
+            showSorterTooltip={false}
             onCell={(w) => ({
               style: {
                 width: 200,
@@ -223,6 +230,7 @@ export default function SearchPage() {
             title="제작자"
             dataIndex="author"
             sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
+            showSorterTooltip={false}
             ellipsis
           />
           <Column
@@ -273,6 +281,7 @@ export default function SearchPage() {
               </FlexRow>
             )}
             sorter={(a: World, b: World) => a.score - b.score}
+            showSorterTooltip={false}
           />
           {/* <Column
             width="15%"
