@@ -23,6 +23,7 @@ import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
+import StarSelect from '@src/renderer/components/world/StarSelect';
 import useFavoritePage from './hooks/useFavoritePage';
 
 const { TabPane } = Tabs;
@@ -71,13 +72,20 @@ export default function FavoritePage() {
         loading={hookMember.isLoading}
       /> */}
 
-      <Button
-        size="small"
-        css={{ marginLeft: 'auto', alignSelf: 'center' }}
-        icon={<ReloadOutlined />}
-        onClick={() => hookMember.onClickRefresh()}
-        loading={hookMember.isLoading}
-      />
+      <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
+        별점 필터:&nbsp;
+        <StarSelect
+          value={hookMember.currentScoreFilter}
+          onSelect={hookMember.onChangeScoreFilter}
+        />
+        <div css={{ marginLeft: spacing(1) }} />
+        <Button
+          size="small"
+          icon={<ReloadOutlined />}
+          onClick={() => hookMember.onClickRefresh()}
+          loading={hookMember.isLoading}
+        />
+      </FlexRow>
 
       <Spin spinning={hookMember.isLoading}>
         <Table
@@ -203,7 +211,7 @@ export default function FavoritePage() {
             )}
             sorter={(a: World, b: World) => a.score - b.score}
           />
-          <Column
+          {/* <Column
             width="15%"
             title="URL"
             dataIndex="url"
@@ -212,7 +220,7 @@ export default function FavoritePage() {
                 {url}
               </Typography.Link>
             )}
-          />
+          /> */}
           {/* <Column
             width="5%"
             dataIndex="key"

@@ -85,7 +85,16 @@ function MenuLayout() {
   return (
     <Flex css={{ minHeight: '100vh' }}>
       <Layout>
-        <Sider>
+        <Sider
+          css={{
+            overflow: 'auto',
+            height: '100vh',
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            bottom: 0,
+          }}
+        >
           <Title level={4} style={{ color: 'white', textAlign: 'center' }}>
             DOS WORLD EXPLORER
           </Title>
@@ -121,7 +130,7 @@ function MenuLayout() {
             ]}
           />
         </Sider>
-        <Layout>
+        <Layout css={{ marginLeft: 200 }}>
           <Outlet />
           <Footer style={{ textAlign: 'center' }}>
             Dos Gang Application ©2022 Created by Dos Chat
