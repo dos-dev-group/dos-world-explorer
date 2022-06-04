@@ -7,7 +7,15 @@ import {
   modifyEditSheet,
   autoFile,
 } from './utils/editSheet';
-import { testVrchatAPI, getVrchatRencentWorlds } from './utils/vrchatAPI';
+import {
+  testVrchatAPI,
+  getVrchatRencentWorlds,
+  getFriednList,
+  generatedWorldInstanceInfo,
+  sendInvites,
+  genWorldInstanceName,
+  login,
+} from './utils/vrchatAPI';
 import { loadFavorites, saveFavorites } from './utils/favorites';
 
 export default function setupIpcListener() {
@@ -24,17 +32,52 @@ export default function setupIpcListener() {
     }
   });
 
+  // ###################################### for vrchatAPI.tsx ######################################
+
   ipcMain.on('testVrchatAPIToMain', async (event, arg) => {
-    // testVrchatAPI();
     event.reply('testVrchatAPIToRenderer', await testVrchatAPI());
   });
-  ipcMain.on('getVrchatRencentWorldsToMain', async (event, arg) => {
+
+  ipcMain.on('loginToMain', async (event, arg) => {
+    event.reply('loginToRenderer', await login(arg[0], arg[1]));
+  });
+
+  ipcMain.on('getFriednListToMain', async (event, arg) => {
+    event.reply('getFriednListToRenderer', await getFriednList());
+  });
+
+  ipcMain.on('generatedWorldInstanceInfoToMain', async (event, arg) => {
     // testVrchatAPI();
+    event.reply(
+      'generatedWorldInstanceInfoToRenderer',
+      generatedWorldInstanceInfo(arg[0], arg[1], arg[2], arg[3]),
+    );
+  });
+
+  ipcMain.on('sendInvitesToMain', async (event, arg) => {
+    // testVrchatAPI();
+    event.reply(
+      'sendInvitesToRenderer',
+      await sendInvites(arg[0], arg[1], arg[2]),
+    );
+  });
+
+  ipcMain.on('genWorldInstanceNameToMain', async (event, arg) => {
+    // testVrchatAPI();
+    event.reply(
+      'genWorldInstanceNameToRenderer',
+      await genWorldInstanceName(arg[0]),
+    );
+  });
+
+  ipcMain.on('getVrchatRencentWorldsToMain', async (event, arg) => {
     event.reply(
       'getVrchatRencentWorldsToRenderer',
       await getVrchatRencentWorlds(),
     );
   });
+
+  // ###################################### for editSheet.tsx ######################################
 
   ipcMain.on('testEditSheetToMain', async (event, arg) => {
     event.reply('testEditSheetToRenderer', await testEditSheet());
@@ -62,6 +105,8 @@ export default function setupIpcListener() {
   ipcMain.on('autoFileToMain', async (event, arg) => {
     event.reply('autoFileToRenderer', await autoFile(arg[0]));
   });
+
+  // ###################################### for favorites.tsx ######################################
 
   ipcMain.on('saveFavorites', async (event, arg) => {
     try {
