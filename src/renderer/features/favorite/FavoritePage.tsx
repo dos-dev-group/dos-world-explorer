@@ -73,7 +73,6 @@ export default function FavoritePage() {
       /> */}
 
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
-        별점 필터:&nbsp;
         <Button
           size="small"
           icon={<ReloadOutlined />}
