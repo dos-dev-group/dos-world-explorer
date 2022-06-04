@@ -92,7 +92,6 @@ function WorldInfoModal(props: Props) {
                 <Button
                   type="primary"
                   ghost
-                  css={{ marginLeft: 'auto' }}
                   onClick={() => {
                     props.onEdit?.(props.world!);
                   }}
@@ -104,9 +103,7 @@ function WorldInfoModal(props: Props) {
                   placement="topRight"
                   onConfirm={() => props.onRemove?.(props.world!)}
                 >
-                  <Button danger css={{ marginLeft: 'auto' }}>
-                    삭제
-                  </Button>
+                  <Button danger>삭제</Button>
                 </Popconfirm>
               </FlexRow>
 
