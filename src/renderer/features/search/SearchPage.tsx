@@ -22,7 +22,7 @@ import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
-import StarSelect from '@src/renderer/components/world/StarSelect';
+import StarSelect from '@src/renderer/components/StarSelect';
 import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 import WorldInfoModal from '../../components/WorldInfoModal';
@@ -118,19 +118,8 @@ export default function SearchPage() {
       >
         {renderedTabs}
       </Tabs>
-      <FlexRow
-        css={{
-          marginLeft: 'auto',
-          alignItems: 'center',
-          marginBottom: spacing(2),
-        }}
-      >
-        별점 필터:&nbsp;
-        <StarSelect
-          value={hookMember.currentScoreFilter}
-          onSelect={hookMember.onChangeScoreFilter}
-        />
-        <div css={{ marginLeft: spacing(1) }} />
+
+      <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
         <Button
           size="small"
           icon={<ReloadOutlined />}
@@ -207,7 +196,6 @@ export default function SearchPage() {
             title="제목"
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
-            showSorterTooltip={false}
             onCell={(w) => ({
               style: {
                 width: 200,
@@ -230,7 +218,6 @@ export default function SearchPage() {
             title="제작자"
             dataIndex="author"
             sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
-            showSorterTooltip={false}
             ellipsis
           />
           <Column
@@ -274,14 +261,15 @@ export default function SearchPage() {
             title="별점"
             dataIndex="score"
             render={(score: number) => (
-              <FlexRow>
+              <FlexRow css={{ width: 90 }}>
                 {new Array(score).fill(null).map((_, index) => (
                   <StarFilled key={index} css={{ color: gold.primary }} />
                 ))}
               </FlexRow>
             )}
             sorter={(a: World, b: World) => a.score - b.score}
-            showSorterTooltip={false}
+            filters={scoreFilters}
+            onFilter={(value, record) => value === record.score}
           />
           {/* <Column
             width="15%"
@@ -323,3 +311,69 @@ export default function SearchPage() {
     </Flex>
   );
 }
+
+const scoreFilters = [
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 1,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 2,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 3,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 4,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 5,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 6,
+  },
+];
