@@ -104,19 +104,20 @@ const useSearchPage = (): HookMember => {
             return true;
           }
           const words = searchText.split(' ');
+          const trimedText = searchText.trim();
 
           switch (curSearchOption) {
             case 'NAME':
               return (
-                e.name.toLowerCase().search(searchText.toLowerCase()) !== -1
+                e.name.toLowerCase().search(trimedText.toLowerCase()) !== -1
               );
             case 'AUTHOR':
               return (
-                e.author.toLowerCase().search(searchText.toLowerCase()) !== -1
+                e.author.toLowerCase().search(trimedText.toLowerCase()) !== -1
               );
             case 'DESCRIPTION':
               return (
-                e.description.toLowerCase().search(searchText.toLowerCase()) !==
+                e.description.toLowerCase().search(trimedText.toLowerCase()) !==
                 -1
               );
             case 'TAG':
