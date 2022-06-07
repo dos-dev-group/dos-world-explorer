@@ -104,7 +104,7 @@ function EditWorldModal(props: Props) {
         <Typography.Title level={5}>URL</Typography.Title>
         <Input
           css={{ width: 'calc(100% - 200px)' }}
-          value={props.world?.url}
+          value={curUrl}
           onChange={(e) => {
             setCurUrl(e.target.value);
             setWorldCheckInfo(undefined);
@@ -171,11 +171,8 @@ function EditWorldModal(props: Props) {
       <div css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}>
         <Typography.Title level={5}>태그</Typography.Title>
         {curTags.map((tag) => {
-          let color;
-          if (tag) {
-            const colorIndex = simpleStringHash(tag) % PresetColorTypes.length;
-            color = PresetColorTypes[colorIndex];
-          }
+          const colorIndex = simpleStringHash(tag) % PresetColorTypes.length;
+          const color = PresetColorTypes[colorIndex];
 
           return (
             <Tag

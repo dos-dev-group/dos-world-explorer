@@ -23,7 +23,7 @@ import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
-import StarSelect from '@src/renderer/components/world/StarSelect';
+import StarSelect from '@src/renderer/components/StarSelect';
 import useFavoritePage from './hooks/useFavoritePage';
 
 const { TabPane } = Tabs;
@@ -73,12 +73,6 @@ export default function FavoritePage() {
       /> */}
 
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
-        별점 필터:&nbsp;
-        <StarSelect
-          value={hookMember.currentScoreFilter}
-          onSelect={hookMember.onChangeScoreFilter}
-        />
-        <div css={{ marginLeft: spacing(1) }} />
         <Button
           size="small"
           icon={<ReloadOutlined />}
@@ -138,7 +132,6 @@ export default function FavoritePage() {
             title="제목"
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
-            showSorterTooltip={false}
             onCell={(w) => ({
               style: {
                 width: 200,
@@ -161,7 +154,6 @@ export default function FavoritePage() {
             title="제작자"
             dataIndex="author"
             sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
-            showSorterTooltip={false}
             ellipsis
           />
           <Column
@@ -212,7 +204,8 @@ export default function FavoritePage() {
               </FlexRow>
             )}
             sorter={(a: World, b: World) => a.score - b.score}
-            showSorterTooltip={false}
+            filters={scoreFilters}
+            onFilter={(value, record) => value === record.score}
           />
           {/* <Column
             width="15%"
@@ -246,3 +239,69 @@ export default function FavoritePage() {
     </Flex>
   );
 }
+
+const scoreFilters = [
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 1,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 2,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 3,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 4,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 5,
+  },
+  {
+    text: (
+      <FlexRow>
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+        <StarFilled css={{ color: gold.primary }} />
+      </FlexRow>
+    ),
+    value: 6,
+  },
+];
