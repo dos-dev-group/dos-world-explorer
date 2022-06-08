@@ -1,15 +1,6 @@
-import {
-  FlexCenter,
-} from '@src/renderer/components/styledComponents';
+import { FlexCenter } from '@src/renderer/components/styledComponents';
 import { World, WorldEditInput } from '@src/types';
-import {
-  Button,
-  Image,
-  Input,
-  Modal,
-  Select,
-  Typography,
-} from 'antd';
+import { Button, Image, Input, Modal, Select, Typography } from 'antd';
 import { URL_REGEX } from '@src/renderer/utils/constants';
 import { useState } from 'react';
 import { spacing } from '@src/renderer/utils/styling';

@@ -15,10 +15,8 @@ import {
   useLocation,
   Navigate,
 } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
 // import './App.css';
 import { Flex } from './components/styledComponents';
-import { worldFavoritesState } from './data/favorites';
 import FavoritePage from './features/favorite/FavoritePage';
 import Home from './features/home/Home';
 import SearchPage from './features/search/SearchPage';

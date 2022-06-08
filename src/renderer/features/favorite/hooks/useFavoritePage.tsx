@@ -1,5 +1,6 @@
 import { worldFavoritesState } from '@src/renderer/data/favorites';
 import { worldDataState } from '@src/renderer/data/world';
+import copyDeep from '@src/renderer/utils/copyDeep';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
 import { WorldData, World } from '@src/types';
@@ -89,8 +90,7 @@ const useFavoritePage = (): HookMember => {
         return;
       }
       setFavorites((v) => {
-        const val = { ...v };
-        val.favorite1 = [...val.favorite1];
+        const val = copyDeep(v)!;
         if (val.favorite1.find((e) => e === world.key)) {
           val.favorite1 = val.favorite1.filter((e) => e !== world.key);
           return val;
