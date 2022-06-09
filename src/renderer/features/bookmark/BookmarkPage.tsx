@@ -94,7 +94,7 @@ export default function BookmarkPage() {
           <Column
             width="5%"
             title=""
-            key="favorite"
+            key="bookmark"
             render={(_, record: World) => {
               if (hookMember.checkIsFavorite(record)) {
                 return (

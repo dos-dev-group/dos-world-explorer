@@ -10,12 +10,12 @@ const FAV_PATH = path.join(
   'favorites.json',
 );
 
-export function saveBookmarks(favorites: Bookmarks) {
+export function saveBookmarks(bookmarks: Bookmarks) {
   return fs
     .access(FAV_PATH, constants.R_OK)
     .catch(() => fs.mkdir(path.dirname(FAV_PATH), { recursive: true }))
-    .then(() => fs.writeFile(FAV_PATH, JSON.stringify(favorites, null, 2)))
-    .then(() => favorites);
+    .then(() => fs.writeFile(FAV_PATH, JSON.stringify(bookmarks, null, 2)))
+    .then(() => bookmarks);
 }
 
 export function loadBookmarks(): Promise<Bookmarks> {

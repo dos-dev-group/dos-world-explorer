@@ -106,7 +106,7 @@ export default function setupIpcListener() {
     event.reply('autoFileToRenderer', await autoFile(arg[0]));
   });
 
-  // ###################################### for favorites.tsx ######################################
+  // ###################################### for bookmarks.tsx ######################################
 
   ipcMain.on('saveBookmarks', async (event, arg) => {
     try {

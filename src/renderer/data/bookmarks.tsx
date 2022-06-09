@@ -1,23 +1,23 @@
 import { Bookmarks } from '@src/types';
 import { atom, AtomEffect } from 'recoil';
-import { loadFavorites, saveFavorites } from '../utils/ipc/bookmarksUtils';
+import { loadBookmarks, saveBookmarks } from '../utils/ipc/bookmarksUtils';
 
 const bookmarkEffect =
   (): AtomEffect<Bookmarks | undefined> =>
   ({ trigger, onSet, setSelf }) => {
     if (trigger === 'get') {
-      loadFavorites()
-        .catch(() => saveFavorites({ favorite1: [] }))
+      loadBookmarks()
+        .catch(() => saveBookmarks({ favorite1: [] }))
         .then((value) => setSelf(value));
     }
 
     onSet((newValue, _, isReset) => {
-      if (newValue !== undefined) saveFavorites(newValue);
+      if (newValue !== undefined) saveBookmarks(newValue);
     });
   };
 
 export const worldBookmarksState = atom<Bookmarks | undefined>({
-  key: 'worldFavoritesState',
+  key: 'worldBookmarksState',
   default: undefined,
   effects: [bookmarkEffect()],
 });

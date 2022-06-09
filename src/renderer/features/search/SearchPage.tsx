@@ -176,7 +176,7 @@ export default function SearchPage() {
           <Column
             width="5%"
             // title=""
-            key="favorite"
+            key="bookmark"
             render={(_, record: World) => {
               if (bookmarkHookMember.isSomewhereBookmarkedWorld(record)) {
                 return (
