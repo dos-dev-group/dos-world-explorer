@@ -24,6 +24,8 @@ import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import StarSelect from '@src/renderer/components/StarSelect';
+import BookmarkSelectModal from '@src/renderer/components/BookmarkSelectModal';
+import useBookmark from '@src/renderer/utils/hooks/useBookmark';
 import useBookmarkPage from './hooks/useBookmarkPage';
 
 const { TabPane } = Tabs;
@@ -33,6 +35,7 @@ const { Search } = Input;
 
 export default function BookmarkPage() {
   const hookMember = useBookmarkPage();
+  const bookmarkHookMember = useBookmark();
 
   const renderedTabs = hookMember.typeList.map((e) => (
     <TabPane tab={e} key={e} />
@@ -40,6 +43,21 @@ export default function BookmarkPage() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+      <BookmarkSelectModal
+        bookmarkTypes={bookmarkHookMember.bookmarkTypes}
+        visible={bookmarkHookMember.isOpenBookmarkModal}
+        preSelectType={bookmarkHookMember.worldTypes}
+        onOk={(types: string[]): void => {
+          bookmarkHookMember.onChangeBookmarkWorld(types);
+          bookmarkHookMember.onCloseBookmarkModal();
+        }}
+        onCancel={(): void => {
+          bookmarkHookMember.onCloseBookmarkModal();
+        }}
+        onAddItem={(type: string): void => {
+          bookmarkHookMember.onAddBookmarkType(type);
+        }}
+      />
       <WorldInfoModal
         onCancel={() => {
           hookMember.onClickToggleInfoModal(undefined);
@@ -96,18 +114,22 @@ export default function BookmarkPage() {
             title=""
             key="bookmark"
             render={(_, record: World) => {
-              if (hookMember.checkIsFavorite(record)) {
+              if (bookmarkHookMember.checkIsSomewhereBookmarkedWorld(record)) {
                 return (
                   <HeartFilled
                     css={{ color: red.primary, fontSize: 20 }}
-                    onClick={() => hookMember.onClickFavorite(record)}
+                    onClick={() =>
+                      bookmarkHookMember.onClickOpenBookmarkModal(record)
+                    }
                   />
                 );
               }
               return (
                 <HeartOutlined
                   css={{ color: red.primary, fontSize: 20 }}
-                  onClick={() => hookMember.onClickFavorite(record)}
+                  onClick={() =>
+                    bookmarkHookMember.onClickOpenBookmarkModal(record)
+                  }
                 />
               );
             }}

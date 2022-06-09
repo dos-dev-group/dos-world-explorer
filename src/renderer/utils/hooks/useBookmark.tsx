@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 interface HookMember {
-  onOpenBookmarkModal(world: World): void;
+  onClickOpenBookmarkModal(world: World): void;
   onCloseBookmarkModal(): void;
   onAddBookmarkType(bookmarkType: string): void;
   onRemoveBookmarkType(bookmarkType: string): void;
@@ -13,7 +13,7 @@ interface HookMember {
   onRemoveBookmarkWorld(bookmarkType: string): void;
   onChangeBookmarkWorld(bookmarkTypes: string[]): void;
 
-  isSomewhereBookmarkedWorld(world: World): boolean;
+  checkIsSomewhereBookmarkedWorld(world: World): boolean;
 
   isOpenBookmarkModal: boolean;
   bookmarkTypes: string[];
@@ -26,7 +26,7 @@ const useBookmark = (): HookMember => {
     useRecoilState(worldBookmarksState);
 
   const hookMember: HookMember = {
-    onOpenBookmarkModal(world: World): void {
+    onClickOpenBookmarkModal(world: World): void {
       setSelectedWorld(world);
     },
     onCloseBookmarkModal(): void {
@@ -35,37 +35,45 @@ const useBookmark = (): HookMember => {
     onAddBookmarkType(bookmarkType: string): void {
       if (!recoilBookmarks) return;
 
-      const clone = copyDeep(recoilBookmarks);
-      clone[bookmarkType] = [];
-      setRecoilBookmarks(clone);
+      setRecoilBookmarks((b) => {
+        const clone = copyDeep(b)!;
+        clone[bookmarkType] = [];
+        return clone;
+      });
     },
     onRemoveBookmarkType(bookmarkType: string): void {
       if (!recoilBookmarks) return;
 
-      const clone = copyDeep(recoilBookmarks);
-      delete clone[bookmarkType];
-      setRecoilBookmarks(clone);
+      setRecoilBookmarks((b) => {
+        const clone = copyDeep(b)!;
+        delete clone[bookmarkType];
+        return clone;
+      });
     },
     onAddBookmarkWorld(bookmarkType: string): void {
       if (!selectedWorld) return;
       if (!recoilBookmarks) return;
 
-      const clone = copyDeep(recoilBookmarks);
-      clone[bookmarkType].push(selectedWorld.key);
-      setRecoilBookmarks(clone);
+      setRecoilBookmarks((b) => {
+        const clone = copyDeep(b)!;
+        clone[bookmarkType].push(selectedWorld.key);
+        return clone;
+      });
     },
     onRemoveBookmarkWorld(bookmarkType: string): void {
       if (!selectedWorld) return;
       if (!recoilBookmarks) return;
 
-      const clone = copyDeep(recoilBookmarks);
-      clone[bookmarkType] = clone[bookmarkType].filter(
-        (key) => key !== selectedWorld.key,
-      );
-      setRecoilBookmarks(clone);
+      setRecoilBookmarks((b) => {
+        const clone = copyDeep(b)!;
+        clone[bookmarkType] = clone[bookmarkType].filter(
+          (key) => key !== selectedWorld.key,
+        );
+        return clone;
+      });
     },
 
-    isSomewhereBookmarkedWorld(world: World): boolean {
+    checkIsSomewhereBookmarkedWorld(world: World): boolean {
       if (!recoilBookmarks) return false;
 
       const isMarked =
@@ -83,11 +91,13 @@ const useBookmark = (): HookMember => {
       const deleteTarget = this.worldTypes.filter(
         (be) => !types.find((te) => te === be),
       );
+      console.log('deleteTarget', deleteTarget);
       deleteTarget.forEach((t) => this.onRemoveBookmarkWorld(t));
       // 북마크 추가
       const addTarget = types.filter(
         (be) => !this.worldTypes!.find((te) => te === be),
       );
+      console.log('addTarget', addTarget);
       addTarget.forEach((t) => this.onAddBookmarkWorld(t));
     },
 

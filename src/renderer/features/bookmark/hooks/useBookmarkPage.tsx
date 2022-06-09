@@ -21,8 +21,7 @@ interface HookMember {
   isLoading: boolean;
 
   onChangeType: (tabKey: string) => void;
-  onClickFavorite: (world: World) => void;
-  checkIsFavorite: (world: World) => boolean;
+  // onClickFavorite: (world: World) => void;
   onSearchWorlds: (text: string) => void;
   onChangeSearchOption: (option: SearchOptions[number]) => void;
   onClickToggleInfoModal: (world?: World) => void;
@@ -39,13 +38,14 @@ const useBookmarkPage = (): HookMember => {
   const [modalWorldInfo, setModalWorldInfo] = useState<World | undefined>();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const memoizedFavorites = useMemo(() => favorites, [worldData]);
+  // const bookmarks = useMemo(() => favorites, [worldData]);
+  const bookmarks = favorites;
 
   useEffect(() => {
-    if (favorites && Object.keys(favorites).length > 0) {
+    if (!currentType && favorites && Object.keys(favorites).length > 0) {
       setCurrentType(Object.keys(favorites)[0]);
     }
-  }, [favorites]);
+  }, [currentType, favorites]);
 
   useEffect(() => {
     if (worldData === undefined) {
@@ -57,9 +57,8 @@ const useBookmarkPage = (): HookMember => {
   }, [setWorldData, worldData]);
 
   const favKeys = useMemo(
-    () =>
-      memoizedFavorites && currentType ? memoizedFavorites[currentType] : [],
-    [currentType, memoizedFavorites],
+    () => (bookmarks && currentType ? bookmarks[currentType] : []),
+    [currentType, bookmarks],
   );
   const worldTableData = useMemo(() => {
     const favWorlds = (
@@ -74,7 +73,7 @@ const useBookmarkPage = (): HookMember => {
 
   return {
     currentType: currentType || '',
-    typeList: memoizedFavorites ? Object.keys(memoizedFavorites) : [],
+    typeList: bookmarks ? Object.keys(bookmarks) : [],
     worldData: worldTableData,
     searchOptions: SEARCH_OPTIONS,
     // FIXME date 제대로 나오게 변환할것
@@ -84,21 +83,21 @@ const useBookmarkPage = (): HookMember => {
     onChangeType(tabKey) {
       setCurrentType(tabKey);
     },
-    onClickFavorite(world) {
-      if (!favorites) {
-        message.loading('Favorite 불러오는 중');
-        return;
-      }
-      setFavorites((v) => {
-        const val = copyDeep(v)!;
-        if (val.favorite1.find((e) => e === world.key)) {
-          val.favorite1 = val.favorite1.filter((e) => e !== world.key);
-          return val;
-        }
-        val.favorite1.push(world.key);
-        return val;
-      });
-    },
+    // onClickFavorite(world) {
+    //   if (!favorites) {
+    //     message.loading('Favorite 불러오는 중');
+    //     return;
+    //   }
+    //   setFavorites((v) => {
+    //     const val = copyDeep(v)!;
+    //     if (val.favorite1.find((e) => e === world.key)) {
+    //       val.favorite1 = val.favorite1.filter((e) => e !== world.key);
+    //       return val;
+    //     }
+    //     val.favorite1.push(world.key);
+    //     return val;
+    //   });
+    // },
     onClickToggleInfoModal(w) {
       setModalWorldInfo(w);
     },
@@ -113,12 +112,12 @@ const useBookmarkPage = (): HookMember => {
     onChangeSearchOption(option) {},
     onSearchWorlds(text) {},
 
-    checkIsFavorite(world) {
-      if (favorites?.favorite1) {
-        return favorites.favorite1.find((e) => e === world.key) ? true : false;
-      }
-      return false;
-    },
+    // checkIsFavorite(world) {
+    //   if (favorites?.favorite1) {
+    //     return favorites.favorite1.find((e) => e === world.key) ? true : false;
+    //   }
+    //   return false;
+    // },
   };
 };
 

@@ -28,7 +28,7 @@ import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 import WorldInfoModal from '../../components/WorldInfoModal';
 import EditWorldModal from './EditWorldModal';
-import useBookmark from './hooks/useBookmark';
+import useBookmark from '../../utils/hooks/useBookmark';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -178,12 +178,12 @@ export default function SearchPage() {
             // title=""
             key="bookmark"
             render={(_, record: World) => {
-              if (bookmarkHookMember.isSomewhereBookmarkedWorld(record)) {
+              if (bookmarkHookMember.checkIsSomewhereBookmarkedWorld(record)) {
                 return (
                   <HeartFilled
                     css={{ color: red.primary, fontSize: 20 }}
                     onClick={() =>
-                      bookmarkHookMember.onOpenBookmarkModal(record)
+                      bookmarkHookMember.onClickOpenBookmarkModal(record)
                     }
                   />
                 );
@@ -191,7 +191,9 @@ export default function SearchPage() {
               return (
                 <HeartOutlined
                   css={{ color: red.primary, fontSize: 20 }}
-                  onClick={() => bookmarkHookMember.onOpenBookmarkModal(record)}
+                  onClick={() =>
+                    bookmarkHookMember.onClickOpenBookmarkModal(record)
+                  }
                 />
               );
             }}
