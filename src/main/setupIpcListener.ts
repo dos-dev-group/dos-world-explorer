@@ -16,7 +16,7 @@ import {
   genWorldInstanceName,
   login,
 } from './utils/vrchatAPI';
-import { loadFavorites, saveFavorites } from './utils/favorites';
+import { loadBookmarks, saveBookmarks } from './utils/bookmarkUtils';
 
 export default function setupIpcListener() {
   ipcMain.on('ipc-example', async (event, arg) => {
@@ -108,18 +108,18 @@ export default function setupIpcListener() {
 
   // ###################################### for favorites.tsx ######################################
 
-  ipcMain.on('saveFavorites', async (event, arg) => {
+  ipcMain.on('saveBookmarks', async (event, arg) => {
     try {
-      event.reply('saveFavorites', await saveFavorites(arg[0]));
+      event.reply('saveBookmarks', await saveBookmarks(arg[0]));
     } catch {
-      event.reply('saveFavorites', null);
+      event.reply('saveBookmarks', null);
     }
   });
-  ipcMain.on('loadFavorites', async (event, arg) => {
+  ipcMain.on('loadBookmarks', async (event, arg) => {
     try {
-      event.reply('loadFavorites', await loadFavorites());
+      event.reply('loadBookmarks', await loadBookmarks());
     } catch {
-      event.reply('loadFavorites', null);
+      event.reply('loadBookmarks', null);
     }
   });
 }

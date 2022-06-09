@@ -1,17 +1,13 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
-import { worldFavoritesState } from '@src/renderer/data/favorites';
-import { searchTextState, worldDataState } from '@src/renderer/data/world';
-import copyDeep from '@src/renderer/utils/copyDeep';
+import { worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
   addEditSheetToMain,
-  getWorldDataToMain,
   modifyEditSheetToMain,
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
-import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
 import { World, WorldEditInput } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
@@ -43,11 +39,8 @@ interface HookMember {
   onClickRefresh: () => void;
   onClickOpenWorldInfoModal: (world: World) => void;
   onCloseWorldInfoModal: () => void;
-  onClickFavorite: (world: World) => void;
   onSearchWorlds: (text: string) => void;
   onChangeSearchOption: (option: SearchOptions[number]) => void;
-
-  checkIsFavorite: (world: World) => boolean;
 }
 const useSearchPage = (): HookMember => {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -60,7 +53,6 @@ const useSearchPage = (): HookMember => {
     undefined,
   );
   const [editModalWorld, setEditModalWorld] = useState<World | undefined>();
-  const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
   const [curSearchOption, setCurSearchOption] =
     useState<SearchOptions[number]>('NAME');
 
@@ -220,28 +212,6 @@ const useSearchPage = (): HookMember => {
     },
     onCloseWorldInfoModal() {
       setInfoModalWorld(undefined);
-    },
-    onClickFavorite(world) {
-      if (!favorites) {
-        message.loading('Favorite 불러오는 중');
-        return;
-      }
-      setFavorites((v) => {
-        const val = copyDeep(v)!;
-        // val.favorite1 = [...val.favorite1];
-        if (val.favorite1.find((e) => e === world.key)) {
-          val.favorite1 = val.favorite1.filter((e) => e !== world.key);
-          return val;
-        }
-        val.favorite1.push(world.key);
-        return val;
-      });
-    },
-    checkIsFavorite(world) {
-      if (favorites?.favorite1) {
-        return favorites.favorite1.find((e) => e === world.key) ? true : false;
-      }
-      return false;
     },
     onChangeSearchOption(option) {
       setCurSearchOption(option);

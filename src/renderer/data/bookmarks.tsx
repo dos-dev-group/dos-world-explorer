@@ -1,9 +1,9 @@
-import { Favorites } from '@src/types';
+import { Bookmarks } from '@src/types';
 import { atom, AtomEffect } from 'recoil';
-import { loadFavorites, saveFavorites } from '../utils/ipc/favoritesUtils';
+import { loadFavorites, saveFavorites } from '../utils/ipc/bookmarksUtils';
 
-const favoriteEffect =
-  (): AtomEffect<Favorites | undefined> =>
+const bookmarkEffect =
+  (): AtomEffect<Bookmarks | undefined> =>
   ({ trigger, onSet, setSelf }) => {
     if (trigger === 'get') {
       loadFavorites()
@@ -16,8 +16,8 @@ const favoriteEffect =
     });
   };
 
-export const worldFavoritesState = atom<Favorites | undefined>({
+export const worldBookmarksState = atom<Bookmarks | undefined>({
   key: 'worldFavoritesState',
   default: undefined,
-  effects: [favoriteEffect()],
+  effects: [bookmarkEffect()],
 });

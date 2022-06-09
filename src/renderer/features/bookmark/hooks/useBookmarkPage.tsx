@@ -1,4 +1,4 @@
-import { worldFavoritesState } from '@src/renderer/data/favorites';
+import { worldBookmarksState } from '@src/renderer/data/bookmarks';
 import { worldDataState } from '@src/renderer/data/world';
 import copyDeep from '@src/renderer/utils/copyDeep';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
@@ -28,8 +28,8 @@ interface HookMember {
   onClickToggleInfoModal: (world?: World) => void;
   onClickRefresh: () => void;
 }
-const useFavoritePage = (): HookMember => {
-  const [favorites, setFavorites] = useRecoilState(worldFavoritesState);
+const useBookmarkPage = (): HookMember => {
+  const [favorites, setFavorites] = useRecoilState(worldBookmarksState);
   const [worldData, setWorldData] = useRecoilState(worldDataState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [currentType, setCurrentType] = useState<string>();
@@ -122,4 +122,4 @@ const useFavoritePage = (): HookMember => {
   };
 };
 
-export default useFavoritePage;
+export default useBookmarkPage;

@@ -1,4 +1,4 @@
-import { Favorites } from '@src/types';
+import { Bookmarks } from '@src/types';
 import { app, shell } from 'electron';
 import { constants } from 'fs';
 import * as fs from 'fs/promises';
@@ -10,7 +10,7 @@ const FAV_PATH = path.join(
   'favorites.json',
 );
 
-export function saveFavorites(favorites: Favorites) {
+export function saveBookmarks(favorites: Bookmarks) {
   return fs
     .access(FAV_PATH, constants.R_OK)
     .catch(() => fs.mkdir(path.dirname(FAV_PATH), { recursive: true }))
@@ -18,6 +18,6 @@ export function saveFavorites(favorites: Favorites) {
     .then(() => favorites);
 }
 
-export function loadFavorites(): Promise<Favorites> {
+export function loadBookmarks(): Promise<Bookmarks> {
   return fs.readFile(FAV_PATH).then((v: Buffer) => JSON.parse(v.toString()));
 }

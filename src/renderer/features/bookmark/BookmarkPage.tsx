@@ -24,15 +24,15 @@ import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import StarSelect from '@src/renderer/components/StarSelect';
-import useFavoritePage from './hooks/useFavoritePage';
+import useBookmarkPage from './hooks/useBookmarkPage';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
 
-export default function FavoritePage() {
-  const hookMember = useFavoritePage();
+export default function BookmarkPage() {
+  const hookMember = useBookmarkPage();
 
   const renderedTabs = hookMember.typeList.map((e) => (
     <TabPane tab={e} key={e} />

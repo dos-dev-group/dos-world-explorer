@@ -8,23 +8,27 @@ import {
   Space,
   Typography,
 } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Flex } from './styledComponents';
 
 const { Option } = Select;
 
 interface Props {
   bookmarkTypes: string[];
-  preSelectType?: string;
+  preSelectType?: string[];
   visible: boolean;
 
-  onOk: (type: string) => void;
+  onOk: (types: string[]) => void;
   onCancel: () => void;
   onAddItem: (type: string) => void;
 }
 export default function BookmarkSelectModal(props: Props) {
   const [insertedItemName, setInsertedItemName] = useState('');
-  const [selectedType, setSelectedType] = useState(props.preSelectType);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>();
+
+  useEffect(() => {
+    setSelectedTypes(props.preSelectType);
+  }, [props.preSelectType]);
 
   const renderedOptions = props.bookmarkTypes.map((e) => (
     <Option key={e}>{e}</Option>
@@ -40,11 +44,11 @@ export default function BookmarkSelectModal(props: Props) {
       title="북마크를 선택해주세요"
       visible={props.visible}
       onOk={() => {
-        if (!selectedType) {
+        if (!selectedTypes) {
           message.error('타입을 골라주세요.');
           return;
         }
-        props.onOk(selectedType);
+        props.onOk(selectedTypes);
       }}
       onCancel={() => {
         props.onCancel();
@@ -53,8 +57,9 @@ export default function BookmarkSelectModal(props: Props) {
       <Flex>
         <Select
           placeholder="custom dropdown render"
-          value={selectedType}
-          onChange={(value) => setSelectedType(value)}
+          mode="multiple"
+          value={selectedTypes}
+          onChange={(value) => setSelectedTypes(value)}
           dropdownRender={(menu) => (
             <>
               {menu}
