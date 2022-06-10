@@ -1,9 +1,12 @@
 import { FolderOutlined } from '@ant-design/icons';
+import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
+import { spacing } from '@src/renderer/utils/styling';
 import { Bookmarks } from '@src/types';
 import { Avatar, Button, Input, List, Modal, Popconfirm } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
+  onAddBookmark(type: string): void;
   onEditBookmark(type: string, newType: string): void;
   onRemoveBookmark(type: string): void;
   onCancel: () => void;
@@ -13,9 +16,18 @@ interface Props {
 }
 export default function BookmarkTypeModal(props: Props) {
   const [curEditItem, setCurEditItem] = useState<string | undefined>();
-  const [newType, setNewType] = useState<string>('');
+  const [newEditType, setNewEditType] = useState<string>('');
+  const [newAddType, setNewAddType] = useState<string>('');
 
   const types = Object.keys(props.bookmarks);
+
+  useEffect(() => {
+    if (!props.visible) {
+      setCurEditItem(undefined);
+      setNewAddType('');
+      setNewEditType('');
+    }
+  }, [props.visible]);
 
   return (
     <Modal
@@ -29,6 +41,24 @@ export default function BookmarkTypeModal(props: Props) {
         className="demo-loadmore-list"
         itemLayout="horizontal"
         dataSource={types}
+        footer={
+          <FlexRow css={{ alignItems: 'center' }}>
+            <Input
+              placeholder="북마크 이름"
+              onChange={(e) => setNewAddType(e.target.value)}
+              value={newAddType}
+            />
+            <Button
+              css={{ marginLeft: spacing(1) }}
+              onClick={() => {
+                props.onAddBookmark(newAddType);
+                setNewAddType('');
+              }}
+            >
+              북마크 추가
+            </Button>
+          </FlexRow>
+        }
         renderItem={(item) => {
           const bookmarkItem = props.bookmarks[item];
           const renderedEditButton =
@@ -37,7 +67,7 @@ export default function BookmarkTypeModal(props: Props) {
                 type="primary"
                 onClick={() => {
                   setCurEditItem(undefined);
-                  setNewType('');
+                  setNewEditType('');
                 }}
               >
                 취소
@@ -58,26 +88,27 @@ export default function BookmarkTypeModal(props: Props) {
 
           return (
             <List.Item
+              // TODO 수정버튼 useBookmarkPage에서 참조하는 Memo때문에 현재 안됨
               //@ts-ignore
-              actions={[renderedEditButton, renderedRemoveButton]}
+              actions={[renderedRemoveButton]}
             >
               <List.Item.Meta
                 avatar={<Avatar icon={<FolderOutlined />} />}
                 title={
                   item === curEditItem ? (
                     <Input
-                      onChange={(e) => setNewType(e.target.value.trim())}
+                      onChange={(e) => setNewEditType(e.target.value.trim())}
                       onPressEnter={() => {
-                        props.onEditBookmark(item, newType);
+                        props.onEditBookmark(item, newEditType);
                         setCurEditItem(undefined);
-                        setNewType('');
+                        setNewEditType('');
                       }}
                     />
                   ) : (
                     item
                   )
                 }
-                description={'현재 북마크 갯수: ' + bookmarkItem.length}
+                description={'북마크 갯수: ' + bookmarkItem.length}
               />
             </List.Item>
           );

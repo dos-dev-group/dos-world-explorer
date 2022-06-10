@@ -30,6 +30,13 @@ export default function BookmarkSelectModal(props: Props) {
     setSelectedTypes(props.preSelectType);
   }, [props.preSelectType]);
 
+  useEffect(() => {
+    if (!props.visible) {
+      setInsertedItemName('');
+      setSelectedTypes(undefined);
+    }
+  }, [props.visible]);
+
   const renderedOptions = props.bookmarkTypes.map((e) => (
     <Option key={e}>{e}</Option>
   ));
@@ -56,7 +63,7 @@ export default function BookmarkSelectModal(props: Props) {
     >
       <Flex>
         <Select
-          placeholder="custom dropdown render"
+          placeholder="북마크를 선택해주세요"
           mode="multiple"
           value={selectedTypes}
           onChange={(value) => setSelectedTypes(value)}
@@ -66,7 +73,7 @@ export default function BookmarkSelectModal(props: Props) {
               <Divider style={{ margin: '8px 0' }} />
               <Space align="center" style={{ padding: '0 8px 4px' }}>
                 <Input
-                  placeholder="Please enter item"
+                  placeholder="추가할 북마크 이름"
                   value={insertedItemName}
                   onChange={(e) => setInsertedItemName(e.target.value)}
                 />

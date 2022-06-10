@@ -27,6 +27,7 @@ import StarSelect from '@src/renderer/components/StarSelect';
 import BookmarkSelectModal from '@src/renderer/components/BookmarkSelectModal';
 import useBookmark from '@src/renderer/utils/hooks/useBookmark';
 import useBookmarkPage from './hooks/useBookmarkPage';
+import BookmarkTypeModal from './BookmarkTypeModal';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -43,6 +44,22 @@ export default function BookmarkPage() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+      <BookmarkTypeModal
+        onAddBookmark={(type) => {
+          bookmarkHookMember.onAddBookmarkType(type);
+        }}
+        onEditBookmark={(type: string, newType: string): void => {
+          bookmarkHookMember.onEditBookmarkType(type, newType);
+        }}
+        onRemoveBookmark={(type: string): void => {
+          bookmarkHookMember.onRemoveBookmarkType(type);
+        }}
+        onCancel={(): void => {
+          hookMember.onCloseTypeModal();
+        }}
+        bookmarks={hookMember.modalBookmarkInfo || {}}
+        visible={hookMember.modalBookmarkInfo ? true : false}
+      />
       <BookmarkSelectModal
         bookmarkTypes={bookmarkHookMember.bookmarkTypes}
         visible={bookmarkHookMember.isOpenBookmarkModal}
@@ -75,13 +92,19 @@ export default function BookmarkPage() {
         }}
         loading={hookMember.isLoading}
       /> */}
+      <FlexRow css={{ alignItems: 'center' }}>
+        <Tabs
+          css={{ flex: 1 }}
+          activeKey={hookMember.currentType}
+          onChange={hookMember.onChangeType}
+        >
+          {renderedTabs}
+        </Tabs>
+        <Button onClick={() => hookMember.onClickOpenTypeModal()}>
+          북마크 관리
+        </Button>
+      </FlexRow>
 
-      <Tabs
-        activeKey={hookMember.currentType}
-        onChange={hookMember.onChangeType}
-      >
-        {renderedTabs}
-      </Tabs>
       {/* <Button
         size="small"
         css={{ marginLeft: 'auto', alignSelf: 'center' }}
@@ -90,7 +113,7 @@ export default function BookmarkPage() {
         loading={hookMember.isLoading}
       /> */}
 
-      <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
+      <FlexRow css={{ marginLeft: 'auto' }}>
         <Button
           size="small"
           icon={<ReloadOutlined />}

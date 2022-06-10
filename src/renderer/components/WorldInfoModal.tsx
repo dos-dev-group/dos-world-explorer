@@ -89,22 +89,26 @@ function WorldInfoModal(props: Props) {
                   url={props.world.url}
                   onClickInstance={() => setVisibleInstanceModal(true)}
                 />
-                <Button
-                  type="primary"
-                  ghost
-                  onClick={() => {
-                    props.onEdit?.(props.world!);
-                  }}
-                >
-                  수정
-                </Button>
-                <Popconfirm
-                  title="정말 월드를 삭제하시겠습니까?"
-                  placement="topRight"
-                  onConfirm={() => props.onRemove?.(props.world!)}
-                >
-                  <Button danger>삭제</Button>
-                </Popconfirm>
+                {props.onEdit && (
+                  <Button
+                    type="primary"
+                    ghost
+                    onClick={() => {
+                      props.onEdit?.(props.world!);
+                    }}
+                  >
+                    수정
+                  </Button>
+                )}
+                {props.onRemove && (
+                  <Popconfirm
+                    title="정말 월드를 삭제하시겠습니까?"
+                    placement="topRight"
+                    onConfirm={() => props.onRemove?.(props.world!)}
+                  >
+                    <Button danger>삭제</Button>
+                  </Popconfirm>
+                )}
               </FlexRow>
 
               <br />

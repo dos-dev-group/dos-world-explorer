@@ -1,6 +1,7 @@
 import { worldBookmarksState } from '@src/renderer/data/bookmarks';
 import copyDeep from '@src/renderer/utils/copyDeep';
 import { World } from '@src/types';
+import { message } from 'antd';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 
@@ -8,6 +9,7 @@ interface HookMember {
   onClickOpenBookmarkModal(world: World): void;
   onCloseBookmarkModal(): void;
   onAddBookmarkType(bookmarkType: string): void;
+  onEditBookmarkType(oldType: string, newType: string): void;
   onRemoveBookmarkType(bookmarkType: string): void;
   onAddBookmarkWorld(bookmarkType: string): void;
   onRemoveBookmarkWorld(bookmarkType: string): void;
@@ -34,6 +36,14 @@ const useBookmark = (): HookMember => {
     },
     onAddBookmarkType(bookmarkType: string): void {
       if (!recoilBookmarks) return;
+      if (Object.keys(recoilBookmarks).find((e) => e === bookmarkType)) {
+        message.error('이미 동일 북마크가 있습니다.');
+        return;
+      }
+      if (bookmarkType.trim() === '') {
+        message.error('적합한 이름이 아닙니다.');
+        return;
+      }
 
       setRecoilBookmarks((b) => {
         const clone = copyDeep(b)!;
@@ -41,8 +51,39 @@ const useBookmark = (): HookMember => {
         return clone;
       });
     },
+    onEditBookmarkType(oldType: string, newType: string): void {
+      if (!recoilBookmarks) return;
+      if (!Object.keys(recoilBookmarks).find((e) => e === oldType)) {
+        message.error('해당 북마크가 없습니다.');
+        return;
+      }
+      if (Object.keys(recoilBookmarks).find((e) => e === newType)) {
+        message.error('이미 동일 북마크가 있습니다.');
+        return;
+      }
+      if (newType.trim() === '') {
+        message.error('적합한 이름이 아닙니다.');
+        return;
+      }
+
+      setRecoilBookmarks((b) => {
+        const clone = copyDeep(b)!;
+        const temp = clone[oldType].concat();
+        delete clone[oldType];
+        clone[newType] = temp;
+        return clone;
+      });
+    },
     onRemoveBookmarkType(bookmarkType: string): void {
       if (!recoilBookmarks) return;
+      if (!Object.keys(recoilBookmarks).find((e) => e === bookmarkType)) {
+        message.error('해당 북마크가 없습니다.');
+        return;
+      }
+      if (bookmarkType.trim() === '') {
+        message.error('적합한 이름이 아닙니다.');
+        return;
+      }
 
       setRecoilBookmarks((b) => {
         const clone = copyDeep(b)!;

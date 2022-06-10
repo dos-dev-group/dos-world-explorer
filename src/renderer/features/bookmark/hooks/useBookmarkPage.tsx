@@ -3,7 +3,7 @@ import { worldDataState } from '@src/renderer/data/world';
 import copyDeep from '@src/renderer/utils/copyDeep';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
-import { WorldData, World } from '@src/types';
+import { WorldData, World, Bookmarks } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -18,6 +18,7 @@ interface HookMember {
   worldData: WorldData;
   searchOptions: SearchOptions;
   modalWorldInfo: World | undefined;
+  modalBookmarkInfo: Bookmarks | undefined;
   isLoading: boolean;
 
   onChangeType: (tabKey: string) => void;
@@ -25,6 +26,8 @@ interface HookMember {
   onSearchWorlds: (text: string) => void;
   onChangeSearchOption: (option: SearchOptions[number]) => void;
   onClickToggleInfoModal: (world?: World) => void;
+  onClickOpenTypeModal(): void;
+  onCloseTypeModal(): void;
   onClickRefresh: () => void;
 }
 const useBookmarkPage = (): HookMember => {
@@ -36,6 +39,8 @@ const useBookmarkPage = (): HookMember => {
   const [curSearchOption, setSearchOption] =
     useState<SearchOptions[number]>('NAME');
   const [modalWorldInfo, setModalWorldInfo] = useState<World | undefined>();
+  const [visibleModalBookmark, setVisibleModalBookmark] =
+    useState<boolean>(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   // const bookmarks = useMemo(() => favorites, [worldData]);
@@ -76,8 +81,8 @@ const useBookmarkPage = (): HookMember => {
     typeList: bookmarks ? Object.keys(bookmarks) : [],
     worldData: worldTableData,
     searchOptions: SEARCH_OPTIONS,
-    // FIXME date 제대로 나오게 변환할것
     modalWorldInfo: modalWorldInfo,
+    modalBookmarkInfo: visibleModalBookmark ? bookmarks : undefined,
     isLoading,
 
     onChangeType(tabKey) {
@@ -107,6 +112,12 @@ const useBookmarkPage = (): HookMember => {
         setIsLoading(false);
         return setWorldData(data);
       });
+    },
+    onClickOpenTypeModal() {
+      setVisibleModalBookmark(true);
+    },
+    onCloseTypeModal() {
+      setVisibleModalBookmark(false);
     },
 
     onChangeSearchOption(option) {},
