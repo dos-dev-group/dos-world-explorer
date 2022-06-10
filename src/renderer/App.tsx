@@ -127,6 +127,7 @@ function MenuLayout() {
                   navigate('/bookmark');
                 },
               },
+              // TODO: 로그인 UI 구현
               // {
               //   label: 'Logout',
               //   key: 'login',

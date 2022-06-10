@@ -84,11 +84,12 @@ function WorldInfoModal(props: Props) {
                   worldKey={props.world.key}
                   url={props.world.url}
                 />
-                <ButtonInstanceCreation
+                {/* TODO: 월드 인스턴스 생성 */}
+                {/* <ButtonInstanceCreation
                   worldKey={props.world.key}
                   url={props.world.url}
                   onClickInstance={() => setVisibleInstanceModal(true)}
-                />
+                /> */}
                 {props.onEdit && (
                   <Button
                     type="primary"
