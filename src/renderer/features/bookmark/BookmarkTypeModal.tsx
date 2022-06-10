@@ -49,6 +49,7 @@ export default function BookmarkTypeModal(props: Props) {
               value={newAddType}
             />
             <Button
+              disabled={newAddType.trim() === ''}
               css={{ marginLeft: spacing(1) }}
               onClick={() => {
                 props.onAddBookmark(newAddType);
