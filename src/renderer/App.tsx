@@ -127,14 +127,14 @@ function MenuLayout() {
                   navigate('/bookmark');
                 },
               },
-              {
-                label: 'Logout',
-                key: 'login',
-                icon: <LogoutOutlined />,
-                onClick(ev) {
-                  navigate('/login');
-                },
-              },
+              // {
+              //   label: 'Logout',
+              //   key: 'login',
+              //   icon: <LogoutOutlined />,
+              //   onClick(ev) {
+              //     navigate('/login');
+              //   },
+              // },
             ]}
           />
         </Sider>
