@@ -31,7 +31,7 @@ interface HookMember {
   onClickRefresh: () => void;
 }
 const useBookmarkPage = (): HookMember => {
-  const [favorites, setFavorites] = useRecoilState(worldBookmarksState);
+  const [bookmarks, setFavorites] = useRecoilState(worldBookmarksState);
   const [worldData, setWorldData] = useRecoilState(worldDataState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [currentType, setCurrentType] = useState<string>();
@@ -44,13 +44,22 @@ const useBookmarkPage = (): HookMember => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   // const bookmarks = useMemo(() => favorites, [worldData]);
-  const bookmarks = favorites;
 
   useEffect(() => {
-    if (!currentType && favorites && Object.keys(favorites).length > 0) {
-      setCurrentType(Object.keys(favorites)[0]);
+    if (!bookmarks) return;
+    if (
+      !currentType ||
+      !Object.keys(bookmarks).find((e) => e === currentType)
+    ) {
+      setCurrentType(Object.keys(bookmarks)[0]);
     }
-  }, [currentType, favorites]);
+  }, [bookmarks, currentType]);
+
+  // useEffect(() => {
+  //   if (!currentType && bookmarks && Object.keys(bookmarks).length > 0) {
+  //     setCurrentType(Object.keys(bookmarks)[0]);
+  //   }
+  // }, [currentType, bookmarks]);
 
   useEffect(() => {
     if (worldData === undefined) {
@@ -62,7 +71,10 @@ const useBookmarkPage = (): HookMember => {
   }, [setWorldData, worldData]);
 
   const favKeys = useMemo(
-    () => (bookmarks && currentType ? bookmarks[currentType] : []),
+    () =>
+      bookmarks && currentType && bookmarks[currentType]
+        ? bookmarks[currentType]
+        : [],
     [currentType, bookmarks],
   );
   const worldTableData = useMemo(() => {
