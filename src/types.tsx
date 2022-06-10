@@ -42,7 +42,7 @@ export interface UserLogin {
 
 export type WorldData = World[];
 
-export interface Favorites {
+export interface Bookmarks {
   [worldKeys: string]: string[];
 }
 

@@ -16,11 +16,9 @@ import {
   useLocation,
   Navigate,
 } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
 // import './App.css';
 import { Flex } from './components/styledComponents';
-import { worldFavoritesState } from './data/favorites';
-import FavoritePage from './features/favorite/FavoritePage';
+import BookmarkPage from './features/bookmark/BookmarkPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
 import SearchPage from './features/search/SearchPage';
@@ -122,11 +120,11 @@ function MenuLayout() {
                 },
               },
               {
-                label: 'Favorites',
-                key: 'favorite',
+                label: 'Bookmarks',
+                key: 'bookmark',
                 icon: <HeartOutlined />,
                 onClick(ev) {
-                  navigate('/favorite');
+                  navigate('/bookmark');
                 },
               },
               {
@@ -158,8 +156,7 @@ export default function App() {
         <Route path="/" element={<MenuLayout />}>
           <Route index element={<Home />} />
           <Route path="world" element={<SearchPage />} />
-          <Route path="favorite" element={<Navigate replace to="일반" />} />
-          <Route path="favorite/:type" element={<FavoritePage />} />
+          <Route path="bookmark" element={<BookmarkPage />} />
           <Route path="login" element={<LoginPage />} />
         </Route>
       </Routes>

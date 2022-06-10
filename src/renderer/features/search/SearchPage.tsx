@@ -23,10 +23,12 @@ import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import StarSelect from '@src/renderer/components/StarSelect';
+import BookmarkSelectModal from '@src/renderer/components/BookmarkSelectModal';
 import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
 import AddWorldModal from './AddWorldModal';
 import WorldInfoModal from '../../components/WorldInfoModal';
 import EditWorldModal from './EditWorldModal';
+import useBookmark from '../../utils/hooks/useBookmark';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -35,6 +37,7 @@ const { Search } = Input;
 
 export default function SearchPage() {
   const hookMember = useSearchPage();
+  const bookmarkHookMember = useBookmark();
 
   const renderedTabs = hookMember.typeList.map((e) => (
     <TabPane tab={e} key={e} />
@@ -61,6 +64,21 @@ export default function SearchPage() {
 
   return (
     <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+      <BookmarkSelectModal
+        bookmarkTypes={bookmarkHookMember.bookmarkTypes}
+        visible={bookmarkHookMember.isOpenBookmarkModal}
+        preSelectType={bookmarkHookMember.worldTypes}
+        onOk={(types: string[]): void => {
+          bookmarkHookMember.onChangeBookmarkWorld(types);
+          bookmarkHookMember.onCloseBookmarkModal();
+        }}
+        onCancel={(): void => {
+          bookmarkHookMember.onCloseBookmarkModal();
+        }}
+        onAddItem={(type: string): void => {
+          bookmarkHookMember.onAddBookmarkType(type);
+        }}
+      />
       <WorldInfoModal
         onCancel={() => {
           hookMember.onCloseWorldInfoModal();
@@ -158,20 +176,24 @@ export default function SearchPage() {
           <Column
             width="5%"
             // title=""
-            key="favorite"
+            key="bookmark"
             render={(_, record: World) => {
-              if (hookMember.checkIsFavorite(record)) {
+              if (bookmarkHookMember.checkIsSomewhereBookmarkedWorld(record)) {
                 return (
                   <HeartFilled
                     css={{ color: red.primary, fontSize: 20 }}
-                    onClick={() => hookMember.onClickFavorite(record)}
+                    onClick={() =>
+                      bookmarkHookMember.onClickOpenBookmarkModal(record)
+                    }
                   />
                 );
               }
               return (
                 <HeartOutlined
                   css={{ color: red.primary, fontSize: 20 }}
-                  onClick={() => hookMember.onClickFavorite(record)}
+                  onClick={() =>
+                    bookmarkHookMember.onClickOpenBookmarkModal(record)
+                  }
                 />
               );
             }}
