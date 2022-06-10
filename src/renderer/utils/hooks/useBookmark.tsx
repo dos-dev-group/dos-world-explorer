@@ -132,13 +132,11 @@ const useBookmark = (): HookMember => {
       const deleteTarget = this.worldTypes.filter(
         (be) => !types.find((te) => te === be),
       );
-      console.log('deleteTarget', deleteTarget);
       deleteTarget.forEach((t) => this.onRemoveBookmarkWorld(t));
       // 북마크 추가
       const addTarget = types.filter(
         (be) => !this.worldTypes!.find((te) => te === be),
       );
-      console.log('addTarget', addTarget);
       addTarget.forEach((t) => this.onAddBookmarkWorld(t));
     },
 
