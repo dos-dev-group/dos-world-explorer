@@ -127,14 +127,15 @@ function MenuLayout() {
                   navigate('/bookmark');
                 },
               },
-              {
-                label: 'Logout',
-                key: 'login',
-                icon: <LogoutOutlined />,
-                onClick(ev) {
-                  navigate('/login');
-                },
-              },
+              // TODO: 로그인 UI 구현
+              // {
+              //   label: 'Logout',
+              //   key: 'login',
+              //   icon: <LogoutOutlined />,
+              //   onClick(ev) {
+              //     navigate('/login');
+              //   },
+              // },
             ]}
           />
         </Sider>
