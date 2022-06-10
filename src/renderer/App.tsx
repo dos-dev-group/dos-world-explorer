@@ -2,6 +2,7 @@ import {
   GlobalOutlined,
   HeartOutlined,
   HomeOutlined,
+  LogoutOutlined,
   StarOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Typography } from 'antd';
@@ -19,6 +20,7 @@ import {
 import { Flex } from './components/styledComponents';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import Home from './features/home/Home';
+import LoginPage from './features/login/LoginPage';
 import SearchPage from './features/search/SearchPage';
 
 const { Sider } = Layout;
@@ -125,6 +127,14 @@ function MenuLayout() {
                   navigate('/bookmark');
                 },
               },
+              {
+                label: 'Logout',
+                key: 'login',
+                icon: <LogoutOutlined />,
+                onClick(ev) {
+                  navigate('/login');
+                },
+              },
             ]}
           />
         </Sider>
@@ -146,8 +156,8 @@ export default function App() {
         <Route path="/" element={<MenuLayout />}>
           <Route index element={<Home />} />
           <Route path="world" element={<SearchPage />} />
-          <Route path="bookmark" element={<Navigate replace to="일반" />} />
-          <Route path="bookmark/:type" element={<BookmarkPage />} />
+          <Route path="bookmark" element={<BookmarkPage />} />
+          <Route path="login" element={<LoginPage />} />
         </Route>
       </Routes>
     </Router>

@@ -34,6 +34,12 @@ export interface User {
   state: UserState; // 유저 상태
 }
 
+export interface UserLogin {
+  name: string; // 유저이름
+  password: string; // 비밀번호
+  code: string; // Two Factors Authentication OTP 코드
+}
+
 export type WorldData = World[];
 
 export interface Bookmarks {
