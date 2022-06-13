@@ -42,7 +42,7 @@ interface HookMember {
   onSearchWorlds: (text: string) => void;
   onChangeSearchOption: (option: SearchOptions[number]) => void;
 }
-const useSearchPage = (): HookMember => {
+const useWorldSheetPage = (): HookMember => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentType, setCurrentType] = useState<string>('전체');
   const [worldData, setWorldData] = useRecoilState(worldDataState);
@@ -218,4 +218,4 @@ const useSearchPage = (): HookMember => {
   };
 };
 
-export default useSearchPage;
+export default useWorldSheetPage;

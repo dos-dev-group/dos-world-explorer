@@ -21,7 +21,7 @@ import { Flex } from './components/styledComponents';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
-import SearchPage from './features/search/SearchPage';
+import WorldSheetPage from './features/world-sheet/WorldSheetPage';
 
 const { Sider } = Layout;
 const { Title } = Typography;
@@ -156,7 +156,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MenuLayout />}>
           <Route index element={<Home />} />
-          <Route path="world" element={<SearchPage />} />
+          <Route path="world" element={<WorldSheetPage />} />
           <Route path="bookmark" element={<BookmarkPage />} />
           <Route path="login" element={<LoginPage />} />
         </Route>

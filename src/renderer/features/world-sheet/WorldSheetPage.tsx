@@ -24,7 +24,7 @@ import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import StarSelect from '@src/renderer/components/StarSelect';
 import BookmarkSelectModal from '@src/renderer/components/BookmarkSelectModal';
-import useSearchPage, { SearchOptions } from './hooks/useSearchPage';
+import useWorldSheetPage, { SearchOptions } from './hooks/useWorldSheetPage';
 import AddWorldModal from './AddWorldModal';
 import WorldInfoModal from '../../components/WorldInfoModal';
 import EditWorldModal from './EditWorldModal';
@@ -35,8 +35,8 @@ const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
 
-export default function SearchPage() {
-  const hookMember = useSearchPage();
+export default function WorldSheetPage() {
+  const hookMember = useWorldSheetPage();
   const bookmarkHookMember = useBookmark();
 
   const renderedTabs = hookMember.typeList.map((e) => (
