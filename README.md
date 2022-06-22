@@ -1,4 +1,4 @@
-# DOS GANG DIAMOND MEMBERSHIP PROJECT
+# DOS GANG VRC Explorer
 
 ## 프로젝트 실행
 
