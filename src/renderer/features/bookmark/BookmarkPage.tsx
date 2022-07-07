@@ -1,8 +1,10 @@
 import {
+  DownOutlined,
   HeartFilled,
   HeartOutlined,
   ReloadOutlined,
   StarFilled,
+  UpOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -71,7 +73,7 @@ export default function BookmarkPage() {
         onCancel={(): void => {
           bookmarkHookMember.onCloseBookmarkModal();
         }}
-        onAddItem={(type: string): void => {
+        onAddBookmarkItem={(type: string): void => {
           bookmarkHookMember.onAddBookmarkType(type);
         }}
       />
@@ -252,16 +254,39 @@ export default function BookmarkPage() {
             filters={scoreFilters}
             onFilter={(value, record) => value === record.score}
           />
-          {/* <Column
+          <Column
             width="15%"
-            title="URL"
-            dataIndex="url"
-            render={(url: string) => (
-              <Typography.Link href={url} target="_blank">
-                {url}
-              </Typography.Link>
+            title=""
+            key="swap"
+            render={(_, record, index) => (
+              <Flex>
+                {index === 0 ? undefined : (
+                  <Button
+                    type="text"
+                    icon={<UpOutlined />}
+                    onClick={() =>
+                      bookmarkHookMember.onFrontSwapWorld(
+                        hookMember.currentType,
+                        record as World,
+                      )
+                    }
+                  />
+                )}
+                {index + 1 === hookMember.worldData.length ? undefined : (
+                  <Button
+                    type="text"
+                    icon={<DownOutlined />}
+                    onClick={() =>
+                      bookmarkHookMember.onRearSwapWorld(
+                        hookMember.currentType,
+                        record as World,
+                      )
+                    }
+                  />
+                )}
+              </Flex>
             )}
-          /> */}
+          />
           {/* <Column
             width="5%"
             dataIndex="key"

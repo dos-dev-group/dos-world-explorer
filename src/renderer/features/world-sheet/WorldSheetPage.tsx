@@ -75,7 +75,7 @@ export default function WorldSheetPage() {
         onCancel={(): void => {
           bookmarkHookMember.onCloseBookmarkModal();
         }}
-        onAddItem={(type: string): void => {
+        onAddBookmarkItem={(type: string): void => {
           bookmarkHookMember.onAddBookmarkType(type);
         }}
       />

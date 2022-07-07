@@ -78,14 +78,19 @@ const useBookmarkPage = (): HookMember => {
     [currentType, bookmarks],
   );
   const worldTableData = useMemo(() => {
-    const favWorlds = (
-      worldData?.filter((w) =>
-        favKeys.find((e) => e === w.key) ? true : false,
-      ) || []
-    )
-      .concat()
-      .reverse();
-    return favWorlds;
+    const orderedFavWorlds = favKeys
+      .map((e) => worldData?.find((w) => w.key === e))
+      .filter((e) => !!e) as World[];
+
+    // const favWorlds = (
+    //   worldData?.filter((w) =>
+    //     favKeys.find((e) => e === w.key) ? true : false,
+    //   ) || []
+    // )
+    //   .concat()
+    //   .reverse();
+    // return favWorlds;
+    return orderedFavWorlds;
   }, [favKeys, worldData]);
 
   return {
