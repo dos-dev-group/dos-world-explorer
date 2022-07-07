@@ -20,7 +20,7 @@ interface Props {
 
   onOk: (types: string[]) => void;
   onCancel: () => void;
-  onAddItem: (type: string) => void;
+  onAddBookmarkItem: (type: string) => void;
 }
 export default function BookmarkSelectModal(props: Props) {
   const [insertedItemName, setInsertedItemName] = useState('');
@@ -80,7 +80,7 @@ export default function BookmarkSelectModal(props: Props) {
                 <Typography.Link
                   onClick={(e) => {
                     e.preventDefault();
-                    props.onAddItem(insertedItemName);
+                    props.onAddBookmarkItem(insertedItemName);
                   }}
                   style={{ whiteSpace: 'nowrap' }}
                   disabled={isDisabledAddItem}
