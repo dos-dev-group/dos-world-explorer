@@ -161,6 +161,9 @@ const useBookmark = (): HookMember => {
       if (targetIndex === -1) {
         message.error('해당 월드가 북마크에 없습니다.');
       }
+      if (targetIndex === 0) {
+        message.error('조건이 맞지 않습니다.');
+      }
 
       const temp = curTypeWorlds[targetIndex - 1];
       curTypeWorlds[targetIndex - 1] = curTypeWorlds[targetIndex];
@@ -183,6 +186,9 @@ const useBookmark = (): HookMember => {
 
       if (targetIndex === -1) {
         message.error('해당 월드가 북마크에 없습니다.');
+      }
+      if (targetIndex === curTypeWorlds.length - 1) {
+        message.error('조건이 맞지 않습니다.');
       }
 
       const temp = curTypeWorlds[targetIndex + 1];
