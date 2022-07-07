@@ -8,6 +8,7 @@ import {
   modifyEditSheetToMain,
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
+import stringEscape from '@src/renderer/utils/stringEscape';
 import { World, WorldEditInput } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
@@ -142,7 +143,8 @@ const useWorldSheetPage = (): HookMember => {
       setCurrentPage(page);
     },
     onSearchWorlds(text) {
-      setSearchText(text);
+      const escapedText = stringEscape(text);
+      setSearchText(escapedText);
     },
     onOpenAddWorldModal() {
       setVisibleAddWorldModal(true);
