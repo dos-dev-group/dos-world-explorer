@@ -35,6 +35,7 @@ function WorldInfoModal(props: Props) {
       visible={props.visible}
       width="60%"
       footer={false}
+      zIndex={2}
     >
       <WorldInstanceCreationModal
         onCancel={() => {
