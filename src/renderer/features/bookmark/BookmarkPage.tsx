@@ -133,6 +133,17 @@ export default function BookmarkPage() {
           pagination={{
             pageSize: 100,
           }}
+          onChange={(pagination, filters, sorter) => {
+            const isFiltered =
+              Object.values(filters).filter((e) => !!e).length > 0;
+            // eslint-disable-next-line no-nested-ternary
+            const isSorted = Array.isArray(sorter)
+              ? true
+              : sorter.order
+              ? true
+              : false;
+            hookMember.onChangeIsManipulatedTable(isFiltered || isSorted);
+          }}
         >
           <Column
             width="5%"
@@ -254,39 +265,42 @@ export default function BookmarkPage() {
             filters={scoreFilters}
             onFilter={(value, record) => value === record.score}
           />
-          <Column
-            width="15%"
-            title=""
-            key="swap"
-            render={(_, record, index) => (
-              <Flex>
-                {index === 0 ? undefined : (
-                  <Button
-                    type="text"
-                    icon={<UpOutlined />}
-                    onClick={() =>
-                      bookmarkHookMember.onFrontSwapWorld(
-                        hookMember.currentType,
-                        record as World,
-                      )
-                    }
-                  />
-                )}
-                {index + 1 === hookMember.worldData.length ? undefined : (
-                  <Button
-                    type="text"
-                    icon={<DownOutlined />}
-                    onClick={() =>
-                      bookmarkHookMember.onRearSwapWorld(
-                        hookMember.currentType,
-                        record as World,
-                      )
-                    }
-                  />
-                )}
-              </Flex>
-            )}
-          />
+          {!hookMember.isManipulatedTable && (
+            <Column
+              width="15%"
+              title=""
+              key="swap"
+              render={(_, record, index) => (
+                <Flex>
+                  {index === 0 ? undefined : (
+                    <Button
+                      type="text"
+                      icon={<UpOutlined />}
+                      onClick={() =>
+                        bookmarkHookMember.onFrontSwapWorld(
+                          hookMember.currentType,
+                          record as World,
+                        )
+                      }
+                    />
+                  )}
+                  {index + 1 === hookMember.worldData.length ? undefined : (
+                    <Button
+                      type="text"
+                      icon={<DownOutlined />}
+                      onClick={() =>
+                        bookmarkHookMember.onRearSwapWorld(
+                          hookMember.currentType,
+                          record as World,
+                        )
+                      }
+                    />
+                  )}
+                </Flex>
+              )}
+            />
+          )}
+
           {/* <Column
             width="5%"
             dataIndex="key"

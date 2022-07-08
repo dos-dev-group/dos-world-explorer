@@ -20,6 +20,7 @@ interface HookMember {
   modalWorldInfo: World | undefined;
   modalBookmarkInfo: Bookmarks | undefined;
   isLoading: boolean;
+  isManipulatedTable: boolean;
 
   onChangeType: (tabKey: string) => void;
   // onClickFavorite: (world: World) => void;
@@ -29,6 +30,7 @@ interface HookMember {
   onClickOpenTypeModal(): void;
   onCloseTypeModal(): void;
   onClickRefresh: () => void;
+  onChangeIsManipulatedTable: (isManipulated: boolean) => void;
 }
 const useBookmarkPage = (): HookMember => {
   const [bookmarks, setFavorites] = useRecoilState(worldBookmarksState);
@@ -41,6 +43,7 @@ const useBookmarkPage = (): HookMember => {
   const [modalWorldInfo, setModalWorldInfo] = useState<World | undefined>();
   const [visibleModalBookmark, setVisibleModalBookmark] =
     useState<boolean>(false);
+  const [isManipulatedTable, setIsManipulatedTable] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   // const bookmarks = useMemo(() => favorites, [worldData]);
@@ -101,6 +104,7 @@ const useBookmarkPage = (): HookMember => {
     modalWorldInfo: modalWorldInfo,
     modalBookmarkInfo: visibleModalBookmark ? bookmarks : undefined,
     isLoading,
+    isManipulatedTable,
 
     onChangeType(tabKey) {
       setCurrentType(tabKey);
@@ -139,6 +143,9 @@ const useBookmarkPage = (): HookMember => {
 
     onChangeSearchOption(option) {},
     onSearchWorlds(text) {},
+    onChangeIsManipulatedTable(isManipulated) {
+      setIsManipulatedTable(isManipulated);
+    },
 
     // checkIsFavorite(world) {
     //   if (favorites?.favorite1) {
