@@ -59,8 +59,8 @@ export default function BookmarkPage() {
         onCancel={(): void => {
           hookMember.onCloseTypeModal();
         }}
-        bookmarks={hookMember.modalBookmarkInfo || {}}
-        visible={hookMember.modalBookmarkInfo ? true : false}
+        bookmarks={hookMember.bookmarkModalData || {}}
+        visible={hookMember.bookmarkModalData ? true : false}
       />
       <BookmarkSelectModal
         bookmarkTypes={bookmarkHookMember.bookmarkTypes}
@@ -81,8 +81,18 @@ export default function BookmarkPage() {
         onCancel={() => {
           hookMember.onClickToggleInfoModal(undefined);
         }}
-        visible={hookMember.modalWorldInfo ? true : false}
-        world={hookMember.modalWorldInfo}
+        visible={hookMember.infoModalWorld ? true : false}
+        world={hookMember.infoModalWorld}
+        isBookmarked={
+          hookMember.infoModalWorld
+            ? bookmarkHookMember.checkIsSomewhereBookmarkedWorld(
+                hookMember.infoModalWorld,
+              )
+            : false
+        }
+        onClickBookmark={(world) =>
+          bookmarkHookMember.onClickOpenBookmarkModal(world)
+        }
       />
 
       {/* <Search

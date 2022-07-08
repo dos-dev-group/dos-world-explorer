@@ -17,8 +17,8 @@ interface HookMember {
   typeList: string[];
   worldData: WorldData;
   searchOptions: SearchOptions;
-  modalWorldInfo: World | undefined;
-  modalBookmarkInfo: Bookmarks | undefined;
+  infoModalWorld: World | undefined;
+  bookmarkModalData: Bookmarks | undefined;
   isLoading: boolean;
   isManipulatedTable: boolean;
 
@@ -101,8 +101,8 @@ const useBookmarkPage = (): HookMember => {
     typeList: bookmarks ? Object.keys(bookmarks) : [],
     worldData: worldTableData,
     searchOptions: SEARCH_OPTIONS,
-    modalWorldInfo: modalWorldInfo,
-    modalBookmarkInfo: visibleModalBookmark ? bookmarks : undefined,
+    infoModalWorld: modalWorldInfo,
+    bookmarkModalData: visibleModalBookmark ? bookmarks : undefined,
     isLoading,
     isManipulatedTable,
 

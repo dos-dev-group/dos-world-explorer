@@ -91,6 +91,16 @@ export default function WorldSheetPage() {
         onRemove={(world) => {
           hookMember.onRemoveWorld(world.key);
         }}
+        isBookmarked={
+          hookMember.infoModalWorld
+            ? bookmarkHookMember.checkIsSomewhereBookmarkedWorld(
+                hookMember.infoModalWorld,
+              )
+            : false
+        }
+        onClickBookmark={(world) =>
+          bookmarkHookMember.onClickOpenBookmarkModal(world)
+        }
       />
       <AddWorldModal
         onCancel={() => {

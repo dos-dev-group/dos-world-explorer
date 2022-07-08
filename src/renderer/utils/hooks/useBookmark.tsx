@@ -25,16 +25,16 @@ interface HookMember {
 }
 
 const useBookmark = (): HookMember => {
-  const [selectedWorld, setSelectedWorld] = useState<World>();
+  const [bookmarkTargetWorld, setBookmarkTargetWorld] = useState<World>();
   const [recoilBookmarks, setRecoilBookmarks] =
     useRecoilState(worldBookmarksState);
 
   const hookMember: HookMember = {
     onClickOpenBookmarkModal(world: World): void {
-      setSelectedWorld(world);
+      setBookmarkTargetWorld(world);
     },
     onCloseBookmarkModal(): void {
-      setSelectedWorld(undefined);
+      setBookmarkTargetWorld(undefined);
     },
     onAddBookmarkType(bookmarkType: string): void {
       if (!recoilBookmarks) return;
@@ -94,23 +94,23 @@ const useBookmark = (): HookMember => {
       });
     },
     onAddBookmarkWorld(bookmarkType: string): void {
-      if (!selectedWorld) return;
+      if (!bookmarkTargetWorld) return;
       if (!recoilBookmarks) return;
 
       setRecoilBookmarks((b) => {
         const clone = copyDeep(b)!;
-        clone[bookmarkType].push(selectedWorld.key);
+        clone[bookmarkType].push(bookmarkTargetWorld.key);
         return clone;
       });
     },
     onRemoveBookmarkWorld(bookmarkType: string): void {
-      if (!selectedWorld) return;
+      if (!bookmarkTargetWorld) return;
       if (!recoilBookmarks) return;
 
       setRecoilBookmarks((b) => {
         const clone = copyDeep(b)!;
         clone[bookmarkType] = clone[bookmarkType].filter(
-          (key) => key !== selectedWorld.key,
+          (key) => key !== bookmarkTargetWorld.key,
         );
         return clone;
       });
@@ -142,13 +142,13 @@ const useBookmark = (): HookMember => {
       addTarget.forEach((t) => this.onAddBookmarkWorld(t));
     },
 
-    isOpenBookmarkModal: selectedWorld ? true : false,
+    isOpenBookmarkModal: bookmarkTargetWorld ? true : false,
     bookmarkTypes: recoilBookmarks ? Object.keys(recoilBookmarks) : [],
     worldTypes: recoilBookmarks
       ? Object.keys(recoilBookmarks).filter(
           (key) =>
             recoilBookmarks[key].filter(
-              (worldKey) => worldKey === selectedWorld?.key,
+              (worldKey) => worldKey === bookmarkTargetWorld?.key,
             ).length > 0,
         )
       : undefined,
