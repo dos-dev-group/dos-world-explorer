@@ -65,7 +65,7 @@ export default function BookmarkPage() {
       <BookmarkSelectModal
         bookmarkTypes={bookmarkHookMember.bookmarkTypes}
         visible={bookmarkHookMember.isOpenBookmarkModal}
-        preSelectType={bookmarkHookMember.worldTypes}
+        preSelectType={bookmarkHookMember.targetWorldTypes}
         onOk={(types: string[]): void => {
           bookmarkHookMember.onChangeBookmarkWorld(types);
           bookmarkHookMember.onCloseBookmarkModal();
@@ -93,6 +93,10 @@ export default function BookmarkPage() {
         onClickBookmark={(world) =>
           bookmarkHookMember.onClickOpenBookmarkModal(world)
         }
+        // onEdit={(world) => {}}
+        onRemove={(world) => {
+          hookMember.onRemoveWorld(world.key);
+        }}
       />
 
       {/* <Search

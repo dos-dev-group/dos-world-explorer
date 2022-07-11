@@ -2,8 +2,12 @@ import { worldBookmarksState } from '@src/renderer/data/bookmarks';
 import { worldDataState } from '@src/renderer/data/world';
 import copyDeep from '@src/renderer/utils/copyDeep';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
+import {
+  modifyEditSheetToMain,
+  reomoveEditSheetToMain,
+} from '@src/renderer/utils/ipc/editSheetToMain';
 import openExternalLink from '@src/renderer/utils/ipc/openExternalLink';
-import { WorldData, World, Bookmarks } from '@src/types';
+import { WorldData, World, Bookmarks, WorldEditInput } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -31,6 +35,8 @@ interface HookMember {
   onCloseTypeModal(): void;
   onClickRefresh: () => void;
   onChangeIsManipulatedTable: (isManipulated: boolean) => void;
+  onEditWorld: (key: string, world: WorldEditInput) => void;
+  onRemoveWorld: (key: string) => void;
 }
 const useBookmarkPage = (): HookMember => {
   const [bookmarks, setFavorites] = useRecoilState(worldBookmarksState);
@@ -145,6 +151,34 @@ const useBookmarkPage = (): HookMember => {
     onSearchWorlds(text) {},
     onChangeIsManipulatedTable(isManipulated) {
       setIsManipulatedTable(isManipulated);
+    },
+    onEditWorld(key, world) {
+      setIsLoading(true);
+      modifyEditSheetToMain(key, world)
+        .then(() => {
+          message.info('월드가 변경되었습니다');
+        })
+        .then(() => {
+          getSheetWorldData().then((data) => {
+            setWorldData(data);
+          });
+        })
+        .catch((e: Error) => message.error(e.toString()))
+        .finally(() => setIsLoading(false));
+    },
+    onRemoveWorld(key) {
+      setIsLoading(true);
+      reomoveEditSheetToMain(key)
+        .then(() => {
+          message.info('월드가 삭제되었습니다');
+        })
+        .then(() => {
+          getSheetWorldData().then((data) => {
+            setWorldData(data);
+          });
+        })
+        .catch((e: Error) => message.error(e.toString()))
+        .finally(() => setIsLoading(false));
     },
 
     // checkIsFavorite(world) {

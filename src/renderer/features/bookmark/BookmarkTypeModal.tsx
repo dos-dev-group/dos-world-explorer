@@ -74,7 +74,14 @@ export default function BookmarkTypeModal(props: Props) {
                 취소
               </Button>
             ) : (
-              <Button ghost type="primary" onClick={() => setCurEditItem(item)}>
+              <Button
+                ghost
+                type="primary"
+                onClick={() => {
+                  setCurEditItem(item);
+                  setNewEditType(item);
+                }}
+              >
                 수정
               </Button>
             );
@@ -91,13 +98,14 @@ export default function BookmarkTypeModal(props: Props) {
             <List.Item
               // TODO 수정버튼 useBookmarkPage에서 참조하는 Memo때문에 현재 안됨
               //@ts-ignore
-              actions={[renderedRemoveButton]}
+              actions={[renderedEditButton, renderedRemoveButton]}
             >
               <List.Item.Meta
                 avatar={<Avatar icon={<FolderOutlined />} />}
                 title={
                   item === curEditItem ? (
                     <Input
+                      value={newEditType}
                       onChange={(e) => setNewEditType(e.target.value.trim())}
                       onPressEnter={() => {
                         props.onEditBookmark(item, newEditType);

@@ -67,7 +67,7 @@ export default function WorldSheetPage() {
       <BookmarkSelectModal
         bookmarkTypes={bookmarkHookMember.bookmarkTypes}
         visible={bookmarkHookMember.isOpenBookmarkModal}
-        preSelectType={bookmarkHookMember.worldTypes}
+        preSelectType={bookmarkHookMember.targetWorldTypes}
         onOk={(types: string[]): void => {
           bookmarkHookMember.onChangeBookmarkWorld(types);
           bookmarkHookMember.onCloseBookmarkModal();

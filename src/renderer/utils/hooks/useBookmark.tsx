@@ -21,7 +21,7 @@ interface HookMember {
 
   isOpenBookmarkModal: boolean;
   bookmarkTypes: string[];
-  worldTypes: string[] | undefined;
+  targetWorldTypes: string[] | undefined;
 }
 
 const useBookmark = (): HookMember => {
@@ -99,7 +99,9 @@ const useBookmark = (): HookMember => {
 
       setRecoilBookmarks((b) => {
         const clone = copyDeep(b)!;
-        clone[bookmarkType].push(bookmarkTargetWorld.key);
+        clone[bookmarkType] = [bookmarkTargetWorld.key].concat(
+          clone[bookmarkType],
+        );
         return clone;
       });
     },
@@ -128,23 +130,23 @@ const useBookmark = (): HookMember => {
       return isMarked;
     },
     onChangeBookmarkWorld(types: string[]): void {
-      if (this.worldTypes === undefined) return;
+      if (this.targetWorldTypes === undefined) return;
 
       // 북마크 삭제
-      const deleteTarget = this.worldTypes.filter(
+      const deleteTarget = this.targetWorldTypes.filter(
         (be) => !types.find((te) => te === be),
       );
       deleteTarget.forEach((t) => this.onRemoveBookmarkWorld(t));
       // 북마크 추가
       const addTarget = types.filter(
-        (be) => !this.worldTypes!.find((te) => te === be),
+        (be) => !this.targetWorldTypes!.find((te) => te === be),
       );
       addTarget.forEach((t) => this.onAddBookmarkWorld(t));
     },
 
     isOpenBookmarkModal: bookmarkTargetWorld ? true : false,
     bookmarkTypes: recoilBookmarks ? Object.keys(recoilBookmarks) : [],
-    worldTypes: recoilBookmarks
+    targetWorldTypes: recoilBookmarks
       ? Object.keys(recoilBookmarks).filter(
           (key) =>
             recoilBookmarks[key].filter(
