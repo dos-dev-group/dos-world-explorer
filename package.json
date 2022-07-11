@@ -31,8 +31,8 @@
     ]
   },
   "build": {
-    "productName": "DosWorldExplorer",
-    "appId": "com.dos.DosWorldExplorer",
+    "productName": "VRCExplorer",
+    "appId": "com.dos.VRCExplorer",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [

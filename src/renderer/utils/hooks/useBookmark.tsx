@@ -21,20 +21,20 @@ interface HookMember {
 
   isOpenBookmarkModal: boolean;
   bookmarkTypes: string[];
-  worldTypes: string[] | undefined;
+  targetWorldTypes: string[] | undefined;
 }
 
 const useBookmark = (): HookMember => {
-  const [selectedWorld, setSelectedWorld] = useState<World>();
+  const [bookmarkTargetWorld, setBookmarkTargetWorld] = useState<World>();
   const [recoilBookmarks, setRecoilBookmarks] =
     useRecoilState(worldBookmarksState);
 
   const hookMember: HookMember = {
     onClickOpenBookmarkModal(world: World): void {
-      setSelectedWorld(world);
+      setBookmarkTargetWorld(world);
     },
     onCloseBookmarkModal(): void {
-      setSelectedWorld(undefined);
+      setBookmarkTargetWorld(undefined);
     },
     onAddBookmarkType(bookmarkType: string): void {
       if (!recoilBookmarks) return;
@@ -94,23 +94,25 @@ const useBookmark = (): HookMember => {
       });
     },
     onAddBookmarkWorld(bookmarkType: string): void {
-      if (!selectedWorld) return;
+      if (!bookmarkTargetWorld) return;
       if (!recoilBookmarks) return;
 
       setRecoilBookmarks((b) => {
         const clone = copyDeep(b)!;
-        clone[bookmarkType].push(selectedWorld.key);
+        clone[bookmarkType] = [bookmarkTargetWorld.key].concat(
+          clone[bookmarkType],
+        );
         return clone;
       });
     },
     onRemoveBookmarkWorld(bookmarkType: string): void {
-      if (!selectedWorld) return;
+      if (!bookmarkTargetWorld) return;
       if (!recoilBookmarks) return;
 
       setRecoilBookmarks((b) => {
         const clone = copyDeep(b)!;
         clone[bookmarkType] = clone[bookmarkType].filter(
-          (key) => key !== selectedWorld.key,
+          (key) => key !== bookmarkTargetWorld.key,
         );
         return clone;
       });
@@ -128,27 +130,27 @@ const useBookmark = (): HookMember => {
       return isMarked;
     },
     onChangeBookmarkWorld(types: string[]): void {
-      if (this.worldTypes === undefined) return;
+      if (this.targetWorldTypes === undefined) return;
 
       // 북마크 삭제
-      const deleteTarget = this.worldTypes.filter(
+      const deleteTarget = this.targetWorldTypes.filter(
         (be) => !types.find((te) => te === be),
       );
       deleteTarget.forEach((t) => this.onRemoveBookmarkWorld(t));
       // 북마크 추가
       const addTarget = types.filter(
-        (be) => !this.worldTypes!.find((te) => te === be),
+        (be) => !this.targetWorldTypes!.find((te) => te === be),
       );
       addTarget.forEach((t) => this.onAddBookmarkWorld(t));
     },
 
-    isOpenBookmarkModal: selectedWorld ? true : false,
+    isOpenBookmarkModal: bookmarkTargetWorld ? true : false,
     bookmarkTypes: recoilBookmarks ? Object.keys(recoilBookmarks) : [],
-    worldTypes: recoilBookmarks
+    targetWorldTypes: recoilBookmarks
       ? Object.keys(recoilBookmarks).filter(
           (key) =>
             recoilBookmarks[key].filter(
-              (worldKey) => worldKey === selectedWorld?.key,
+              (worldKey) => worldKey === bookmarkTargetWorld?.key,
             ).length > 0,
         )
       : undefined,

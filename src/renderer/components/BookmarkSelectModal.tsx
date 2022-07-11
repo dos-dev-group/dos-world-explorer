@@ -60,6 +60,7 @@ export default function BookmarkSelectModal(props: Props) {
       onCancel={() => {
         props.onCancel();
       }}
+      zIndex={3}
     >
       <Flex>
         <Select

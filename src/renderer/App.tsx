@@ -96,7 +96,7 @@ function MenuLayout() {
           }}
         >
           <Title level={4} style={{ color: 'white', textAlign: 'center' }}>
-            DOS WORLD EXPLORER
+            VRCExplorer
           </Title>
           <Menu
             theme="dark"
@@ -142,7 +142,7 @@ function MenuLayout() {
         <Layout css={{ marginLeft: 200 }}>
           <Outlet />
           <Footer style={{ textAlign: 'center' }}>
-            Dos Gang Application ©2022 Created by Dos Chat
+            VRCExplorer Created by Dos Chat
           </Footer>
         </Layout>
       </Layout>

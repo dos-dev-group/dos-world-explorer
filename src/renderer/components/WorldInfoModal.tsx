@@ -1,3 +1,5 @@
+import { HeartFilled, HeartOutlined } from '@ant-design/icons';
+import { gold, red } from '@ant-design/colors';
 import { FlexCenter, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { World, WorldEditInput } from '@src/types';
@@ -9,11 +11,13 @@ import { spacing } from '../utils/styling';
 import WorldInstanceCreationModal from './WorldInstanceCreationModal';
 
 interface Props {
-  onOk?: (e: WorldEditInput) => void;
   onCancel?: () => void;
   onEdit?: (world: World) => void;
   onRemove?: (world: World) => void;
+  onClickBookmark: (world: World, isBookmarked: boolean) => void;
+
   visible: boolean;
+  isBookmarked: boolean;
   world?: World;
 }
 
@@ -31,6 +35,7 @@ function WorldInfoModal(props: Props) {
       visible={props.visible}
       width="60%"
       footer={false}
+      zIndex={2}
     >
       <WorldInstanceCreationModal
         onCancel={() => {
@@ -49,11 +54,31 @@ function WorldInfoModal(props: Props) {
           <FlexRow>
             <div css={{ flex: 1 }}>
               <Typography.Title level={5}>
+                <div>
+                  북마크:{' '}
+                  {props.isBookmarked ? (
+                    <HeartFilled
+                      css={{ color: red.primary, fontSize: 20 }}
+                      onClick={() =>
+                        props.world &&
+                        props.onClickBookmark(props.world, props.isBookmarked)
+                      }
+                    />
+                  ) : (
+                    <HeartOutlined
+                      css={{ color: red.primary, fontSize: 20 }}
+                      onClick={() =>
+                        props.world &&
+                        props.onClickBookmark(props.world, props.isBookmarked)
+                      }
+                    />
+                  )}
+                </div>
                 <div>제작자: {props.world.author}</div>
                 <div>
                   별점: <StarScore score={props.world.score} />
                 </div>
-                타입: {props.world.type}
+                <div>타입: {props.world.type}</div>
                 <div>
                   {props.world.tags.map((tag) => {
                     const colorIndex =
