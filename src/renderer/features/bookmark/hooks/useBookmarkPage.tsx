@@ -3,6 +3,10 @@ import { worldDataState } from '@src/renderer/data/world';
 import copyDeep from '@src/renderer/utils/copyDeep';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
+  loadBookmarkFromFileDialog,
+  saveBookmarkToFileDialog,
+} from '@src/renderer/utils/ipc/bookmarksUtils';
+import {
   modifyEditSheetToMain,
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
@@ -33,6 +37,8 @@ interface HookMember {
   onClickToggleInfoModal: (world?: World) => void;
   onClickOpenTypeModal(): void;
   onCloseTypeModal(): void;
+  onClickOpenSaveBookmarkDialog(): void;
+  onClickOpenLoadBookmarkDialog(): void;
   onClickRefresh: () => void;
   onChangeIsManipulatedTable: (isManipulated: boolean) => void;
   onEditWorld: (key: string, world: WorldEditInput) => void;
@@ -145,6 +151,17 @@ const useBookmarkPage = (): HookMember => {
     },
     onCloseTypeModal() {
       setVisibleModalBookmark(false);
+    },
+
+    onClickOpenLoadBookmarkDialog() {
+      loadBookmarkFromFileDialog().catch((e: Error) => message.warn('취소됨.'));
+    },
+    onClickOpenSaveBookmarkDialog() {
+      if (bookmarks) {
+        saveBookmarkToFileDialog(bookmarks).catch((e: Error) =>
+          message.warn('취소됨.'),
+        );
+      }
     },
 
     onChangeSearchOption(option) {},

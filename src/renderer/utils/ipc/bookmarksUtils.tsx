@@ -18,8 +18,37 @@ export function loadBookmarks() {
       if (result === null) {
         reject(new NoDataError('Fail Load Bookmarks'));
       }
-      // eslint-disable-next-line no-new-object
-      resolve(new Object(result) as Bookmarks);
+      resolve(result as Bookmarks);
     });
+  });
+}
+
+export function saveBookmarkToFileDialog(bookmarks: Bookmarks) {
+  window.electron.ipcRenderer.sendMessage('saveBookmarkToFileDialog', [
+    bookmarks,
+  ]);
+  return new Promise<Bookmarks>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'saveBookmarkToFileDialog',
+      (result: unknown) => {
+        if (result === null) reject(new Error('Canceled'));
+        resolve(result as Bookmarks);
+      },
+    );
+  });
+}
+
+export function loadBookmarkFromFileDialog() {
+  window.electron.ipcRenderer.sendMessage('loadBookmarkFromFileDialog', []);
+  return new Promise<Bookmarks>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'loadBookmarkFromFileDialog',
+      (result: unknown) => {
+        if (result === null) {
+          reject(new Error('Canceled'));
+        }
+        resolve(result as Bookmarks);
+      },
+    );
   });
 }
