@@ -39,6 +39,8 @@ export default function WorldSheetPage() {
   const hookMember = useWorldSheetPage();
   const bookmarkHookMember = useBookmark();
 
+  const isAllType = hookMember.currentType === '전체';
+
   const renderedTabs = hookMember.typeList.map((e) => (
     <TabPane tab={e} key={e} />
   ));
@@ -159,9 +161,9 @@ export default function WorldSheetPage() {
       <Spin spinning={hookMember.isLoading}>
         <Table
           dataSource={hookMember.currentTableData}
-          scroll={{
-            x: true,
-          }}
+          // scroll={{
+          //   x: true,
+          // }}
           pagination={{
             showQuickJumper: true,
             onChange: (page, pageSize) => {
@@ -184,7 +186,7 @@ export default function WorldSheetPage() {
           )}
         >
           <Column
-            width="5%"
+            width={5}
             // title=""
             key="bookmark"
             render={(_, record: World) => {
@@ -209,13 +211,12 @@ export default function WorldSheetPage() {
             }}
           />
           <Column
-            width="10%"
+            width={10}
             title="이미지"
             dataIndex="imageUrl"
             render={(imageUrl, record: World) => (
               <Image
                 src={imageUrl}
-                width={130}
                 preview={false}
                 onClick={(e) => {
                   hookMember.onClickOpenWorldInfoModal(record);
@@ -224,41 +225,76 @@ export default function WorldSheetPage() {
             )}
           />
           <Column
-            width="10%"
+            width={20}
             title="제목"
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
-            onCell={(w) => ({
-              style: {
-                width: 200,
-                wordBreak: 'keep-all',
-              },
-            })}
-            ellipsis
             render={(_, world) => (
-              <Typography.Link
-                onClick={(e) => {
-                  hookMember.onClickOpenWorldInfoModal(world);
-                }}
+              <Typography.Text
+                css={{ wordBreak: 'keep-all' }}
+                ellipsis={{ tooltip: world.name }}
               >
-                {world.name}
-              </Typography.Link>
+                <Typography.Link
+                  onClick={(e) => {
+                    hookMember.onClickOpenWorldInfoModal(world);
+                  }}
+                >
+                  {world.name}
+                </Typography.Link>
+              </Typography.Text>
+              //
+              // <Typography.Paragraph
+              //   css={{ wordBreak: 'keep-all' }}
+              //   ellipsis={{ rows: 3, expandable: true }}
+              // >
+              //   {world.name}
+              // </Typography.Paragraph>
             )}
+            // onCell={(w) => ({
+            //   style: {
+            //     width: 200,
+            //     wordBreak: 'keep-all',
+            //   },
+            // })}
+            // ellipsis
+            // render={(_, world) => (
+            //   <Typography.Link
+            //     onClick={(e) => {
+            //       hookMember.onClickOpenWorldInfoModal(world);
+            //     }}
+            //   >
+            //     {world.name}
+            //   </Typography.Link>
+            // )}
           />
           <Column
-            width="10%"
+            width={10}
             title="제작자"
             dataIndex="author"
             sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
             ellipsis
           />
+          {isAllType && (
+            <Column
+              responsive={['xl']}
+              width={6}
+              title="타입"
+              dataIndex="type"
+              ellipsis
+              onCell={(world) => ({
+                style: {
+                  fontSize: 12,
+                },
+              })}
+            />
+          )}
           <Column
-            width="20%"
+            width={isAllType ? 15 : 20}
             title="설명"
             dataIndex="description"
             render={(value) => (
               <Typography.Paragraph
-                css={{ wordBreak: 'keep-all', width: '24vw' }}
+                css={{ wordBreak: 'keep-all' }}
                 ellipsis={{ rows: 3, expandable: true }}
               >
                 {value}
@@ -266,12 +302,12 @@ export default function WorldSheetPage() {
             )}
           />
           <Column
-            width="15%"
+            width={15}
             title="태그"
             dataIndex="tags"
             ellipsis
             render={(tags: any[]) => (
-              <>
+              <div css={{ wordBreak: 'break-all', whiteSpace: 'break-spaces' }}>
                 {tags.map((tag, index) => {
                   const colorIndex =
                     simpleStringHash(tag) % PresetColorTypes.length;
@@ -279,21 +315,21 @@ export default function WorldSheetPage() {
                   return (
                     <span key={tag}>
                       <Tag color={color}>{tag.toUpperCase()}</Tag>
-                      {(index + 1) / 4 > 0 && (index + 1) % 4 === 0 ? (
+                      {/* {(index + 1) / 4 > 0 && (index + 1) % 4 === 0 ? (
                         <br />
-                      ) : undefined}
+                      ) : undefined} */}
                     </span>
                   );
                 })}
-              </>
+              </div>
             )}
           />
           <Column
-            width="10%"
+            width={9}
             title="별점"
             dataIndex="score"
             render={(score: number) => (
-              <FlexRow css={{ width: 90 }}>
+              <FlexRow>
                 {new Array(score).fill(null).map((_, index) => (
                   <StarFilled key={index} css={{ color: gold.primary }} />
                 ))}
@@ -314,8 +350,9 @@ export default function WorldSheetPage() {
             )}
           /> */}
           <Column
-            width="5%"
+            width={7}
             dataIndex="key"
+            responsive={['xl']}
             render={(k, record: World) => (
               <Flex>
                 <Button
