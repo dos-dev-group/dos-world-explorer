@@ -281,7 +281,18 @@ export default function BookmarkPage() {
             ellipsis
           />
           <Column
-            width={20}
+            responsive={['xl']}
+            width={6}
+            dataIndex="type"
+            ellipsis
+            onCell={(world) => ({
+              style: {
+                fontSize: 12,
+              },
+            })}
+          />
+          <Column
+            width={15}
             title="설명"
             dataIndex="description"
             render={(value) => (

@@ -38,10 +38,10 @@ export const Grid = styled.div({
 
 export const HoverOpacity = styled.div<{
   transitionTime?: number;
-  opacity?: number;
+  hoverOpacity?: number;
 }>((props) => {
   const transitionTime = props.transitionTime || 0.1;
-  const opacity = props.opacity || 0.7;
+  const opacity = props.hoverOpacity || 0.7;
   return {
     backgroundColor: 'white',
     transition: `all ${transitionTime}s ease-out`,
