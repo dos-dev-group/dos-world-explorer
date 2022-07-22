@@ -20,7 +20,11 @@ import {
 } from 'antd';
 import { gold, red } from '@ant-design/colors';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
-import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
+import {
+  Flex,
+  FlexRow,
+  HoverOpacity,
+} from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
@@ -203,13 +207,15 @@ export default function BookmarkPage() {
             title="이미지"
             dataIndex="imageUrl"
             render={(imageUrl, record: World) => (
-              <Image
-                src={imageUrl}
-                preview={false}
-                onClick={(e) => {
-                  hookMember.onClickToggleInfoModal(record);
-                }}
-              />
+              <HoverOpacity>
+                <Image
+                  src={imageUrl}
+                  preview={false}
+                  onClick={(e) => {
+                    hookMember.onClickToggleInfoModal(record);
+                  }}
+                />
+              </HoverOpacity>
             )}
           />
           <Column

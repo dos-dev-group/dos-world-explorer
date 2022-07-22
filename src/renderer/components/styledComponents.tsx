@@ -35,3 +35,18 @@ export const Grid = styled.div({
   // gridTemplateColumns: 'repeat(12, 1fr)',
   // gap: 2,
 });
+
+export const HoverOpacity = styled.div<{
+  transitionTime?: number;
+  opacity?: number;
+}>((props) => {
+  const transitionTime = props.transitionTime || 0.1;
+  const opacity = props.opacity || 0.7;
+  return {
+    backgroundColor: 'white',
+    transition: `all ${transitionTime}s ease-out`,
+    ':hover': {
+      opacity: opacity,
+    },
+  };
+});
