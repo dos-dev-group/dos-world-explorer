@@ -16,7 +16,12 @@ import {
   genWorldInstanceName,
   login,
 } from './utils/vrchatAPI';
-import { loadBookmarks, saveBookmarks } from './utils/bookmarkUtils';
+import {
+  loadBookmarkFromFileDialog,
+  loadBookmarks,
+  saveBookmarks,
+  saveBookmarkToFileDialog,
+} from './utils/fileSystem';
 
 export default function setupIpcListener() {
   ipcMain.on('ipc-example', async (event, arg) => {
@@ -106,7 +111,7 @@ export default function setupIpcListener() {
     event.reply('autoFileToRenderer', await autoFile(arg[0]));
   });
 
-  // ###################################### for bookmarks.tsx ######################################
+  // ###################################### for bookmarks ######################################
 
   ipcMain.on('saveBookmarks', async (event, arg) => {
     try {
@@ -120,6 +125,26 @@ export default function setupIpcListener() {
       event.reply('loadBookmarks', await loadBookmarks());
     } catch {
       event.reply('loadBookmarks', null);
+    }
+  });
+  ipcMain.on('saveBookmarkToFileDialog', async (event, arg) => {
+    try {
+      event.reply(
+        'saveBookmarkToFileDialog',
+        await saveBookmarkToFileDialog(arg[0]),
+      );
+    } catch {
+      event.reply('saveBookmarkToFileDialog', null);
+    }
+  });
+  ipcMain.on('loadBookmarkFromFileDialog', async (event, arg) => {
+    try {
+      event.reply(
+        'loadBookmarkFromFileDialog',
+        await loadBookmarkFromFileDialog(),
+      );
+    } catch {
+      event.reply('loadBookmarkFromFileDialog', null);
     }
   });
 }

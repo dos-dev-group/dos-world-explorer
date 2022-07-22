@@ -52,7 +52,7 @@ export async function login(id: string, pw: string): Promise<boolean> {
       user = res.data;
       console.log(user);
       console.log('login success');
-      console.log(res.data.displayName);
+      console.log('api displayName :', res.data.displayName);
     })
     .catch((err) => {
       console.log(err.response.data);

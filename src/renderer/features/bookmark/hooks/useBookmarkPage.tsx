@@ -3,6 +3,10 @@ import { worldDataState } from '@src/renderer/data/world';
 import copyDeep from '@src/renderer/utils/copyDeep';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
+  loadBookmarkFromFileDialog,
+  saveBookmarkToFileDialog,
+} from '@src/renderer/utils/ipc/bookmarksUtils';
+import {
   modifyEditSheetToMain,
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
@@ -33,13 +37,15 @@ interface HookMember {
   onClickToggleInfoModal: (world?: World) => void;
   onClickOpenTypeModal(): void;
   onCloseTypeModal(): void;
+  onClickOpenSaveBookmarkDialog(): void;
+  onClickOpenLoadBookmarkDialog(): void;
   onClickRefresh: () => void;
   onChangeIsManipulatedTable: (isManipulated: boolean) => void;
   onEditWorld: (key: string, world: WorldEditInput) => void;
   onRemoveWorld: (key: string) => void;
 }
 const useBookmarkPage = (): HookMember => {
-  const [bookmarks, setFavorites] = useRecoilState(worldBookmarksState);
+  const [bookmarks, setBookmarks] = useRecoilState(worldBookmarksState);
   const [worldData, setWorldData] = useRecoilState(worldDataState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [currentType, setCurrentType] = useState<string>();
@@ -145,6 +151,26 @@ const useBookmarkPage = (): HookMember => {
     },
     onCloseTypeModal() {
       setVisibleModalBookmark(false);
+    },
+
+    onClickOpenLoadBookmarkDialog() {
+      loadBookmarkFromFileDialog()
+        .then((b: Bookmarks) => {
+          setBookmarks(b);
+        })
+        .then(() => {
+          message.info('북마크 불러오기 성공.');
+        })
+        .catch((e: Error) => message.warn('취소됨.'));
+    },
+    onClickOpenSaveBookmarkDialog() {
+      if (bookmarks) {
+        saveBookmarkToFileDialog(bookmarks)
+          .then(() => {
+            message.info('북마크 내보내기 성공.');
+          })
+          .catch((e: Error) => message.warn('취소됨.'));
+      }
     },
 
     onChangeSearchOption(option) {},
