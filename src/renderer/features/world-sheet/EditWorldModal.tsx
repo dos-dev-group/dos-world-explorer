@@ -102,29 +102,31 @@ function EditWorldModal(props: Props) {
       </Select>
       <Input.Group css={{ marginTop: spacing(1) }}>
         <Typography.Title level={5}>URL</Typography.Title>
-        <Input
-          css={{ width: 'calc(100% - 200px)' }}
-          value={curUrl}
-          onChange={(e) => {
-            setCurUrl(e.target.value);
-            setWorldCheckInfo(undefined);
-          }}
-        />
-        <Button
-          type="primary"
-          loading={isChecking}
-          disabled={!URL_REGEX.test(curUrl || '')}
-          onClick={() => {
-            setIsChecking(true);
-            autoFileToMain(curUrl!).then((info) => {
-              console.log('autoFileToMain');
-              setWorldCheckInfo(info);
-              setIsChecking(false);
-            });
-          }}
-        >
-          Check
-        </Button>
+        <FlexRow css={{ width: 'calc(100% - 200px)' }}>
+          <Input
+            css={{ flex: 1 }}
+            onChange={(e) => {
+              setCurUrl(e.target.value);
+              setWorldCheckInfo(undefined);
+            }}
+          />
+          <Button
+            css={{ marginLeft: spacing(1) }}
+            type="primary"
+            loading={isChecking}
+            disabled={!URL_REGEX.test(curUrl || '')}
+            onClick={() => {
+              setIsChecking(true);
+              autoFileToMain(curUrl!).then((info) => {
+                console.log('autoFileToMain');
+                setWorldCheckInfo(info);
+                setIsChecking(false);
+              });
+            }}
+          >
+            Check
+          </Button>
+        </FlexRow>
       </Input.Group>
       <Input.Group css={{ marginTop: spacing(1) }}>
         <Space size="small" direction="vertical">

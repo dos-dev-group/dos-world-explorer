@@ -1,15 +1,21 @@
 import {
+  DownloadOutlined,
   DownOutlined,
   HeartFilled,
   HeartOutlined,
+  MoreOutlined,
   ReloadOutlined,
   StarFilled,
+  UploadOutlined,
   UpOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import {
   Button,
+  Dropdown,
   Image,
   Input,
+  Menu,
   Popconfirm,
   Select,
   Spin,
@@ -20,7 +26,11 @@ import {
 } from 'antd';
 import { gold, red } from '@ant-design/colors';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
-import { Flex, FlexRow } from '@src/renderer/components/styledComponents';
+import {
+  Flex,
+  FlexRow,
+  HoverOpacity,
+} from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
@@ -110,14 +120,39 @@ export default function BookmarkPage() {
       /> */}
       <FlexRow css={{ alignItems: 'center' }}>
         <Tabs
-          css={{ flex: 1 }}
+          css={{ flex: 1, overflowX: 'auto' }}
           activeKey={hookMember.currentType}
           onChange={hookMember.onChangeType}
         >
           {renderedTabs}
         </Tabs>
 
-        <Button
+        <Dropdown.Button
+          onClick={() => hookMember.onClickOpenTypeModal()}
+          css={{ marginLeft: spacing(1) }}
+          overlay={
+            <Menu
+              items={[
+                {
+                  label: '북마크 내보내기',
+                  key: '1',
+                  icon: <UploadOutlined />,
+                  onClick: () => hookMember.onClickOpenSaveBookmarkDialog(),
+                },
+                {
+                  label: '북마크 가져오기',
+                  key: '2',
+                  icon: <DownloadOutlined />,
+                  danger: true,
+                  onClick: () => hookMember.onClickOpenLoadBookmarkDialog(),
+                },
+              ]}
+            />
+          }
+        >
+          북마크 관리
+        </Dropdown.Button>
+        {/* <Button
           onClick={() => hookMember.onClickOpenTypeModal()}
           css={{ marginLeft: spacing(1) }}
         >
@@ -134,17 +169,9 @@ export default function BookmarkPage() {
           danger
           type="text"
         >
-          북마크 불러오기
-        </Button>
+          북마크 가져오기
+        </Button> */}
       </FlexRow>
-
-      {/* <Button
-        size="small"
-        css={{ marginLeft: 'auto', alignSelf: 'center' }}
-        icon={<ReloadOutlined />}
-        onClick={() => hookMember.onClickRefresh()}
-        loading={hookMember.isLoading}
-      /> */}
 
       <FlexRow css={{ marginLeft: 'auto' }}>
         <Button
@@ -203,13 +230,20 @@ export default function BookmarkPage() {
             title="이미지"
             dataIndex="imageUrl"
             render={(imageUrl, record: World) => (
-              <Image
-                src={imageUrl}
-                preview={false}
-                onClick={(e) => {
-                  hookMember.onClickToggleInfoModal(record);
-                }}
-              />
+              <HoverOpacity>
+                <Image
+                  css={{
+                    ':hover': {
+                      cursor: 'pointer',
+                    },
+                  }}
+                  src={imageUrl}
+                  preview={false}
+                  onClick={(e) => {
+                    hookMember.onClickToggleInfoModal(record);
+                  }}
+                />
+              </HoverOpacity>
             )}
           />
           <Column
