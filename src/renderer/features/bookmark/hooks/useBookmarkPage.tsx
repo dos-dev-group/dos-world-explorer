@@ -45,7 +45,7 @@ interface HookMember {
   onRemoveWorld: (key: string) => void;
 }
 const useBookmarkPage = (): HookMember => {
-  const [bookmarks, setFavorites] = useRecoilState(worldBookmarksState);
+  const [bookmarks, setBookmarks] = useRecoilState(worldBookmarksState);
   const [worldData, setWorldData] = useRecoilState(worldDataState);
   const [isLoading, setIsLoading] = useState(worldData === undefined);
   const [currentType, setCurrentType] = useState<string>();
@@ -154,13 +154,22 @@ const useBookmarkPage = (): HookMember => {
     },
 
     onClickOpenLoadBookmarkDialog() {
-      loadBookmarkFromFileDialog().catch((e: Error) => message.warn('취소됨.'));
+      loadBookmarkFromFileDialog()
+        .then((b: Bookmarks) => {
+          setBookmarks(b);
+        })
+        .then(() => {
+          message.info('북마크 불러오기 성공.');
+        })
+        .catch((e: Error) => message.warn('취소됨.'));
     },
     onClickOpenSaveBookmarkDialog() {
       if (bookmarks) {
-        saveBookmarkToFileDialog(bookmarks).catch((e: Error) =>
-          message.warn('취소됨.'),
-        );
+        saveBookmarkToFileDialog(bookmarks)
+          .then(() => {
+            message.info('북마크 내보내기 성공.');
+          })
+          .catch((e: Error) => message.warn('취소됨.'));
       }
     },
 

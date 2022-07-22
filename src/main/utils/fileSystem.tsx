@@ -25,7 +25,7 @@ export function loadBookmarks(): Promise<Bookmarks> {
 export async function saveBookmarkToFileDialog(bookmarks: Bookmarks) {
   const dialogResult = await dialog.showSaveDialog({
     title: '북마크의 저장 경로를 선택해주세요.',
-    defaultPath: app.getPath('downloads'),
+    defaultPath: app.getPath('documents'),
     filters: [
       {
         name: 'bookmarks',

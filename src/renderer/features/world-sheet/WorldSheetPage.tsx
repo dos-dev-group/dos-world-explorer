@@ -278,7 +278,6 @@ export default function WorldSheetPage() {
             <Column
               responsive={['xl']}
               width={6}
-              title="타입"
               dataIndex="type"
               ellipsis
               onCell={(world) => ({
