@@ -209,6 +209,11 @@ export default function BookmarkPage() {
             render={(imageUrl, record: World) => (
               <HoverOpacity>
                 <Image
+                  css={{
+                    ':hover': {
+                      cursor: 'pointer',
+                    },
+                  }}
                   src={imageUrl}
                   preview={false}
                   onClick={(e) => {
