@@ -161,7 +161,7 @@ const useBookmarkPage = (): HookMember => {
         .then(() => {
           message.info('북마크 불러오기 성공.');
         })
-        .catch((e: Error) => message.warn('취소됨.'));
+        .catch((e: Error) => message.warn('북마크 불러오기 취소됨.'));
     },
     onClickOpenSaveBookmarkDialog() {
       if (bookmarks) {
@@ -169,7 +169,7 @@ const useBookmarkPage = (): HookMember => {
           .then(() => {
             message.info('북마크 내보내기 성공.');
           })
-          .catch((e: Error) => message.warn('취소됨.'));
+          .catch((e: Error) => message.warn('북마크 내보내기 취소됨.'));
       }
     },
 
