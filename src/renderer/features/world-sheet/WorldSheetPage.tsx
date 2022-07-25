@@ -24,7 +24,7 @@ import {
   HoverOpacity,
 } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
-import { minHeightMq, minWidthMq, spacing } from '@src/renderer/utils/styling';
+import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import StarSelect from '@src/renderer/components/StarSelect';
 import BookmarkSelectModal from '@src/renderer/components/BookmarkSelectModal';
@@ -132,7 +132,7 @@ export default function WorldSheetPage() {
       />
       <Flex
         css={{
-          [minHeightMq(768)]: {
+          [mqMinHeight(768)]: {
             position: 'sticky',
             zIndex: 10,
             top: 0,
@@ -239,7 +239,7 @@ export default function WorldSheetPage() {
               <HoverOpacity>
                 <Image
                   css={{
-                    [minWidthMq(1600)]: {
+                    [mqMinWidth(1600)]: {
                       width: 130,
                     },
                   }}
@@ -383,7 +383,7 @@ export default function WorldSheetPage() {
             render={(k, record: World) => (
               <Flex
                 css={{
-                  [minWidthMq(1200)]: {
+                  [mqMinWidth(1200)]: {
                     width: 50,
                   },
                 }}

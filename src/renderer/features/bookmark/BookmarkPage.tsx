@@ -32,7 +32,7 @@ import {
   HoverOpacity as ClickableOpacity,
 } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
-import { minHeightMq, minWidthMq, spacing } from '@src/renderer/utils/styling';
+import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import StarSelect from '@src/renderer/components/StarSelect';
@@ -126,7 +126,7 @@ export default function BookmarkPage() {
       /> */}
       <Flex
         css={{
-          [minHeightMq(768)]: {
+          [mqMinHeight(768)]: {
             position: 'sticky',
             zIndex: 10,
             top: 0,
@@ -252,7 +252,7 @@ export default function BookmarkPage() {
               <ClickableOpacity>
                 <Image
                   css={{
-                    [minWidthMq(1600)]: {
+                    [mqMinWidth(1600)]: {
                       width: 130,
                     },
                   }}
