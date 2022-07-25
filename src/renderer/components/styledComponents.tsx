@@ -47,6 +47,7 @@ export const HoverOpacity = styled.div<{
     transition: `all ${transitionTime}s ease-out`,
     ':hover': {
       opacity: opacity,
+      cursor: 'pointer',
     },
   };
 });
