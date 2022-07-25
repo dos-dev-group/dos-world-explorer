@@ -238,11 +238,6 @@ export default function WorldSheetPage() {
             render={(imageUrl, record: World) => (
               <HoverOpacity>
                 <Image
-                  css={{
-                    [mqMinWidth(1600)]: {
-                      width: 130,
-                    },
-                  }}
                   src={imageUrl}
                   preview={false}
                   onClick={(e) => {
