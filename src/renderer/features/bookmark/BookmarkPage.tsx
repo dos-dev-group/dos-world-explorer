@@ -251,11 +251,6 @@ export default function BookmarkPage() {
             render={(imageUrl, record: World) => (
               <ClickableOpacity>
                 <Image
-                  css={{
-                    [mqMinWidth(1600)]: {
-                      width: 130,
-                    },
-                  }}
                   src={imageUrl}
                   preview={false}
                   onClick={(e) => {
