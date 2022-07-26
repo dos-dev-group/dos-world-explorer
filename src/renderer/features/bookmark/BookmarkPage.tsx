@@ -128,7 +128,7 @@ export default function BookmarkPage() {
         css={{
           [mqMinHeight(768)]: {
             position: 'sticky',
-            zIndex: 10,
+            zIndex: 2,
             top: 0,
             left: 0,
             right: 0,
