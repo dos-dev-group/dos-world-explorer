@@ -21,6 +21,15 @@ export function loginToMain(id: string, pw: string) {
   });
 }
 
+export function logoutToMain() {
+  window.electron.ipcRenderer.sendMessage('logoutToMain', []);
+  return new Promise<boolean>((resolve, reject) => {
+    window.electron.ipcRenderer.once('logoutToRenderer', (result: unknown) => {
+      resolve(result as boolean);
+    });
+  });
+}
+
 export function getFriednListToMain() {
   window.electron.ipcRenderer.sendMessage('getFriednListToMain', []);
   return new Promise<User[]>((resolve, reject) => {

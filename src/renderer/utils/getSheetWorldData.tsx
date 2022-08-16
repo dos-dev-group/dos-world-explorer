@@ -1,17 +1,34 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import axios, { AxiosError } from 'axios';
-import { World, WorldData } from '@src/types';
+import { World, WorldData, TagStyle, TagStyles } from '@src/types';
 import { NoDataError } from './error';
+import { analytics } from 'googleapis/build/src/apis/analytics';
 
 const sheetUrl =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5aaBlO_r5xaHXz7uac1ya_D_yTQTLMY7KrHinZVLobJ66l7f0999AIsCYoY5gAlhTEbzBIrmBbDA2/pubhtml';
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5aaBlO_r5xaHXz7uac1ya_D_yTQTLMY7KrHinZVLobJ66l7f0999AIsCYoY5gAlhTEbzBIrmBbDA2/pubhtml?gid=209660619&single=true';
+const sheetTagUrl =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5aaBlO_r5xaHXz7uac1ya_D_yTQTLMY7KrHinZVLobJ66l7f0999AIsCYoY5gAlhTEbzBIrmBbDA2/pubhtml?gid=1994142434&single=true';
 
 const domparser = new DOMParser();
 // eslint-disable-next-line consistent-return
-export const getHtml = async () => {
+export const getHtml = async (url: string) => {
   // console.log(sheetUrl + '?_=' + new Date().getTime());
   try {
-    const html = await axios.get(sheetUrl + '?_=' + new Date().getTime(), {
+    const html = await axios.get(url + '&_=' + new Date().getTime(), {
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    });
+    return html;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getHtmlTagStyle = async () => {
+  // console.log(sheetUrl + '?_=' + new Date().getTime());
+  try {
+    const html = await axios.get(sheetUrl + '&_=' + new Date().getTime(), {
       headers: {
         'Cache-Control': 'no-cache',
       },
@@ -35,12 +52,12 @@ export async function test() {
 
 export default function getSheetWorldData() {
   const worldData: WorldData = [];
-  return getHtml()
+  return getHtml(sheetUrl)
     .then((html) => {
       if (!html) throw new NoDataError();
 
       const doc = domparser.parseFromString(html.data, 'text/html');
-      // console.log(doc);
+
       const raws = doc
         .getElementsByTagName('tbody')[0]
         .getElementsByTagName('tr');
@@ -64,6 +81,7 @@ export default function getSheetWorldData() {
         // console.log(world);
         worldData.push(world);
       }
+      console.log(worldData);
       return worldData;
     })
     .catch((reason) => {
@@ -74,6 +92,57 @@ export default function getSheetWorldData() {
       } else {
         console.warn('Error: Unknown Error', reason);
       }
+      console.log(worldData);
       return worldData;
+    });
+}
+
+export function getTagStyles() {
+  const tagStyles: TagStyles = [];
+  return getHtml(sheetTagUrl)
+    .then((html) => {
+      if (!html) throw new NoDataError();
+
+      const doc = domparser.parseFromString(html.data, 'text/html');
+      const styleData: string[] =
+        doc
+          .getElementsByTagName('style')[0]
+          .textContent?.split('.ritz .waffle .') || [];
+      // console.log(styleData);
+      const styles: { [k: string]: string } = {};
+      for (let i = 1; i < styleData.length; i++) {
+        styles[styleData[i].split('{')[0]] = styleData[i]
+          .split('background-color:')[1]
+          .split(';')[0];
+      }
+      // console.log(styles);
+      const raws = doc
+        .getElementsByTagName('tbody')[0]
+        .getElementsByTagName('tr');
+      for (let i = 1; i < raws.length; i++) {
+        const row = raws[i].getElementsByTagName('td');
+        // console.log(rows);
+        const tagStyle: TagStyle = {
+          tag: row[0].textContent || '',
+          content:
+            row[1].textContent!.replaceAll(' ', '').slice(1).split('#') || [],
+          color: styles[row[2].className] || '',
+        };
+        // doc.styleSheets;
+        // console.log(tagStyle);
+        tagStyles.push(tagStyle);
+      }
+      console.log(tagStyles);
+      return tagStyles;
+    })
+    .catch((reason) => {
+      if (reason instanceof AxiosError) {
+        console.warn('Error: Fail Fetch html', reason);
+      } else if (reason instanceof NoDataError) {
+        console.warn('Error: Success Fetch html but No Data', reason);
+      } else {
+        console.warn('Error: Unknown Error', reason);
+      }
+      return tagStyles;
     });
 }

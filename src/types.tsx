@@ -26,6 +26,14 @@ export type WorldVrcRaw = Omit<
   'description' | 'tags' | 'score' | 'date' | 'type'
 >;
 
+export interface TagStyle {
+  tag: string;
+  content: string[];
+  color: string;
+}
+
+export type TagStyles = TagStyle[];
+
 export interface User {
   name: string; // 유저이름
   id: string; // 유저 아이디
