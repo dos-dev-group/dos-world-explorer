@@ -15,6 +15,7 @@ import {
   sendInvites,
   genWorldInstanceName,
   login,
+  logout,
 } from './utils/vrchatAPI';
 import {
   loadBookmarkFromFileDialog,
@@ -45,6 +46,10 @@ export default function setupIpcListener() {
 
   ipcMain.on('loginToMain', async (event, arg) => {
     event.reply('loginToRenderer', await login(arg[0], arg[1]));
+  });
+
+  ipcMain.on('logoutToMain', async (event, arg) => {
+    event.reply('logoutToRenderer', await logout());
   });
 
   ipcMain.on('getFriednListToMain', async (event, arg) => {
