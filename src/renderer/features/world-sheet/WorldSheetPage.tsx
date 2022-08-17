@@ -317,7 +317,7 @@ export default function WorldSheetPage() {
             render={(value) => (
               <Typography.Paragraph
                 css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ rows: 3, expandable: true }}
+                ellipsis={{ rows: 3, expandable: false }}
               >
                 {value}
               </Typography.Paragraph>

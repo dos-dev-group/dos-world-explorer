@@ -1,12 +1,15 @@
 import {
+  AuditOutlined,
   GlobalOutlined,
   HeartOutlined,
   HomeOutlined,
+  LoginOutlined,
   LogoutOutlined,
   StarOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
+import { ReactElement, ReactNode, useEffect } from 'react';
 import {
   MemoryRouter as Router,
   Routes,
@@ -16,68 +19,49 @@ import {
   useLocation,
   Navigate,
 } from 'react-router-dom';
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 // import './App.css';
 import { Flex } from './components/styledComponents';
+import { userLoginState } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
 import WorldSheetPage from './features/world-sheet/WorldSheetPage';
+import { loginToMain } from './utils/ipc/vrchatAPIToMain';
 
 const { Sider } = Layout;
 const { Title } = Typography;
 
-// const Hello = () => {
-//   return (
-//     <div>
-//       <div className="Hello">
-//         <img width="200px" alt="icon" src={icon} />
-//       </div>
-//       <h1>electron-react-boilerplate</h1>
-//       <div className="Hello">
-//         <a
-//           href="https://electron-react-boilerplate.js.org/"
-//           target="_blank"
-//           rel="noreferrer"
-//         >
-//           <button type="button">
-//             <span role="img" aria-label="books">
-//               📚
-//             </span>
-//             Read our docs
-//           </button>
-//         </a>
-//         <a
-//           href="https://github.com/sponsors/electron-react-boilerplate"
-//           target="_blank"
-//           rel="noreferrer"
-//         >
-//           <button type="button">
-//             <span role="img" aria-label="books">
-//               🙏
-//             </span>
-//             Donate
-//           </button>
-//         </a>
-//       </div>
-//     </div>
-//   );
-// };
-/* <Content style={{ margin: '0 16px' }}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Dos</Breadcrumb.Item>
-            </Breadcrumb>
-            <div
-              className="site-layout-background"
-              style={{ padding: 24, minHeight: 360 }}
-            >
-              Dos Chat is Dos Gang.
-            </div>
-          </Content> */
+export default function App() {
+  return (
+    <Flex css={{ width: '100vw', height: '100vh' }}>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <AuthChecker
+                renderedPass={<MenuLayout />}
+                renderedFail={<Navigate to="/login" />}
+              />
+            }
+          >
+            <Route index element={<Home />} />
+            <Route path="sheet" element={<WorldSheetPage />} />
+            <Route path="bookmark" element={<BookmarkPage />} />
+          </Route>
+          <Route path="login" element={<LoginPage />} />
+        </Routes>
+      </Router>
+    </Flex>
+  );
+}
 
 function MenuLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const recoilLoginState = useRecoilValue(userLoginState);
+  const recoilLoginStateResetter = useResetRecoilState(userLoginState);
 
   // let menuKey = '';
   // if ()
@@ -112,11 +96,11 @@ function MenuLayout() {
                 },
               },
               {
-                label: 'World',
-                key: 'world',
-                icon: <GlobalOutlined />,
+                label: 'Sheet',
+                key: 'sheet',
+                icon: <AuditOutlined />,
                 onClick(ev) {
-                  navigate('/world');
+                  navigate('/sheet');
                 },
               },
               {
@@ -128,14 +112,23 @@ function MenuLayout() {
                 },
               },
               // TODO: 로그인 UI 구현
-              // {
-              //   label: 'Logout',
-              //   key: 'login',
-              //   icon: <LogoutOutlined />,
-              //   onClick(ev) {
-              //     navigate('/login');
-              //   },
-              // },
+              recoilLoginState
+                ? {
+                    label: 'Logout',
+                    key: 'logout',
+                    icon: <LogoutOutlined />,
+                    onClick(ev) {
+                      recoilLoginStateResetter();
+                    },
+                  }
+                : {
+                    label: 'Login',
+                    key: 'login',
+                    icon: <LoginOutlined />,
+                    onClick(ev) {
+                      navigate('/login');
+                    },
+                  },
             ]}
           />
         </Sider>
@@ -150,17 +143,14 @@ function MenuLayout() {
   );
 }
 
-export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<MenuLayout />}>
-          <Route index element={<Home />} />
-          <Route path="world" element={<WorldSheetPage />} />
-          <Route path="bookmark" element={<BookmarkPage />} />
-          <Route path="login" element={<LoginPage />} />
-        </Route>
-      </Routes>
-    </Router>
-  );
+function AuthChecker(props: {
+  renderedPass: ReactElement;
+  renderedFail: ReactElement;
+}) {
+  const recoilUserLoginState = useRecoilValue(userLoginState);
+
+  if (recoilUserLoginState) {
+    return props.renderedPass;
+  }
+  return props.renderedFail;
 }
