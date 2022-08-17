@@ -93,6 +93,21 @@ export function sendInvitesToMain(
   });
 }
 
+export function sendSelfInviteToMain(worldId: string, instanceId: string) {
+  window.electron.ipcRenderer.sendMessage('sendSelfInviteToMain', [
+    worldId,
+    instanceId,
+  ]);
+  return new Promise<string>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'sendSelfInviteToRenderer',
+      (result: unknown) => {
+        resolve(result as string);
+      },
+    );
+  });
+}
+
 export function genWorldInstanceNameToMain(worldId: string) {
   window.electron.ipcRenderer.sendMessage('genWorldInstanceNameToMain', [
     worldId,

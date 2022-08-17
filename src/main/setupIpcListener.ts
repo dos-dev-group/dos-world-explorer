@@ -16,6 +16,7 @@ import {
   genWorldInstanceName,
   login,
   logout,
+  sendSelfInvite,
 } from './utils/vrchatAPI';
 import {
   loadBookmarkFromFileDialog,
@@ -69,6 +70,14 @@ export default function setupIpcListener() {
     event.reply(
       'sendInvitesToRenderer',
       await sendInvites(arg[0], arg[1], arg[2]),
+    );
+  });
+
+  ipcMain.on('sendSelfInviteToMain', async (event, arg) => {
+    // testVrchatAPI();
+    event.reply(
+      'sendSelfInviteToRenderer',
+      await sendSelfInvite(arg[0], arg[1]),
     );
   });
 
