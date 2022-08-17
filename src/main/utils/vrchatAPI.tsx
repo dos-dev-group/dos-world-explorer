@@ -178,6 +178,19 @@ export async function sendInvites(
   return 'ok!';
 }
 
+export async function sendSelfInvite(
+  worldId: string,
+  instanceId: string,
+): Promise<string> {
+  authCheck();
+  const instancesApi = new vrchat.InstancesApi();
+  instancesApi
+    .sendSelfInvite(worldId, instanceId)
+    .then((res) => console.log(res.data))
+    .catch((err) => console.log(err.response));
+  return 'ok!';
+}
+
 export async function genWorldInstanceName(worldId: string): Promise<string> {
   let randInt = Math.floor(Math.random() * 100000)
     .toString()
