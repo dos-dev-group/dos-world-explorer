@@ -29,9 +29,9 @@ import { World } from '@src/types';
 import StarSelect from '@src/renderer/components/StarSelect';
 import BookmarkSelectModal from '@src/renderer/components/BookmarkSelectModal';
 import useWorldSheetPage, { SearchOptions } from './hooks/useWorldSheetPage';
-import AddWorldModal from './AddWorldModal';
+import AddWorldModal from '../../components/AddWorldModal';
 import WorldInfoModal from '../../components/WorldInfoModal';
-import EditWorldModal from './EditWorldModal';
+import EditWorldModal from '../../components/EditWorldModal';
 import useBookmark from '../../utils/hooks/useBookmark';
 
 const { TabPane } = Tabs;
@@ -317,7 +317,7 @@ export default function WorldSheetPage() {
             render={(value) => (
               <Typography.Paragraph
                 css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ rows: 3, expandable: false }}
+                ellipsis={{ rows: 3, expandable: true }}
               >
                 {value}
               </Typography.Paragraph>
