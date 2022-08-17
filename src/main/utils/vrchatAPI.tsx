@@ -11,33 +11,13 @@ import vrckey from '../../../secret/vrc.json';
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
 
-const FAV_PATH = path.join(
-  app.getPath('documents'),
-  app.getName(),
-  'VRCToken.json',
-);
-
-// export function saveToken(VRCToken: { token: string }) {
-//   return fs
-//     .access(FAV_PATH, constants.R_OK)
-//     .catch(() => fs.mkdir(path.dirname(FAV_PATH), { recursive: true }))
-//     .then(() => fs.writeFile(FAV_PATH, JSON.stringify(VRCToken, null, 2)))
-//     .then(() => VRCToken);
-// }
-
-// export function loadToken(): Promise<{ token: string }> {
-//   return fs.readFile(FAV_PATH).then((v: Buffer) => JSON.parse(v.toString()));
-// }
-
 let authenticationApi = new vrchat.AuthenticationApi();
 
 let user;
 
-login(vrckey.id, vrckey.pw)
-  .then((res) => console.log(res))
-  .catch((err) => console.log(err));
-
 export async function login(id: string, pw: string): Promise<boolean> {
+  authenticationApi.logout();
+
   authenticationApi = new vrchat.AuthenticationApi(
     new vrchat.Configuration({
       apiKey: VRCHATAPIKEY,
