@@ -33,6 +33,8 @@ const { Sider } = Layout;
 const { Title } = Typography;
 
 export default function App() {
+  const recoilUserLoginState = useRecoilValue(userLoginState);
+
   return (
     <Flex css={{ width: '100vw', height: '100vh' }}>
       <Router>
@@ -40,10 +42,7 @@ export default function App() {
           <Route
             path="/"
             element={
-              <AuthChecker
-                renderedPass={<MenuLayout />}
-                renderedFail={<Navigate to="/login" />}
-              />
+              recoilUserLoginState ? <MenuLayout /> : <Navigate to="/login" />
             }
           >
             <Route index element={<Home />} />
@@ -141,16 +140,4 @@ function MenuLayout() {
       </Layout>
     </Flex>
   );
-}
-
-function AuthChecker(props: {
-  renderedPass: ReactElement;
-  renderedFail: ReactElement;
-}) {
-  const recoilUserLoginState = useRecoilValue(userLoginState);
-
-  if (recoilUserLoginState) {
-    return props.renderedPass;
-  }
-  return props.renderedFail;
 }

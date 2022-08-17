@@ -23,7 +23,7 @@ interface HookMember {
   onCloseTwoFactorAuthdModal: () => void;
   onCheckAutoLogin: (isChecked: boolean) => void;
   onCheckTwoFactorLogin: (isChecked: boolean) => void;
-  onClickLogin: (user: UserLogin) => void;
+  onSubmitLogin: (user: UserLogin) => void;
   checkInputValid: (input: string | null | undefined) => boolean;
 }
 
@@ -43,13 +43,12 @@ const useLoginPage = (): HookMember => {
     useState(false);
   const [isAutoLogin, setIsAutoLogin] = useState(false);
 
-  const proceedAutoLogin = useCallback(() => {
+  useEffect(() => {
+    // if Login, go Main Page
     if (recoilLoginState) {
       navigate((location.state as any)?.from?.pathname || '/');
     }
   }, [location.state, navigate, recoilLoginState]);
-
-  useEffect(() => proceedAutoLogin(), [proceedAutoLogin]);
 
   const hookMember: HookMember = {
     username,
@@ -74,7 +73,7 @@ const useLoginPage = (): HookMember => {
     onCheckTwoFactorLogin(isChecked: boolean) {
       setIsTwoFactorAuth(isChecked);
     },
-    onClickLogin(loginState: UserLogin) {
+    onSubmitLogin(loginState: UserLogin) {
       if (
         !checkInputValid(loginState.name) ||
         !checkInputValid(loginState.password)
@@ -94,7 +93,6 @@ const useLoginPage = (): HookMember => {
       if (isTwoFactorAuth) {
         setVisibleTwoFactorAuthModal(true);
       }
-
       setRecoilLoginState(loginState);
     },
     onChangeUsername(u: string): void {

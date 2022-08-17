@@ -19,7 +19,7 @@ export function loginToMain(id: string, pw: string) {
       'loginToRenderer',
       (resultIpc: unknown) => {
         const result = resultIpc as boolean;
-        console.log('login result renderer', result);
+        // console.log('renderer: login result', result);
         if (result) {
           resolve();
         } else {

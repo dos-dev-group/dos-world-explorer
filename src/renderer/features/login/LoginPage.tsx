@@ -39,6 +39,15 @@ export default function LoginPage() {
           onChange={(e) => {
             hookMember.onChangeUsername(e.target.value);
           }}
+          onKeyUp={(e) => {
+            if (e.key === 'Enter' && !hookMember.isLoginProgress) {
+              hookMember.onSubmitLogin({
+                name: hookMember.username,
+                password: hookMember.password,
+                code: undefined,
+              });
+            }
+          }}
         />
         <Typography.Title css={{ marginTop: '10px' }} level={5}>
           VRChat Password
@@ -54,6 +63,15 @@ export default function LoginPage() {
           }
           onChange={(e) => {
             hookMember.onChangePassword(e.target.value);
+          }}
+          onKeyUp={(e) => {
+            if (e.key === 'Enter' && !hookMember.isLoginProgress) {
+              hookMember.onSubmitLogin({
+                name: hookMember.username,
+                password: hookMember.password,
+                code: undefined,
+              });
+            }
           }}
         />
         {/* <Checkbox
@@ -80,7 +98,7 @@ export default function LoginPage() {
             loading={hookMember.isLoginProgress}
             css={{ width: '80%', margin: '15px' }}
             onClick={() => {
-              hookMember.onClickLogin({
+              hookMember.onSubmitLogin({
                 name: hookMember.username,
                 password: hookMember.password,
                 code: undefined,
