@@ -61,6 +61,22 @@ export async function login(id: string, pw: string): Promise<boolean> {
     });
 }
 
+export async function logout(): Promise<boolean> {
+  let ck = true;
+  authenticationApi
+    .logout()
+    .then(async (res) => {
+      user = res.data;
+      console.log(user);
+      console.log('logout success');
+    })
+    .catch((err) => {
+      console.log(err.response.data);
+      ck = false;
+    });
+  return ck;
+}
+
 function authCheck() {
   authenticationApi = new vrchat.AuthenticationApi();
   authenticationApi
