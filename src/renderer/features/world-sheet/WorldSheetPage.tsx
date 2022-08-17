@@ -24,7 +24,7 @@ import {
   HoverOpacity,
 } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
-import { spacing } from '@src/renderer/utils/styling';
+import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import StarSelect from '@src/renderer/components/StarSelect';
 import BookmarkSelectModal from '@src/renderer/components/BookmarkSelectModal';
@@ -69,7 +69,13 @@ export default function WorldSheetPage() {
   });
 
   return (
-    <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+    <Flex
+      css={{
+        paddingLeft: spacing(1),
+        paddingRight: spacing(1),
+        position: 'relative',
+      }}
+    >
       <BookmarkSelectModal
         bookmarkTypes={bookmarkHookMember.bookmarkTypes}
         visible={bookmarkHookMember.isOpenBookmarkModal}
@@ -124,34 +130,46 @@ export default function WorldSheetPage() {
         types={hookMember.typeList}
         world={hookMember.editModalWorld}
       />
-
-      <Search
-        placeholder="검색어를 입력하세요"
-        allowClear
-        onSearch={hookMember.onSearchWorlds}
+      <Flex
         css={{
-          marginTop: spacing(1),
+          [mqMinHeight(768)]: {
+            position: 'sticky',
+            zIndex: 2,
+            top: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#f0f2f5',
+          },
         }}
-        loading={hookMember.isLoading}
-        addonBefore={
-          <Select<SearchOptions[number]>
-            css={{ width: 100 }}
-            defaultValue="NAME"
-            onChange={(v) => {
-              hookMember.onChangeSearchOption(v);
-            }}
-          >
-            {renderedOptions}
-          </Select>
-        }
-      />
-
-      <Tabs
-        activeKey={hookMember.currentType}
-        onChange={hookMember.onChangeSheetTab}
       >
-        {renderedTabs}
-      </Tabs>
+        <Search
+          placeholder="검색어를 입력하세요"
+          allowClear
+          onSearch={hookMember.onSearchWorlds}
+          css={{
+            marginTop: spacing(1),
+          }}
+          loading={hookMember.isLoading}
+          addonBefore={
+            <Select<SearchOptions[number]>
+              css={{ width: 100 }}
+              defaultValue="NAME"
+              onChange={(v) => {
+                hookMember.onChangeSearchOption(v);
+              }}
+            >
+              {renderedOptions}
+            </Select>
+          }
+        />
+
+        <Tabs
+          activeKey={hookMember.currentType}
+          onChange={hookMember.onChangeSheetTab}
+        >
+          {renderedTabs}
+        </Tabs>
+      </Flex>
 
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
         <Button
@@ -161,7 +179,6 @@ export default function WorldSheetPage() {
           loading={hookMember.isLoading}
         />
       </FlexRow>
-
       <Spin spinning={hookMember.isLoading}>
         <Table
           dataSource={hookMember.currentTableData}
@@ -221,11 +238,6 @@ export default function WorldSheetPage() {
             render={(imageUrl, record: World) => (
               <HoverOpacity>
                 <Image
-                  css={{
-                    ':hover': {
-                      cursor: 'pointer',
-                    },
-                  }}
                   src={imageUrl}
                   preview={false}
                   onClick={(e) => {
@@ -305,7 +317,7 @@ export default function WorldSheetPage() {
             render={(value) => (
               <Typography.Paragraph
                 css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ rows: 3, expandable: true }}
+                ellipsis={{ rows: 3, expandable: false }}
               >
                 {value}
               </Typography.Paragraph>
@@ -364,7 +376,13 @@ export default function WorldSheetPage() {
             dataIndex="key"
             responsive={['xl']}
             render={(k, record: World) => (
-              <Flex>
+              <Flex
+                css={{
+                  [mqMinWidth(1200)]: {
+                    width: 50,
+                  },
+                }}
+              >
                 <Button
                   type="primary"
                   ghost
@@ -373,6 +391,7 @@ export default function WorldSheetPage() {
                 >
                   수정
                 </Button>
+                <div css={{ marginTop: 4 }} />
                 <Popconfirm
                   title="정말 월드를 삭제하시겠습니까?"
                   placement="topRight"

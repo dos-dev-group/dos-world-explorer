@@ -14,10 +14,19 @@ export function testVrchatAPIToMain() {
 
 export function loginToMain(id: string, pw: string) {
   window.electron.ipcRenderer.sendMessage('loginToMain', [id, pw]);
-  return new Promise<boolean>((resolve, reject) => {
-    window.electron.ipcRenderer.once('loginToRenderer', (result: unknown) => {
-      resolve(result as boolean);
-    });
+  return new Promise<void>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'loginToRenderer',
+      (resultIpc: unknown) => {
+        const result = resultIpc as boolean;
+        // console.log('renderer: login result', result);
+        if (result) {
+          resolve();
+        } else {
+          reject();
+        }
+      },
+    );
   });
 }
 

@@ -1,5 +1,5 @@
 import { Button, Input, Typography } from 'antd';
-import { FlexCenter } from '@src/renderer/components/styledComponents';
+import { Flex, FlexCenter } from '@src/renderer/components/styledComponents';
 import { useState } from 'react';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import useLoginPage from './hooks/useLoginPage';
@@ -7,14 +7,10 @@ import TwoFactorAuthModal from './TwoFactorAuthModal';
 
 export default function LoginPage() {
   const hookMember = useLoginPage();
-  const [username, setUsername] = useState<string>();
-  const [isUsernameValid, setIsUsernameValid] = useState(true);
-  const [password, setPassword] = useState<string>();
-  const [isPwValid, setIsPwValid] = useState(true);
 
   return (
     <FlexCenter style={{ width: '100%', height: '100%' }}>
-      <TwoFactorAuthModal
+      {/* <TwoFactorAuthModal
         onLogin={(u) => {
           hookMember.onClickLogin(u);
         }}
@@ -23,7 +19,9 @@ export default function LoginPage() {
         }}
         visible={hookMember.visibleTwoFactorAuthModal}
         userLogin={hookMember.userLogin}
-      />
+      /> */}
+
+      <Typography.Title level={2}>VRCExplorer</Typography.Title>
 
       <Typography.Title level={4}>Login</Typography.Title>
       <div css={{ width: '300px' }}>
@@ -32,10 +30,23 @@ export default function LoginPage() {
         </Typography.Title>
         <Input
           placeholder="Username/Email"
-          status={isUsernameValid ? '' : 'error'}
+          status={
+            hookMember.username === '' ||
+            hookMember.checkInputValid(hookMember.username)
+              ? ''
+              : 'error'
+          }
           onChange={(e) => {
-            setUsername(e.target.value);
-            setIsUsernameValid(hookMember.onChangeInputValue(e.target.value));
+            hookMember.onChangeUsername(e.target.value);
+          }}
+          onKeyUp={(e) => {
+            if (e.key === 'Enter' && !hookMember.isLoginProgress) {
+              hookMember.onSubmitLogin({
+                name: hookMember.username,
+                password: hookMember.password,
+                code: undefined,
+              });
+            }
           }}
         />
         <Typography.Title css={{ marginTop: '10px' }} level={5}>
@@ -43,13 +54,27 @@ export default function LoginPage() {
         </Typography.Title>
         <Input
           placeholder="Password"
-          status={isPwValid ? '' : 'error'}
+          type="password"
+          status={
+            hookMember.password === '' ||
+            hookMember.checkInputValid(hookMember.password)
+              ? ''
+              : 'error'
+          }
           onChange={(e) => {
-            setPassword(e.target.value);
-            setIsPwValid(hookMember.onChangeInputValue(e.target.value));
+            hookMember.onChangePassword(e.target.value);
+          }}
+          onKeyUp={(e) => {
+            if (e.key === 'Enter' && !hookMember.isLoginProgress) {
+              hookMember.onSubmitLogin({
+                name: hookMember.username,
+                password: hookMember.password,
+                code: undefined,
+              });
+            }
           }}
         />
-        <Checkbox
+        {/* <Checkbox
           css={{ margin: '10px' }}
           checked={hookMember.isAutoLogin}
           onChange={(e) => {
@@ -57,8 +82,8 @@ export default function LoginPage() {
           }}
         >
           자동 로그인
-        </Checkbox>
-        <Checkbox
+        </Checkbox> */}
+        {/* <Checkbox
           css={{ margin: '10px' }}
           checked={hookMember.isTwoFactorAuth}
           onChange={(e) => {
@@ -66,30 +91,40 @@ export default function LoginPage() {
           }}
         >
           Two-Factor Auth 테스트
-        </Checkbox>
+        </Checkbox> */}
         <FlexCenter>
           <Button
             type="primary"
-            loading={hookMember.isChecking}
+            loading={hookMember.isLoginProgress}
             css={{ width: '80%', margin: '15px' }}
             onClick={() => {
-              let isUsernameValid = hookMember.onChangeInputValue(username);
-              let isPwValid = hookMember.onChangeInputValue(password);
-              setIsUsernameValid(isUsernameValid);
-              setIsPwValid(isPwValid);
-              if (isUsernameValid && isPwValid) {
-                hookMember.onClickLogin({
-                  name: username || '',
-                  password: password || '',
-                  code: '',
-                });
-              }
+              hookMember.onSubmitLogin({
+                name: hookMember.username,
+                password: hookMember.password,
+                code: undefined,
+              });
             }}
           >
             Login
           </Button>
         </FlexCenter>
-        <Typography.Text>
+      </div>
+      <FlexCenter css={{ marginTop: '20vh', padding: '0px 100px 0px 100px' }}>
+        <ul>
+          <li>
+            VRCE는 사용자의 개인정보{'(ID와 PW)'}를 해당 사용자의 컴퓨터에만
+            저장하며 외부로 유출하지 않습니다.
+          </li>
+          <li>
+            VRCE는 VRChat의 월드 기록 및 탐험을 위해 Dos팀에서 개발된 앱으로
+            VRChat운영측과 아무런 관련이 없으며 VRChat을 대변하지 않습니다.
+          </li>
+          <li>
+            Dos팀은 사용자가 VRCE를 사용함으로서 생긴 문제에 대해 아무런 책임을
+            지지 않습니다.
+          </li>
+        </ul>
+        {/* <Typography.Text>
           VRCE는 사용자의 개인정보{'(ID와 PW)'}를 해당 사용자의 컴퓨터에만
           저장하며 외부로 유출하지 않습니다.
           <br />
@@ -100,8 +135,8 @@ export default function LoginPage() {
           <br />
           Dos팀은 사용자가 VRCE를 사용함으로서 생긴 문제에 대해 아무런 책임을
           지지 않습니다.
-        </Typography.Text>
-      </div>
+        </Typography.Text> */}
+      </FlexCenter>
     </FlexCenter>
   );
 }

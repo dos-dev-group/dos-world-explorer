@@ -6,7 +6,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { app, shell } from 'electron';
 import { User, UserState, WorldVrcRaw } from '../../types';
-import vrckey from '../../../secret/vrc.json';
+// import vrckey from '../../../secret/vrc.json';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -15,9 +15,11 @@ let authenticationApi = new vrchat.AuthenticationApi();
 
 let user;
 
-export async function login(id: string, pw: string): Promise<boolean> {
-  authenticationApi.logout();
+login(vrckey.id, vrckey.pw)
+  .then((res) => console.log(res))
+  .catch((err) => console.log(err));
 
+export async function login(id: string, pw: string): Promise<boolean> {
   authenticationApi = new vrchat.AuthenticationApi(
     new vrchat.Configuration({
       apiKey: VRCHATAPIKEY,
@@ -25,20 +27,20 @@ export async function login(id: string, pw: string): Promise<boolean> {
       password: pw,
     }),
   );
-  let ck = true;
-  authenticationApi
+
+  return authenticationApi
     .getCurrentUser()
     .then(async (res) => {
       user = res.data;
       console.log(user);
       console.log('login success');
       console.log('api displayName :', res.data.displayName);
+      return true;
     })
     .catch((err) => {
       console.log(err.response.data);
-      ck = false;
+      return false;
     });
-  return ck;
 }
 
 export async function logout(): Promise<boolean> {

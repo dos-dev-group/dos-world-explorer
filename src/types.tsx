@@ -45,7 +45,7 @@ export interface User {
 export interface UserLogin {
   name: string; // 유저이름
   password: string; // 비밀번호
-  code: string; // Two Factors Authentication OTP 코드
+  code?: string; // Two Factors Authentication OTP 코드
 }
 
 export type WorldData = World[];

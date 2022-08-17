@@ -29,10 +29,10 @@ import { PresetColorTypes } from 'antd/lib/_util/colors';
 import {
   Flex,
   FlexRow,
-  HoverOpacity,
+  HoverOpacity as ClickableOpacity,
 } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
-import { spacing } from '@src/renderer/utils/styling';
+import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import StarSelect from '@src/renderer/components/StarSelect';
@@ -55,7 +55,13 @@ export default function BookmarkPage() {
   ));
 
   return (
-    <Flex css={{ paddingLeft: spacing(1), paddingRight: spacing(1) }}>
+    <Flex
+      css={{
+        paddingLeft: spacing(1),
+        paddingRight: spacing(1),
+        position: 'relative',
+      }}
+    >
       <BookmarkTypeModal
         onAddBookmark={(type) => {
           bookmarkHookMember.onAddBookmarkType(type);
@@ -118,41 +124,53 @@ export default function BookmarkPage() {
         }}
         loading={hookMember.isLoading}
       /> */}
-      <FlexRow css={{ alignItems: 'center' }}>
-        <Tabs
-          css={{ flex: 1, overflowX: 'auto' }}
-          activeKey={hookMember.currentType}
-          onChange={hookMember.onChangeType}
-        >
-          {renderedTabs}
-        </Tabs>
+      <Flex
+        css={{
+          [mqMinHeight(768)]: {
+            position: 'sticky',
+            zIndex: 2,
+            top: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#f0f2f5',
+          },
+        }}
+      >
+        <FlexRow css={{ alignItems: 'center' }}>
+          <Tabs
+            css={{ flex: 1, overflowX: 'auto' }}
+            activeKey={hookMember.currentType}
+            onChange={hookMember.onChangeType}
+          >
+            {renderedTabs}
+          </Tabs>
 
-        <Dropdown.Button
-          onClick={() => hookMember.onClickOpenTypeModal()}
-          css={{ marginLeft: spacing(1) }}
-          overlay={
-            <Menu
-              items={[
-                {
-                  label: '북마크 내보내기',
-                  key: '1',
-                  icon: <UploadOutlined />,
-                  onClick: () => hookMember.onClickOpenSaveBookmarkDialog(),
-                },
-                {
-                  label: '북마크 가져오기',
-                  key: '2',
-                  icon: <DownloadOutlined />,
-                  danger: true,
-                  onClick: () => hookMember.onClickOpenLoadBookmarkDialog(),
-                },
-              ]}
-            />
-          }
-        >
-          북마크 관리
-        </Dropdown.Button>
-        {/* <Button
+          <Dropdown.Button
+            onClick={() => hookMember.onClickOpenTypeModal()}
+            css={{ marginLeft: spacing(1) }}
+            overlay={
+              <Menu
+                items={[
+                  {
+                    label: '북마크 내보내기',
+                    key: '1',
+                    icon: <UploadOutlined />,
+                    onClick: () => hookMember.onClickOpenSaveBookmarkDialog(),
+                  },
+                  {
+                    label: '북마크 가져오기',
+                    key: '2',
+                    icon: <DownloadOutlined />,
+                    danger: true,
+                    onClick: () => hookMember.onClickOpenLoadBookmarkDialog(),
+                  },
+                ]}
+              />
+            }
+          >
+            북마크 관리
+          </Dropdown.Button>
+          {/* <Button
           onClick={() => hookMember.onClickOpenTypeModal()}
           css={{ marginLeft: spacing(1) }}
         >
@@ -171,7 +189,8 @@ export default function BookmarkPage() {
         >
           북마크 가져오기
         </Button> */}
-      </FlexRow>
+        </FlexRow>
+      </Flex>
 
       <FlexRow css={{ marginLeft: 'auto' }}>
         <Button
@@ -230,20 +249,15 @@ export default function BookmarkPage() {
             title="이미지"
             dataIndex="imageUrl"
             render={(imageUrl, record: World) => (
-              <HoverOpacity>
+              <ClickableOpacity>
                 <Image
-                  css={{
-                    ':hover': {
-                      cursor: 'pointer',
-                    },
-                  }}
                   src={imageUrl}
                   preview={false}
                   onClick={(e) => {
                     hookMember.onClickToggleInfoModal(record);
                   }}
                 />
-              </HoverOpacity>
+              </ClickableOpacity>
             )}
           />
           <Column
@@ -281,13 +295,24 @@ export default function BookmarkPage() {
             ellipsis
           />
           <Column
-            width={20}
+            responsive={['xl']}
+            width={6}
+            dataIndex="type"
+            ellipsis
+            onCell={(world) => ({
+              style: {
+                fontSize: 12,
+              },
+            })}
+          />
+          <Column
+            width={15}
             title="설명"
             dataIndex="description"
             render={(value) => (
               <Typography.Paragraph
                 css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ rows: 3, expandable: true }}
+                ellipsis={{ rows: 3, expandable: false }}
               >
                 {value}
               </Typography.Paragraph>

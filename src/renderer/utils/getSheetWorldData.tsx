@@ -81,7 +81,7 @@ export default function getSheetWorldData() {
         // console.log(world);
         worldData.push(world);
       }
-      console.log(worldData);
+      // console.log(worldData);
       return worldData;
     })
     .catch((reason) => {
@@ -92,7 +92,7 @@ export default function getSheetWorldData() {
       } else {
         console.warn('Error: Unknown Error', reason);
       }
-      console.log(worldData);
+      // console.log(worldData);
       return worldData;
     });
 }
@@ -132,7 +132,7 @@ export function getTagStyles() {
         // console.log(tagStyle);
         tagStyles.push(tagStyle);
       }
-      console.log(tagStyles);
+      // console.log(tagStyles);
       return tagStyles;
     })
     .catch((reason) => {
