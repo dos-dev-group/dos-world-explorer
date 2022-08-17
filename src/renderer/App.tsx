@@ -45,7 +45,7 @@ export default function App() {
               recoilUserLoginState ? <MenuLayout /> : <Navigate to="/login" />
             }
           >
-            <Route index element={<Home />} />
+            <Route index element={<Navigate to="/sheet" />} />
             <Route path="sheet" element={<WorldSheetPage />} />
             <Route path="bookmark" element={<BookmarkPage />} />
           </Route>
@@ -83,17 +83,17 @@ function MenuLayout() {
           </Title>
           <Menu
             theme="dark"
-            defaultSelectedKeys={['home']}
+            defaultSelectedKeys={['sheet']}
             mode="inline"
             items={[
-              {
-                label: 'Home',
-                key: 'home',
-                icon: <HomeOutlined />,
-                onClick(ev) {
-                  navigate('/');
-                },
-              },
+              // {
+              //   label: 'Home',
+              //   key: 'home',
+              //   icon: <HomeOutlined />,
+              //   onClick(ev) {
+              //     navigate('/');
+              //   },
+              // },
               {
                 label: 'Sheet',
                 key: 'sheet',

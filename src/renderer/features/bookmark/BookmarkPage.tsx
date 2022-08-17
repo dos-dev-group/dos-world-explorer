@@ -312,7 +312,7 @@ export default function BookmarkPage() {
             render={(value) => (
               <Typography.Paragraph
                 css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ rows: 3, expandable: false }}
+                ellipsis={{ rows: 3, expandable: true }}
               >
                 {value}
               </Typography.Paragraph>

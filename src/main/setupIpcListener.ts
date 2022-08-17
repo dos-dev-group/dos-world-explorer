@@ -9,7 +9,7 @@ import {
 } from './utils/editSheet';
 import {
   testVrchatAPI,
-  getVrchatRencentWorlds,
+  getVrchatRecentWorlds,
   getFriednList,
   generatedWorldInstanceInfo,
   sendInvites,
@@ -83,7 +83,7 @@ export default function setupIpcListener() {
   ipcMain.on('getVrchatRencentWorldsToMain', async (event, arg) => {
     event.reply(
       'getVrchatRencentWorldsToRenderer',
-      await getVrchatRencentWorlds(),
+      await getVrchatRecentWorlds(),
     );
   });
 
