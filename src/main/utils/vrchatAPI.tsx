@@ -15,10 +15,7 @@ let authenticationApi = new vrchat.AuthenticationApi();
 
 let user;
 
-login(vrckey.id, vrckey.pw)
-  .then((res) => console.log(res))
-  .catch((err) => console.log(err));
-
+authenticationApi.logout();
 export async function login(id: string, pw: string): Promise<boolean> {
   authenticationApi = new vrchat.AuthenticationApi(
     new vrchat.Configuration({
