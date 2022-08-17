@@ -104,7 +104,7 @@ export async function testVrchatAPI(): Promise<any> {
 }
 
 export async function getFriednList(cnt = 0): Promise<User[]> {
-  authCheck();
+  await authCheck();
   const friendsApi = new vrchat.FriendsApi();
   const friendsData = (await friendsApi.getFriends(cnt)).data;
   const users: User[] = [];
@@ -165,7 +165,7 @@ export async function sendInvites(
   worldId: string,
   instanceId: string,
 ): Promise<string> {
-  authCheck();
+  await authCheck();
   const inviteApi = new vrchat.InviteApi();
   for (let i = 0; i < userList.length; i++) {
     inviteApi
@@ -182,7 +182,7 @@ export async function sendSelfInvite(
   worldId: string,
   instanceId: string,
 ): Promise<string> {
-  authCheck();
+  await authCheck();
   const instancesApi = new vrchat.InstancesApi();
   instancesApi
     .sendSelfInvite(worldId, instanceId)
@@ -206,7 +206,7 @@ export async function genWorldInstanceName(worldId: string): Promise<string> {
 export async function getWorldInfo(
   worldId: string,
 ): Promise<{ name: string; authorName: string; thumbnailImageUrl: string }> {
-  authCheck();
+  await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   const worldData = (await WorldsApi.getWorld(worldId)).data;
 
@@ -218,7 +218,7 @@ export async function getWorldInfo(
 }
 
 async function getWorldInstanceInfo(worldId: string): Promise<string[]> {
-  authCheck();
+  await authCheck();
   const worldsApi = new vrchat.WorldsApi();
   const worldInstanceInfo = [];
   const worldInstance =
@@ -234,7 +234,7 @@ export async function getNowinstancePeople() {
 }
 
 export async function getVrchatRecentWorlds(): Promise<WorldVrcRaw[]> {
-  authCheck();
+  await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   await authenticationApi.getCurrentUser();
   return WorldsApi.getRecentWorlds().then((res) => {
