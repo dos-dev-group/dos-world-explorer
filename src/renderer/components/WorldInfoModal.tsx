@@ -2,7 +2,12 @@ import { HeartFilled, HeartOutlined } from '@ant-design/icons';
 import { gold, red } from '@ant-design/colors';
 import { FlexCenter, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
-import { World, WorldEditInput } from '@src/types';
+import {
+  World,
+  WorldEditInput,
+  WorldPartialNonVrcInfo,
+  WorldVrcRaw,
+} from '@src/types';
 import { Button, Image, Modal, Popconfirm, Tag, Typography } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { format } from 'date-fns';
@@ -12,13 +17,16 @@ import WorldInstanceCreationModal from './WorldInstanceCreationModal';
 
 interface Props {
   onCancel?: () => void;
-  onEdit?: (world: World) => void;
-  onRemove?: (world: World) => void;
-  onClickBookmark: (world: World, isBookmarked: boolean) => void;
+  onEdit?: (world: WorldPartialNonVrcInfo) => void;
+  onRemove?: (world: WorldPartialNonVrcInfo) => void;
+  onClickBookmark?: (
+    world: WorldPartialNonVrcInfo,
+    isBookmarked: boolean,
+  ) => void;
 
   visible: boolean;
-  isBookmarked: boolean;
-  world?: World;
+  isBookmarked?: boolean;
+  world?: WorldPartialNonVrcInfo;
 }
 
 function WorldInfoModal(props: Props) {
@@ -54,50 +62,64 @@ function WorldInfoModal(props: Props) {
           <FlexRow>
             <div css={{ flex: 1 }}>
               <Typography.Title level={5}>
-                <div>
-                  북마크:{' '}
-                  {props.isBookmarked ? (
-                    <HeartFilled
-                      css={{ color: red.primary, fontSize: 20 }}
-                      onClick={() =>
-                        props.world &&
-                        props.onClickBookmark(props.world, props.isBookmarked)
-                      }
-                    />
-                  ) : (
-                    <HeartOutlined
-                      css={{ color: red.primary, fontSize: 20 }}
-                      onClick={() =>
-                        props.world &&
-                        props.onClickBookmark(props.world, props.isBookmarked)
-                      }
-                    />
-                  )}
-                </div>
-                <div>제작자: {props.world.author}</div>
-                <div>
-                  별점: <StarScore score={props.world.score} />
-                </div>
-                <div>타입: {props.world.type}</div>
-                <div>
-                  {props.world.tags.map((tag) => {
-                    const colorIndex =
-                      simpleStringHash(tag) % PresetColorTypes.length;
-                    const color = PresetColorTypes[colorIndex];
-                    return (
-                      <Tag color={color} key={tag}>
-                        {tag.toUpperCase()}
-                      </Tag>
-                    );
-                  })}
-                </div>
+                {props.onClickBookmark && props.isBookmarked !== undefined && (
+                  <div>
+                    북마크:{' '}
+                    {props.isBookmarked ? (
+                      <HeartFilled
+                        css={{ color: red.primary, fontSize: 20 }}
+                        onClick={() =>
+                          props.onClickBookmark!(
+                            props.world!,
+                            props.isBookmarked!,
+                          )
+                        }
+                      />
+                    ) : (
+                      <HeartOutlined
+                        css={{ color: red.primary, fontSize: 20 }}
+                        onClick={() =>
+                          props.onClickBookmark!(
+                            props.world!,
+                            props.isBookmarked!,
+                          )
+                        }
+                      />
+                    )}
+                  </div>
+                )}
+                {props.world.author && <div>제작자: {props.world.author}</div>}
+                {props.world.score && (
+                  <div>
+                    별점: <StarScore score={props.world.score} />
+                  </div>
+                )}
+                {props.world.type && <div>타입: {props.world.type}</div>}
+                {props.world.tags && (
+                  <div>
+                    {props.world.tags.map((tag) => {
+                      const colorIndex =
+                        simpleStringHash(tag) % PresetColorTypes.length;
+                      const color = PresetColorTypes[colorIndex];
+                      return (
+                        <Tag color={color} key={tag}>
+                          {tag.toUpperCase()}
+                        </Tag>
+                      );
+                    })}
+                  </div>
+                )}
               </Typography.Title>
               <div css={{ marginTop: 20 }}>
                 <Typography.Text>
-                  Recorded Date:{' '}
-                  {format(props.world.date, 'yyyy-MM-dd HH:mm:ss')} GMT{' '}
-                  {props.world.date.getTimezoneOffset() / 60}
-                  <br />
+                  {props.world.date && (
+                    <>
+                      Recorded Date:{' '}
+                      {format(props.world.date, 'yyyy-MM-dd HH:mm:ss')} GMT{' '}
+                      {props.world.date.getTimezoneOffset() / 60}
+                      <br />
+                    </>
+                  )}
                   ID: {props.world.key}
                 </Typography.Text>
               </div>
@@ -110,11 +132,10 @@ function WorldInfoModal(props: Props) {
                   url={props.world.url}
                 />
                 {/* TODO: 월드 인스턴스 생성 */}
-                {/* <ButtonInstanceCreation
+                <ButtonInstanceCreation
                   worldKey={props.world.key}
-                  url={props.world.url}
                   onClickInstance={() => setVisibleInstanceModal(true)}
-                /> */}
+                />
                 {props.onEdit && (
                   <Button
                     type="primary"
@@ -179,7 +200,6 @@ function ButtonWorldLink(props: { worldKey: string; url: string }) {
 
 function ButtonInstanceCreation(props: {
   worldKey: string;
-  url: string;
   onClickInstance: () => void;
 }) {
   const btnName = '인스턴스 생성';

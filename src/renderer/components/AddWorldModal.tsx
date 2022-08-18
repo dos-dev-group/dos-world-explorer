@@ -3,7 +3,12 @@ import { URL_REGEX } from '@src/renderer/utils/constants';
 import { autoFileToMain } from '@src/renderer/utils/ipc/editSheetToMain';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
-import { World, WorldEditInput, WorldEditOutput } from '@src/types';
+import {
+  World,
+  WorldEditInput,
+  WorldEditOutput,
+  WorldPartialNonVrcInfo,
+} from '@src/types';
 import {
   Button,
   Col,
@@ -26,6 +31,7 @@ interface Props {
   onCancel?: () => void;
   visible: boolean;
   types: string[];
+  defaultWorldInfo?: WorldPartialNonVrcInfo;
 }
 function AddWorldModal(props: Props) {
   const [curType, setCurType] = useState<string>();
@@ -36,6 +42,18 @@ function AddWorldModal(props: Props) {
   const [inputTag, setInputTag] = useState<string>('');
   const [worldCheckInfo, setWorldCheckInfo] = useState<WorldEditOutput>();
   const [isChecking, setIsChecking] = useState(false);
+
+  useEffect(() => {
+    if (props.defaultWorldInfo && props.visible) {
+      setCurUrl(props.defaultWorldInfo.url);
+      setIsChecking(true);
+      autoFileToMain(props.defaultWorldInfo.url).then((info) => {
+        console.log('autoFileToMain');
+        setWorldCheckInfo(info);
+        setIsChecking(false);
+      });
+    }
+  }, [props.defaultWorldInfo, props.visible]);
 
   useEffect(() => {
     if (props.visible === false) {
@@ -55,7 +73,7 @@ function AddWorldModal(props: Props) {
 
   return (
     <Modal
-      title="월드 추가하기"
+      title="시트에 월드 추가하기"
       onOk={() => {
         props.onOk?.({
           description: curDesc || '',
@@ -72,7 +90,9 @@ function AddWorldModal(props: Props) {
       width="80%"
       okButtonProps={{
         disabled:
-          !URL_REGEX.test(curUrl || '') || worldCheckInfo === undefined
+          isChecking ||
+          !URL_REGEX.test(curUrl || '') ||
+          worldCheckInfo === undefined
             ? true
             : false,
       }}
@@ -95,6 +115,7 @@ function AddWorldModal(props: Props) {
               setCurUrl(e.target.value);
               setWorldCheckInfo(undefined);
             }}
+            value={curUrl}
           />
           <Button
             css={{ marginLeft: spacing(1) }}
