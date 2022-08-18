@@ -3,7 +3,12 @@ import { URL_REGEX } from '@src/renderer/utils/constants';
 import { autoFileToMain } from '@src/renderer/utils/ipc/editSheetToMain';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { spacing } from '@src/renderer/utils/styling';
-import { World, WorldEditInput, WorldEditOutput } from '@src/types';
+import {
+  World,
+  WorldEditInput,
+  WorldEditOutput,
+  WorldPartialNonVrcInfo,
+} from '@src/types';
 import {
   Button,
   Col,
@@ -25,7 +30,7 @@ interface Props {
   onEdit?: (key: string, e: WorldEditInput) => void;
   onCancel?: () => void;
   types: string[];
-  world?: World;
+  world?: WorldPartialNonVrcInfo;
 }
 function EditWorldModal(props: Props) {
   const [curType, setCurType] = useState<string>();
@@ -50,11 +55,11 @@ function EditWorldModal(props: Props) {
       setCurType(props.world.type);
       setCurUrl(props.world.url);
       setCurDesc(props.world.description);
-      setCurTags(props.world.tags);
-      setCurScore(props.world.score);
+      setCurTags(props.world.tags || []);
+      setCurScore(props.world.score || 1);
       setWorldCheckInfo({
         author: props.world.author,
-        date: props.world.date,
+        date: props.world.date || new Date(),
         key: props.world.key,
         name: props.world.name,
         imageUrl: props.world.imageUrl,
@@ -68,7 +73,7 @@ function EditWorldModal(props: Props) {
 
   return (
     <Modal
-      title="월드 변경하기"
+      title="시트 월드정보 변경하기"
       onOk={() => {
         props.onEdit?.(props.world?.key || '', {
           description: curDesc || '',

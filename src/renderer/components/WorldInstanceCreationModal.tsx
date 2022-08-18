@@ -1,5 +1,10 @@
 import { FlexCenter } from '@src/renderer/components/styledComponents';
-import { World, WorldEditInput } from '@src/types';
+import {
+  World,
+  WorldEditInput,
+  WorldPartialNonVrcInfo,
+  WorldVrcRaw,
+} from '@src/types';
 import { Button, Image, Input, Modal, Select, Typography } from 'antd';
 import { URL_REGEX } from '@src/renderer/utils/constants';
 import { useState } from 'react';
@@ -7,10 +12,9 @@ import { spacing } from '@src/renderer/utils/styling';
 import vrckey from '../../../secret/vrc.json';
 
 interface Props {
-  onOk?: (e: WorldEditInput) => void;
   onCancel?: () => void;
   visible: boolean;
-  world?: World;
+  world?: WorldPartialNonVrcInfo;
 }
 
 const InstanceTypes: string[] = [
@@ -45,12 +49,13 @@ function WorldInstanceCreationModal(props: Props) {
   ));
 
   if (instanceUrl === undefined) {
-    generateInstanceUrl({
-      worldKey: props.world?.key,
-      type: type,
-      region: region,
-      setInstanceUrl: setInstanceUrl,
-    });
+    setInstanceUrl(
+      generateInstanceUrl({
+        worldKey: props.world?.key,
+        type: type,
+        region: region,
+      }),
+    );
   }
 
   return (
@@ -62,10 +67,12 @@ function WorldInstanceCreationModal(props: Props) {
       destroyOnClose
       onCancel={props.onCancel}
       visible={props.visible}
-      width="20%"
+      width="50%"
       okButtonProps={{
-        disabled: !URL_REGEX.test(props.world?.key || '') ? true : false,
+        // disabled: !URL_REGEX.test(props.world?.key || '') ? true : false,
+        disabled: instanceUrl === undefined ? true : false,
       }}
+      okText="셀프초대"
     >
       {props.world && (
         <>
@@ -82,12 +89,13 @@ function WorldInstanceCreationModal(props: Props) {
               }}
               onSelect={(e: string) => {
                 setType(e);
-                generateInstanceUrl({
-                  worldKey: props.world?.key,
-                  type: e,
-                  region: region,
-                  setInstanceUrl: setInstanceUrl,
-                });
+                setInstanceUrl(
+                  generateInstanceUrl({
+                    worldKey: props.world?.key,
+                    type: type,
+                    region: region,
+                  }),
+                );
               }}
               defaultValue={InstanceDefaultType}
             >
@@ -102,12 +110,13 @@ function WorldInstanceCreationModal(props: Props) {
               }}
               onSelect={(e: string) => {
                 setRegion(e);
-                generateInstanceUrl({
-                  worldKey: props.world?.key,
-                  type: type,
-                  region: e,
-                  setInstanceUrl: setInstanceUrl,
-                });
+                setInstanceUrl(
+                  generateInstanceUrl({
+                    worldKey: props.world?.key,
+                    type: type,
+                    region: region,
+                  }),
+                );
               }}
               defaultValue={InstanceDefaultRegion}
             >
@@ -115,12 +124,11 @@ function WorldInstanceCreationModal(props: Props) {
             </Select>
           </div>
 
-          <Input.Group
-            css={{ marginTop: spacing(1), width: 'calc(100% - 200px)' }}
-          >
+          {/* <Input.Group */}
+          <div css={{ marginTop: spacing(1) }}>
             <Typography.Title level={5}>URL: </Typography.Title>
             <div css={{ width: '80%' }}>{instanceUrl}</div>
-          </Input.Group>
+          </div>
 
           <Typography.Link
             target="_blank"
@@ -140,11 +148,10 @@ function generateInstanceUrl(props: {
   worldKey?: string;
   type?: string;
   region?: string;
-  setInstanceUrl: (url: string) => void;
-}) {
+}): string {
   const nonce = '~nonce(825789e5-fdbb-4cb8-9190-df3ee696c987)';
   const max = 99999;
-  let randomId = Math.floor(Math.random() * 99999);
+  const randomId = Math.floor(Math.random() * 99999);
   let url = 'worldId=' + props.worldKey + '&instanceId=' + randomId;
   let isPublic = false;
 
@@ -199,5 +206,5 @@ function generateInstanceUrl(props: {
     url += nonce;
   }
 
-  props.setInstanceUrl(url);
+  return url;
 }

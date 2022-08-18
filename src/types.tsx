@@ -11,7 +11,7 @@ export interface World {
   type: string;
 }
 
-export type WorldPartial = Partial<World>;
+export type WorldPartialNonVrcInfo = Partial<World> & WorldVrcRaw;
 export type WorldEditInput = Pick<
   World,
   'url' | 'description' | 'tags' | 'score' | 'type'

@@ -1,12 +1,12 @@
 import { worldBookmarksState } from '@src/renderer/data/bookmarks';
 import copyDeep from '@src/renderer/utils/copyDeep';
-import { World } from '@src/types';
+import { World, WorldPartialNonVrcInfo } from '@src/types';
 import { message } from 'antd';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 interface HookMember {
-  onClickOpenBookmarkModal(world: World): void;
+  onClickOpenBookmarkModal(world: WorldPartialNonVrcInfo): void;
   onCloseBookmarkModal(): void;
   onAddBookmarkType(bookmarkType: string): void;
   onEditBookmarkType(oldType: string, newType: string): void;
@@ -25,12 +25,13 @@ interface HookMember {
 }
 
 const useBookmark = (): HookMember => {
-  const [bookmarkTargetWorld, setBookmarkTargetWorld] = useState<World>();
+  const [bookmarkTargetWorld, setBookmarkTargetWorld] =
+    useState<WorldPartialNonVrcInfo>();
   const [recoilBookmarks, setRecoilBookmarks] =
     useRecoilState(worldBookmarksState);
 
   const hookMember: HookMember = {
-    onClickOpenBookmarkModal(world: World): void {
+    onClickOpenBookmarkModal(world: WorldPartialNonVrcInfo): void {
       setBookmarkTargetWorld(world);
     },
     onCloseBookmarkModal(): void {

@@ -122,13 +122,13 @@ export function genWorldInstanceNameToMain(worldId: string) {
   });
 }
 
-export function getVrchatRencentWorldsToMain() {
+export function getVrchatRecentWorldsToMain() {
   window.electron.ipcRenderer.sendMessage('getVrchatRencentWorldsToMain', []);
-  return new Promise<WorldVrcRaw>((resolve, reject) => {
+  return new Promise<WorldVrcRaw[]>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'getVrchatRencentWorldsToRenderer',
       (result: unknown) => {
-        resolve(result as WorldVrcRaw);
+        resolve(result as WorldVrcRaw[]);
       },
     );
   });

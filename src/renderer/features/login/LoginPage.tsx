@@ -9,7 +9,7 @@ export default function LoginPage() {
   const hookMember = useLoginPage();
 
   return (
-    <FlexCenter style={{ width: '100%', height: '100%' }}>
+    <FlexCenter style={{ height: '100vh' }}>
       {/* <TwoFactorAuthModal
         onLogin={(u) => {
           hookMember.onClickLogin(u);

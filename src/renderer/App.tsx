@@ -1,5 +1,6 @@
 import {
   AuditOutlined,
+  EyeOutlined,
   GlobalOutlined,
   HeartOutlined,
   HomeOutlined,
@@ -26,6 +27,7 @@ import { userLoginState } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
+import WorldRecentPage from './features/world-recent/WorldRecentPage';
 import WorldSheetPage from './features/world-sheet/WorldSheetPage';
 import { loginToMain } from './utils/ipc/vrchatAPIToMain';
 
@@ -36,23 +38,22 @@ export default function App() {
   const recoilUserLoginState = useRecoilValue(userLoginState);
 
   return (
-    <Flex css={{ width: '100vw', height: '100vh' }}>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              recoilUserLoginState ? <MenuLayout /> : <Navigate to="/login" />
-            }
-          >
-            <Route index element={<Navigate to="/sheet" />} />
-            <Route path="sheet" element={<WorldSheetPage />} />
-            <Route path="bookmark" element={<BookmarkPage />} />
-          </Route>
-          <Route path="login" element={<LoginPage />} />
-        </Routes>
-      </Router>
-    </Flex>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            recoilUserLoginState ? <MenuLayout /> : <Navigate to="/login" />
+          }
+        >
+          <Route index element={<Navigate to="/sheet" />} />
+          <Route path="sheet" element={<WorldSheetPage />} />
+          <Route path="bookmark" element={<BookmarkPage />} />
+          <Route path="recent" element={<WorldRecentPage />} />
+        </Route>
+        <Route path="login" element={<LoginPage />} />
+      </Routes>
+    </Router>
   );
 }
 
@@ -110,7 +111,14 @@ function MenuLayout() {
                   navigate('/bookmark');
                 },
               },
-              // TODO: 로그인 UI 구현
+              {
+                label: 'Recent',
+                key: 'recent',
+                icon: <EyeOutlined />,
+                onClick(ev) {
+                  navigate('/recent');
+                },
+              },
               recoilLoginState
                 ? {
                     label: 'Logout',

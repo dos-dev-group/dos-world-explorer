@@ -9,7 +9,7 @@ import {
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
 import stringEscape from '@src/renderer/utils/stringEscape';
-import { World, WorldEditInput } from '@src/types';
+import { World, WorldEditInput, WorldPartialNonVrcInfo } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -25,14 +25,14 @@ interface HookMember {
   currentTableData: World[];
   visibleAddWorldModal: boolean;
   infoModalWorld: World | undefined;
-  editModalWorld: World | undefined;
+  editModalWorld: WorldPartialNonVrcInfo | undefined;
   searchOptions: SearchOptions;
 
   onChangeSheetTab: (tabKey: string) => void;
   onChangePage: (page: number) => void;
   onOpenAddWorldModal: () => void;
   onCloseAddWorldModal: () => void;
-  onOpenEditWorldModal: (world: World) => void;
+  onOpenEditWorldModal: (world: WorldPartialNonVrcInfo) => void;
   onCloseEditWorldModal: () => void;
   onAddWorld: (world: WorldEditInput) => void;
   onEditWorld: (key: string, world: WorldEditInput) => void;
@@ -53,7 +53,9 @@ const useWorldSheetPage = (): HookMember => {
   const [infoModalWorld, setInfoModalWorld] = useState<World | undefined>(
     undefined,
   );
-  const [editModalWorld, setEditModalWorld] = useState<World | undefined>();
+  const [editModalWorld, setEditModalWorld] = useState<
+    WorldPartialNonVrcInfo | undefined
+  >();
   const [curSearchOption, setCurSearchOption] =
     useState<SearchOptions[number]>('NAME');
 
