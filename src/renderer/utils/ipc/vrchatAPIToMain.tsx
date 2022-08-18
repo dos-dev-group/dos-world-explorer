@@ -1,4 +1,5 @@
-import { User, WorldVrcRaw } from '@src/types';
+import { WorldVrcRaw } from '@src/types';
+import { CurrentUser, User } from 'vrchat';
 
 export function testVrchatAPIToMain() {
   window.electron.ipcRenderer.sendMessage('testVrchatAPIToMain', []);
@@ -39,8 +40,8 @@ export function logoutToMain() {
   });
 }
 
-export function getFriednListToMain() {
-  window.electron.ipcRenderer.sendMessage('getFriednListToMain', []);
+export function getFriednListToMain(offline?: boolean) {
+  window.electron.ipcRenderer.sendMessage('getFriednListToMain', [offline]);
   return new Promise<User[]>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'getFriednListToRenderer',
@@ -54,14 +55,14 @@ export function getFriednListToMain() {
 export function generatedWorldInstanceInfoToMain(
   instanceName: string,
   instanceType: string,
-  ownerId: string,
   region: string,
+  ownerId?: string,
 ) {
   window.electron.ipcRenderer.sendMessage('generatedWorldInstanceInfoToMain', [
     instanceName,
     instanceType,
-    ownerId,
     region,
+    ownerId,
   ]);
   return new Promise<string>((resolve, reject) => {
     window.electron.ipcRenderer.once(
@@ -131,5 +132,26 @@ export function getVrchatRencentWorldsToMain() {
         resolve(result as WorldVrcRaw);
       },
     );
+  });
+}
+
+export function getCurrentUserToMain() {
+  window.electron.ipcRenderer.sendMessage('getCurrentUserToMain', []);
+  return new Promise<CurrentUser>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'getCurrentUserToRenderer',
+      (result: unknown) => {
+        resolve(result as CurrentUser);
+      },
+    );
+  });
+}
+
+export function getUserToMain(userId: string) {
+  window.electron.ipcRenderer.sendMessage('getUserToMain', [userId]);
+  return new Promise<User>((resolve, reject) => {
+    window.electron.ipcRenderer.once('getUserToRenderer', (result: unknown) => {
+      resolve(result as User);
+    });
   });
 }
