@@ -5,7 +5,9 @@ import { constants } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { app, shell } from 'electron';
-import { User, UserState, WorldVrcRaw } from '../../types';
+import { UserState, WorldVrcRaw } from '../../types';
+import { CurrentUser, LimitedUser, User } from 'vrchat';
+import { off } from 'process';
 // import vrckey from '../../../secret/vrc.json';
 
 const NONCE = v4();
@@ -103,54 +105,100 @@ export async function testVrchatAPI(): Promise<any> {
   // return genWorldInstanceName('wrld_b02e2bbe-c0c4-46f9-aca2-1d0133eb374f'); // 월드 인스턴스 ID 생성 TODO 4
 }
 
-export async function getFriednList(cnt = 0): Promise<User[]> {
+// export async function getFriednList(cnt = 0): Promise<User[]> {
+//   await authCheck();
+//   const friendsApi = new vrchat.FriendsApi();
+//   const friendsData = (await friendsApi.getFriends(cnt)).data;
+//   const users: User[] = [];
+//   for (let i = 0; i < friendsData.length; i++) {
+//     let staus = UserState.OFFLINE;
+//     if (friendsData[i].location !== '') {
+//       if (friendsData[i].status === 'active') staus = UserState.ONLINE;
+//       else if (friendsData[i].status === 'join me') staus = UserState.JOIN_ME;
+//       else if (friendsData[i].status === 'ask me') staus = UserState.ASK_ME;
+//       else if (friendsData[i].status === 'busy') staus = UserState.BUSY;
+//     } else staus = UserState.ACTIVE;
+
+//     const friend: User = {
+//       name: friendsData[i].displayName,
+//       id: friendsData[i].id,
+//       currentAvatarThumbnailImageUrl:
+//         friendsData[i].currentAvatarThumbnailImageUrl,
+//       state: staus,
+//     };
+//     if (friendsData[i].userIcon !== '')
+//       friend.userIcon = friendsData[i].userIcon;
+//     users.push(friend);
+//   }
+//   if (users.length >= 100) {
+//     users.push(...(await getFriednList(cnt + 100)));
+//   }
+//   return [...new Set(users)];
+// }
+
+export async function getFriednList(offline?: boolean): Promise<LimitedUser[]> {
   await authCheck();
   const friendsApi = new vrchat.FriendsApi();
-  const friendsData = (await friendsApi.getFriends(cnt)).data;
-  const users: User[] = [];
-  for (let i = 0; i < friendsData.length; i++) {
-    let staus = UserState.OFFLINE;
-    if (friendsData[i].location !== '') {
-      if (friendsData[i].status === 'active') staus = UserState.ONLINE;
-      else if (friendsData[i].status === 'join me') staus = UserState.JOIN_ME;
-      else if (friendsData[i].status === 'ask me') staus = UserState.ASK_ME;
-      else if (friendsData[i].status === 'busy') staus = UserState.BUSY;
-    } else staus = UserState.ACTIVE;
+  const friends: LimitedUser[] = [];
+  let cnt = 0;
+  while (true) {
+    if (
+      // eslint-disable-next-line no-await-in-loop, @typescript-eslint/no-loop-func
+      await friendsApi.getFriends(cnt).then((res) => {
+        friends.push(...res.data);
+        cnt += 100;
+        if (res.data.length < 100) {
+          return true;
+        }
+      })
+    ) {
+      break;
+    }
+  }
+  cnt = 0;
+  if (offline === true) {
+    while (true) {
+      if (
+        // eslint-disable-next-line no-await-in-loop, @typescript-eslint/no-loop-func
+        await friendsApi.getFriends(cnt, 100, true).then((res) => {
+          friends.push(...res.data);
+          cnt += 100;
+          if (res.data.length < 100) {
+            return true;
+          }
+        })
+      ) {
+        break;
+      }
+    }
+  }
 
-    const friend: User = {
-      name: friendsData[i].displayName,
-      id: friendsData[i].id,
-      currentAvatarThumbnailImageUrl:
-        friendsData[i].currentAvatarThumbnailImageUrl,
-      state: staus,
-    };
-    if (friendsData[i].userIcon !== '')
-      friend.userIcon = friendsData[i].userIcon;
-    users.push(friend);
-  }
-  if (users.length >= 100) {
-    users.push(...(await getFriednList(cnt + 100)));
-  }
-  return [...new Set(users)];
+  return [...new Set(friends)];
 }
 
-export function generatedWorldInstanceInfo(
+export async function generatedWorldInstanceInfo(
   instanceName: string,
   instanceType: string,
-  ownerId: string,
   region: string,
-): string {
+  ownerId?: string,
+): Promise<string> {
   let link = '';
+  let userId;
+  if (ownerId === undefined){
+    userId = (await authenticationApi.getCurrentUser()).data.id;
+  } else {
+    userId = ownerId;
+  }
   link += instanceName;
   if (instanceType !== 'public') {
     if (instanceType === 'friends+') {
-      link += '~hidden(' + ownerId + ')';
+      link += '~hidden(' + userId + ')';
     } else if (instanceType === 'friends') {
-      link += '~friends(' + ownerId + ')';
+      link += '~friends(' + userId + ')';
     } else if (instanceType === 'invite+') {
-      link += '~private(' + ownerId + ')~canRequestInvite';
+      link += '~private(' + userId + ')~canRequestInvite';
     } else if (instanceType === 'invite') {
-      link += '~private(' + ownerId + ')';
+      link += '~private(' + userId + ')';
     }
   }
   link += '~region(' + region + ')';
@@ -161,15 +209,15 @@ export function generatedWorldInstanceInfo(
 }
 
 export async function sendInvites(
-  userList: User[],
+  userIds: string[],
   worldId: string,
   instanceId: string,
 ): Promise<string> {
   await authCheck();
   const inviteApi = new vrchat.InviteApi();
-  for (let i = 0; i < userList.length; i++) {
+  for (let i = 0; i < userIds.length; i++) {
     inviteApi
-      .inviteUser(userList[i].id, {
+      .inviteUser(userIds[i], {
         instanceId: worldId + ':' + instanceId,
       })
       .then((res) => console.log(res.data))
@@ -250,5 +298,20 @@ export async function getVrchatRecentWorlds(): Promise<WorldVrcRaw[]> {
       });
     }
     return worlds;
+  });
+}
+
+export async function getCurrentUser(): Promise<CurrentUser> {
+  await authCheck();
+  return authenticationApi.getCurrentUser().then((res) => {
+    return res.data;
+  });
+}
+
+export async function getUser(userId: string): Promise<User> {
+  await authCheck();
+  const usersApi = new vrchat.UsersApi();
+  return usersApi.getUser(userId).then((res) => {
+    return res.data;
   });
 }

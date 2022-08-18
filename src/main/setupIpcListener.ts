@@ -17,6 +17,8 @@ import {
   login,
   logout,
   sendSelfInvite,
+  getCurrentUser,
+  getUser,
 } from './utils/vrchatAPI';
 import {
   loadBookmarkFromFileDialog,
@@ -54,14 +56,14 @@ export default function setupIpcListener() {
   });
 
   ipcMain.on('getFriednListToMain', async (event, arg) => {
-    event.reply('getFriednListToRenderer', await getFriednList());
+    event.reply('getFriednListToRenderer', await getFriednList(arg[0]));
   });
 
   ipcMain.on('generatedWorldInstanceInfoToMain', async (event, arg) => {
     // testVrchatAPI();
     event.reply(
       'generatedWorldInstanceInfoToRenderer',
-      generatedWorldInstanceInfo(arg[0], arg[1], arg[2], arg[3]),
+      await generatedWorldInstanceInfo(arg[0], arg[1], arg[2], arg[3]),
     );
   });
 
@@ -94,6 +96,14 @@ export default function setupIpcListener() {
       'getVrchatRencentWorldsToRenderer',
       await getVrchatRecentWorlds(),
     );
+  });
+
+  ipcMain.on('getCurrentUserToMain', async (event, arg) => {
+    event.reply('getCurrentUserToRenderer', await getCurrentUser());
+  });
+
+  ipcMain.on('getUserToMain', async (event, arg) => {
+    event.reply('getUserToRenderer', await getUser(arg[0]));
   });
 
   // ###################################### for editSheet.tsx ######################################
@@ -162,3 +172,7 @@ export default function setupIpcListener() {
     }
   });
 }
+function getCurrentUserWorlds(): any {
+  throw new Error('Function not implemented.');
+}
+
