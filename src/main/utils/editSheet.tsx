@@ -8,9 +8,7 @@ import {
   EditResult,
 } from '../../types';
 import keys from '../../../secret/sheetAuth.json';
-import vrckey from '../../../secret/vrc.json';
 import sheetData from '../../../secret/sheetData.json';
-import protectList from '../../../secret/protectList.json';
 import { getWorldInfo } from './vrchatAPI';
 
 const spreadsheetId = sheetData.spreadsheetId;

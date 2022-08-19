@@ -1,15 +1,17 @@
-import { FlexCenter } from '@src/renderer/components/styledComponents';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { Flex, FlexCenter } from '@src/renderer/components/styledComponents';
 import {
   World,
   WorldEditInput,
   WorldPartialNonVrcInfo,
   WorldVrcRaw,
 } from '@src/types';
-import { Button, Image, Input, Modal, Select, Typography } from 'antd';
+import { Button, Image, Input, message, Modal, Select, Typography } from 'antd';
 import { URL_REGEX } from '@src/renderer/utils/constants';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { spacing } from '@src/renderer/utils/styling';
-import vrckey from '../../../secret/vrc.json';
+import { useVrcCurrentUser } from '../data/user';
+import { sendSelfInviteToMain } from '../utils/ipc/vrchatAPIToMain';
 
 interface Props {
   onCancel?: () => void;
@@ -38,7 +40,8 @@ function WorldInstanceCreationModal(props: Props) {
   const title = '월드 인스턴스 생성';
   const [type, setType] = useState<string>(InstanceDefaultType);
   const [region, setRegion] = useState<string>(InstanceDefaultRegion);
-  const [instanceUrl, setInstanceUrl] = useState<string>();
+  const [instanceId, setInstanceId] = useState<string>();
+  const { currentUser } = useVrcCurrentUser();
 
   const renderedTypes = InstanceTypes.map((e) => (
     <Select.Option key={e}>{e}</Select.Option>
@@ -48,29 +51,41 @@ function WorldInstanceCreationModal(props: Props) {
     <Select.Option key={e}>{e}</Select.Option>
   ));
 
-  if (instanceUrl === undefined) {
-    setInstanceUrl(
-      generateInstanceUrl({
-        worldKey: props.world?.key,
-        type: type,
-        region: region,
-      }),
-    );
-  }
+  useEffect(() => {
+    if (instanceId === undefined && currentUser !== undefined) {
+      setInstanceId(
+        generateInstanceId({
+          worldKey: props.world?.key,
+          type: type,
+          region: region,
+          vrcUserId: currentUser?.id,
+        }),
+      );
+    }
+  }, [currentUser, instanceId, props.world?.key, region, type]);
 
   return (
     <Modal
       title={title}
-      onOk={() => {
-        props.onCancel?.();
-      }}
-      destroyOnClose
-      onCancel={props.onCancel}
       visible={props.visible}
       width="50%"
+      onCancel={props.onCancel}
+      onOk={async () => {
+        if (props.world && instanceId) {
+          try {
+            await sendSelfInviteToMain(props.world.key, instanceId);
+            message.success('셀프초대를 보냈습니다!');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (e: any) {
+            message.error('셀프초대를 실패했습니다.');
+          }
+        }
+
+        props.onCancel?.();
+      }}
       okButtonProps={{
         // disabled: !URL_REGEX.test(props.world?.key || '') ? true : false,
-        disabled: instanceUrl === undefined ? true : false,
+        disabled: props.world && instanceId ? false : true,
       }}
       okText="셀프초대"
     >
@@ -87,15 +102,18 @@ function WorldInstanceCreationModal(props: Props) {
               css={{
                 width: 200,
               }}
-              onSelect={(e: string) => {
-                setType(e);
-                setInstanceUrl(
-                  generateInstanceUrl({
-                    worldKey: props.world?.key,
-                    type: type,
-                    region: region,
-                  }),
-                );
+              onSelect={(newType: string) => {
+                setType(newType);
+                if (currentUser) {
+                  setInstanceId(
+                    generateInstanceId({
+                      worldKey: props.world?.key,
+                      type: newType,
+                      region: region,
+                      vrcUserId: currentUser.id,
+                    }),
+                  );
+                }
               }}
               defaultValue={InstanceDefaultType}
             >
@@ -108,15 +126,18 @@ function WorldInstanceCreationModal(props: Props) {
               css={{
                 width: 200,
               }}
-              onSelect={(e: string) => {
-                setRegion(e);
-                setInstanceUrl(
-                  generateInstanceUrl({
-                    worldKey: props.world?.key,
-                    type: type,
-                    region: region,
-                  }),
-                );
+              onSelect={(newRegion: string) => {
+                setRegion(newRegion);
+                if (currentUser) {
+                  setInstanceId(
+                    generateInstanceId({
+                      worldKey: props.world?.key,
+                      type: type,
+                      region: newRegion,
+                      vrcUserId: currentUser.id,
+                    }),
+                  );
+                }
               }}
               defaultValue={InstanceDefaultRegion}
             >
@@ -126,16 +147,39 @@ function WorldInstanceCreationModal(props: Props) {
 
           {/* <Input.Group */}
           <div css={{ marginTop: spacing(1) }}>
-            <Typography.Title level={5}>URL: </Typography.Title>
-            <div css={{ width: '80%' }}>{instanceUrl}</div>
+            <Typography.Title level={5}>Instance ID: </Typography.Title>
+            <div css={{ width: '80%' }}>{instanceId}</div>
           </div>
 
-          <Typography.Link
-            target="_blank"
-            href={'https://vrchat.com/home/launch?' + instanceUrl}
-          >
-            <Button css={{ marginLeft: 'auto' }}>Link</Button>
-          </Typography.Link>
+          <div css={{ marginTop: spacing(1) }}>
+            <Typography.Link
+              target="_blank"
+              href={
+                'https://vrchat.com/home/launch?' +
+                'worldId=' +
+                props.world?.key +
+                '&instanceId=' +
+                instanceId
+              }
+            >
+              <Button>인스턴스 페이지</Button>
+            </Typography.Link>
+            <Button
+              css={{ marginLeft: spacing(2) }}
+              onClick={() => {
+                setInstanceId(
+                  generateInstanceId({
+                    worldKey: props.world?.key,
+                    type: type,
+                    region: region,
+                    vrcUserId: currentUser!.id,
+                  }),
+                );
+              }}
+            >
+              ID 재생성
+            </Button>
+          </div>
         </>
       )}
     </Modal>
@@ -144,15 +188,16 @@ function WorldInstanceCreationModal(props: Props) {
 
 export default WorldInstanceCreationModal;
 
-function generateInstanceUrl(props: {
+function generateInstanceId(props: {
   worldKey?: string;
   type?: string;
   region?: string;
+  vrcUserId: string;
 }): string {
   const nonce = '~nonce(825789e5-fdbb-4cb8-9190-df3ee696c987)';
   const max = 99999;
   const randomId = Math.floor(Math.random() * 99999);
-  let url = 'worldId=' + props.worldKey + '&instanceId=' + randomId;
+  let instanceIdBuf = String(randomId);
   let isPublic = false;
 
   switch (props.type) {
@@ -163,48 +208,48 @@ function generateInstanceUrl(props: {
     }
     case InstanceTypes[1]: {
       // FriendsPlus
-      url += '~hidden(' + vrckey.id + ')';
+      instanceIdBuf += '~hidden(' + props.vrcUserId + ')';
       break;
     }
     case InstanceTypes[2]: {
       // Friends
-      url += '~friends(' + vrckey.id + ')';
+      instanceIdBuf += '~friends(' + props.vrcUserId + ')';
       break;
     }
     case InstanceTypes[3]: {
       // InvitePlus
-      url += '~private(' + vrckey.id + ')~canRequestInvite';
+      instanceIdBuf += '~private(' + props.vrcUserId + ')~canRequestInvite';
       break;
     }
     case InstanceTypes[4]: {
       // Invite
-      url += '~private(' + vrckey.id + ')';
+      instanceIdBuf += '~private(' + props.vrcUserId + ')';
       break;
     }
   }
 
   switch (props.region) {
     case InstanceRegions[0]: {
-      url += '~region(us)';
+      instanceIdBuf += '~region(us)';
       break;
     }
     case InstanceRegions[1]: {
-      url += '~region(use)';
+      instanceIdBuf += '~region(use)';
       break;
     }
     case InstanceRegions[2]: {
-      url += '~region(eu)';
+      instanceIdBuf += '~region(eu)';
       break;
     }
     case InstanceRegions[3]: {
-      url += '~region(jp)';
+      instanceIdBuf += '~region(jp)';
       break;
     }
   }
 
   if (!isPublic) {
-    url += nonce;
+    instanceIdBuf += nonce;
   }
 
-  return url;
+  return instanceIdBuf;
 }

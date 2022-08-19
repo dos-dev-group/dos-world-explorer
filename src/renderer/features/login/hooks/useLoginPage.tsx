@@ -1,4 +1,4 @@
-import { userLoginState } from '@src/renderer/data/user';
+import { useVrcCurrentUser } from '@src/renderer/data/user';
 import { loginToMain } from '@src/renderer/utils/ipc/vrchatAPIToMain';
 import { UserLogin } from '@src/types';
 import { message } from 'antd';
@@ -28,9 +28,7 @@ interface HookMember {
 }
 
 const useLoginPage = (): HookMember => {
-  const [recoilLoginState, setRecoilLoginState] =
-    useRecoilState(userLoginState);
-  const recoilLoginStateResetter = useResetRecoilState(userLoginState);
+  const { currentUser, login } = useVrcCurrentUser();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -45,10 +43,10 @@ const useLoginPage = (): HookMember => {
 
   useEffect(() => {
     // if Login, go Main Page
-    if (recoilLoginState) {
+    if (currentUser) {
       navigate((location.state as any)?.from?.pathname || '/');
     }
-  }, [location.state, navigate, recoilLoginState]);
+  }, [currentUser, location.state, navigate]);
 
   const hookMember: HookMember = {
     username,
@@ -73,10 +71,10 @@ const useLoginPage = (): HookMember => {
     onCheckTwoFactorLogin(isChecked: boolean) {
       setIsTwoFactorAuth(isChecked);
     },
-    onSubmitLogin(loginState: UserLogin) {
+    onSubmitLogin(loginSubmitValue: UserLogin) {
       if (
-        !checkInputValid(loginState.name) ||
-        !checkInputValid(loginState.password)
+        !checkInputValid(loginSubmitValue.name) ||
+        !checkInputValid(loginSubmitValue.password)
       ) {
         message.error('아이디와 비밀번호를 제대로 입력해주세요.');
         return;
@@ -93,7 +91,7 @@ const useLoginPage = (): HookMember => {
       if (isTwoFactorAuth) {
         setVisibleTwoFactorAuthModal(true);
       }
-      setRecoilLoginState(loginState);
+      login(loginSubmitValue);
     },
     onChangeUsername(u: string): void {
       setUsername(u);

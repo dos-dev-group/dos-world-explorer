@@ -33,9 +33,12 @@ export function loginToMain(id: string, pw: string) {
 
 export function logoutToMain() {
   window.electron.ipcRenderer.sendMessage('logoutToMain', []);
-  return new Promise<boolean>((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     window.electron.ipcRenderer.once('logoutToRenderer', (result: unknown) => {
-      resolve(result as boolean);
+      if (result) {
+        resolve();
+      }
+      reject();
     });
   });
 }
@@ -103,7 +106,11 @@ export function sendSelfInviteToMain(worldId: string, instanceId: string) {
     window.electron.ipcRenderer.once(
       'sendSelfInviteToRenderer',
       (result: unknown) => {
-        resolve(result as string);
+        if (result === 'ok') {
+          resolve(result as string);
+        } else {
+          reject(result);
+        }
       },
     );
   });
@@ -141,6 +148,9 @@ export function getCurrentUserToMain() {
     window.electron.ipcRenderer.once(
       'getCurrentUserToRenderer',
       (result: unknown) => {
+        if (result === null) {
+          reject();
+        }
         resolve(result as CurrentUser);
       },
     );

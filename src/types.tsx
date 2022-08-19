@@ -34,13 +34,21 @@ export interface TagStyle {
 
 export type TagStyles = TagStyle[];
 
-export interface User {
-  name: string; // 유저이름
-  id: string; // 유저 아이디
-  currentAvatarThumbnailImageUrl: string; // 유저 이미지
-  userIcon?: string; //유저 아이콘
-  state: UserState; // 유저 상태
-}
+// export interface User {
+//   name: string; // 유저이름
+//   id: string; // 유저 아이디
+//   currentAvatarThumbnailImageUrl: string; // 유저 이미지
+//   userIcon?: string; //유저 아이콘
+//   state: UserState; // 유저 상태
+// }
+// export enum UserState {
+//   OFFLINE = 'offline',
+//   ONLINE = 'online',
+//   JOIN_ME = 'join me',
+//   ASK_ME = 'ask me',
+//   BUSY = 'busy',
+//   ACTIVE = 'active',
+// }
 
 export interface UserLogin {
   name: string; // 유저이름
@@ -52,15 +60,6 @@ export type WorldData = World[];
 
 export interface Bookmarks {
   [worldKeys: string]: string[];
-}
-
-export enum UserState {
-  OFFLINE = 'offline',
-  ONLINE = 'online',
-  JOIN_ME = 'join me',
-  ASK_ME = 'ask me',
-  BUSY = 'busy',
-  ACTIVE = 'active',
 }
 
 export enum EditResult {

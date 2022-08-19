@@ -99,7 +99,11 @@ export default function setupIpcListener() {
   });
 
   ipcMain.on('getCurrentUserToMain', async (event, arg) => {
-    event.reply('getCurrentUserToRenderer', await getCurrentUser());
+    try {
+      event.reply('getCurrentUserToRenderer', await getCurrentUser());
+    } catch {
+      event.reply('getCurrentUserToRenderer', null);
+    }
   });
 
   ipcMain.on('getUserToMain', async (event, arg) => {
@@ -175,4 +179,3 @@ export default function setupIpcListener() {
 function getCurrentUserWorlds(): any {
   throw new Error('Function not implemented.');
 }
-

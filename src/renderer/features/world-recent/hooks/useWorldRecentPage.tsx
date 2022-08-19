@@ -1,7 +1,9 @@
 import { worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
+import { addEditSheetToMain } from '@src/renderer/utils/ipc/editSheetToMain';
 import { getVrchatRecentWorldsToMain } from '@src/renderer/utils/ipc/vrchatAPIToMain';
 import { World, WorldEditInput, WorldVrcRaw } from '@src/types';
+import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
@@ -66,6 +68,10 @@ const useWorldRecentPage = (): HookMember => {
 
     onClickRefresh(): void {
       setIsLoading(true);
+      getVrchatRecentWorldsToMain().then((w) => {
+        setRecentWorlds(w);
+        setIsLoading(false);
+      });
     },
     onChangePage(page: number): void {
       setCurrentPage(page);
@@ -83,7 +89,13 @@ const useWorldRecentPage = (): HookMember => {
       setInfoModalWorld(undefined);
     },
     onAddWorld(world: WorldEditInput): void {
-      throw new Error('Function not implemented.');
+      setIsLoading(true);
+      addEditSheetToMain(world)
+        .then(() => message.info('월드가 추가되었습니다'))
+        .then(() => getSheetWorldData())
+        .then((data) => setWorldData(data))
+        .catch((e: Error) => message.error(e.toString()))
+        .finally(() => setIsLoading(false));
     },
   };
   return hookMember;
