@@ -148,7 +148,7 @@ function WorldInstanceCreationModal(props: Props) {
           {/* <Input.Group */}
           <div css={{ marginTop: spacing(1) }}>
             <Typography.Title level={5}>Instance ID: </Typography.Title>
-            <div css={{ width: '80%' }}>{instanceId}</div>
+            <code css={{ width: '80%' }}>{instanceId}</code>
           </div>
 
           <div css={{ marginTop: spacing(1) }}>
