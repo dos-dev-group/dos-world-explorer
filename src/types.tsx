@@ -26,13 +26,24 @@ export type WorldVrcRaw = Omit<
   'description' | 'tags' | 'score' | 'date' | 'type'
 >;
 
+export interface SheetReviewWorld {
+  key: string; // 유니크한 ID
+  name: string;
+  author: string;
+  description: string;
+  tags: string[];
+  score: number;
+  url: string;
+  imageUrl: string;
+  date: Date;
+  reviewer: string;
+}
+
 export interface TagStyle {
   tag: string;
   content: string[];
   color: string;
 }
-
-export type TagStyles = TagStyle[];
 
 // export interface User {
 //   name: string; // 유저이름

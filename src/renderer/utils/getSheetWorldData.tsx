@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import axios, { AxiosError } from 'axios';
-import { World, WorldData, TagStyle, TagStyles } from '@src/types';
+import { World, WorldData, TagStyle } from '@src/types';
 import { NoDataError } from './error';
 
 const sheetUrl =
@@ -97,7 +97,7 @@ export default function getSheetWorldData() {
 }
 
 export function getTagStyles() {
-  const tagStyles: TagStyles = [];
+  const tagStyles: TagStyle[] = [];
   return getHtml(sheetTagUrl)
     .then((html) => {
       if (!html) throw new NoDataError();
