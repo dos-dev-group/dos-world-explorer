@@ -7,6 +7,7 @@ import {
   saveBookmarkToFileDialog,
 } from '@src/renderer/utils/ipc/bookmarksUtils';
 import {
+  getWorldDataToMain,
   modifyEditSheetToMain,
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
@@ -78,7 +79,7 @@ const useBookmarkPage = (): HookMember => {
 
   useEffect(() => {
     if (worldData === undefined) {
-      getSheetWorldData().then((data) => {
+      getWorldDataToMain().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
@@ -141,7 +142,7 @@ const useBookmarkPage = (): HookMember => {
     },
     onClickRefresh() {
       setIsLoading(true);
-      getSheetWorldData().then((data) => {
+      getWorldDataToMain().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
@@ -184,10 +185,9 @@ const useBookmarkPage = (): HookMember => {
         .then(() => {
           message.info('월드가 변경되었습니다');
         })
-        .then(() => {
-          getSheetWorldData().then((data) => {
-            setWorldData(data);
-          });
+        .then(() => getWorldDataToMain())
+        .then((data) => {
+          setWorldData(data);
         })
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
@@ -198,10 +198,9 @@ const useBookmarkPage = (): HookMember => {
         .then(() => {
           message.info('월드가 삭제되었습니다');
         })
-        .then(() => {
-          getSheetWorldData().then((data) => {
-            setWorldData(data);
-          });
+        .then(() => getWorldDataToMain())
+        .then((data) => {
+          setWorldData(data);
         })
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
