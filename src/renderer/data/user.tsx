@@ -1,41 +1,82 @@
+/* eslint-disable promise/no-nesting */
 import { UserLogin } from '@src/types';
 import { message } from 'antd';
-import { atom, AtomEffect } from 'recoil';
-import { loginToMain, logoutToMain } from '../utils/ipc/vrchatAPIToMain';
+import { useEffect, useMemo } from 'react';
+import { atom, AtomEffect, useRecoilState, useResetRecoilState } from 'recoil';
+import { CurrentUser } from 'vrchat';
+import {
+  getCurrentUserToMain,
+  loginToMain,
+  logoutToMain,
+} from '../utils/ipc/vrchatAPIToMain';
 
-export const LOADING_LOGIN = 'LOADING_LOGIN';
+const USER_LOGIN_LOCALSTORAGE_KEY = 'USER_LOGIN';
 
-const loginLocalStorageEffect =
-  (key: string): AtomEffect<UserLogin | undefined> =>
+const vrcCurrentUserEffect =
+  (): AtomEffect<CurrentUser | undefined> =>
   ({ trigger, onSet, setSelf, resetSelf }) => {
-    const savedValue = localStorage.getItem(key);
-    if (trigger === 'get' && savedValue !== null) {
-      const loginInfo: UserLogin = JSON.parse(savedValue);
-
-      loginToMain(loginInfo.name, loginInfo.password)
-        .then(() => setSelf(loginInfo))
-        .catch(() => resetSelf());
-    }
-
-    onSet((newValue, _, isReset) => {
-      if (isReset) {
-        localStorage.removeItem(key);
-        logoutToMain();
-      } else if (newValue) {
-        loginToMain(newValue.name, newValue.password)
-          .then(() => {
-            localStorage.setItem(key, JSON.stringify(newValue));
-          })
-          .catch(() => {
-            message.error('로그인에 실패했습니다.');
-            resetSelf();
-          });
-      }
-    });
+    getCurrentUserToMain()
+      .catch(() => {
+        const savedUl = localStorage.getItem(USER_LOGIN_LOCALSTORAGE_KEY);
+        if (savedUl) {
+          return login(JSON.parse(savedUl));
+        }
+        throw new Error('LOGIN_ERROR');
+      })
+      .then((currentUser) => {
+        setSelf(currentUser);
+      })
+      .catch((reason) => console.error(reason.toString()));
   };
 
-export const userLoginState = atom<UserLogin | undefined>({
-  key: 'userLoginState',
+const currentUserState = atom<CurrentUser | undefined>({
+  key: 'currentUserState',
   default: undefined,
-  effects: [loginLocalStorageEffect('userLoginState')],
+  effects: [vrcCurrentUserEffect()],
 });
+
+export interface VrcCurrentUserHookMember {
+  currentUser: CurrentUser | undefined;
+  login(userLogin: UserLogin): Promise<CurrentUser>;
+  logout(): Promise<void>;
+}
+export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+  const resetUser = useResetRecoilState(currentUserState);
+
+  const hookMember: VrcCurrentUserHookMember = {
+    currentUser,
+    async login(userLogin: UserLogin): Promise<CurrentUser> {
+      const user = await login(userLogin);
+      setCurrentUser(user);
+      return user;
+    },
+    async logout(): Promise<void> {
+      await logout();
+      resetUser();
+    },
+  };
+
+  return hookMember;
+};
+
+async function login(userLogin: UserLogin): Promise<CurrentUser> {
+  try {
+    await loginToMain(userLogin.name, userLogin.password);
+    const user = await getCurrentUserToMain();
+    localStorage.setItem(
+      USER_LOGIN_LOCALSTORAGE_KEY,
+      JSON.stringify(userLogin),
+    );
+
+    return user;
+  } catch {
+    localStorage.removeItem(USER_LOGIN_LOCALSTORAGE_KEY);
+    throw new Error('LOGIN_ERROR');
+  }
+}
+
+async function logout(): Promise<void> {
+  await logoutToMain();
+  localStorage.removeItem(USER_LOGIN_LOCALSTORAGE_KEY);
+}

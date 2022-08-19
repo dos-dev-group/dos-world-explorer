@@ -23,7 +23,7 @@ import {
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 // import './App.css';
 import { Flex } from './components/styledComponents';
-import { userLoginState } from './data/user';
+import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
@@ -35,16 +35,14 @@ const { Sider } = Layout;
 const { Title } = Typography;
 
 export default function App() {
-  const recoilUserLoginState = useRecoilValue(userLoginState);
+  const { currentUser } = useVrcCurrentUser();
 
   return (
     <Router>
       <Routes>
         <Route
           path="/"
-          element={
-            recoilUserLoginState ? <MenuLayout /> : <Navigate to="/login" />
-          }
+          element={currentUser ? <MenuLayout /> : <Navigate to="/login" />}
         >
           <Route index element={<Navigate to="/sheet" />} />
           <Route path="sheet" element={<WorldSheetPage />} />
@@ -60,8 +58,7 @@ export default function App() {
 function MenuLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const recoilLoginState = useRecoilValue(userLoginState);
-  const recoilLoginStateResetter = useResetRecoilState(userLoginState);
+  const { logout, currentUser } = useVrcCurrentUser();
 
   // let menuKey = '';
   // if ()
@@ -119,23 +116,32 @@ function MenuLayout() {
                   navigate('/recent');
                 },
               },
-              recoilLoginState
-                ? {
-                    label: 'Logout',
-                    key: 'logout',
-                    icon: <LogoutOutlined />,
-                    onClick(ev) {
-                      recoilLoginStateResetter();
-                    },
-                  }
-                : {
-                    label: 'Login',
-                    key: 'login',
-                    icon: <LoginOutlined />,
-                    onClick(ev) {
-                      navigate('/login');
-                    },
-                  },
+              {
+                type: 'divider',
+              },
+              {
+                disabled: true,
+                key: 'user_info',
+                icon: (
+                  <img
+                    src={currentUser?.currentAvatarThumbnailImageUrl}
+                    width={32}
+                    height={32}
+                    css={{ borderRadius: 16, objectFit: 'cover' }}
+                    alt=""
+                  />
+                ),
+                label: <b>{currentUser?.displayName}</b>,
+              },
+              {
+                label: 'Logout',
+                key: 'logout',
+                icon: <LogoutOutlined />,
+                danger: true,
+                onClick(ev) {
+                  logout();
+                },
+              },
             ]}
           />
         </Sider>

@@ -5,10 +5,9 @@ import { constants } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { app, shell } from 'electron';
-import { UserState, WorldVrcRaw } from '../../types';
 import { CurrentUser, LimitedUser, User } from 'vrchat';
 import { off } from 'process';
-// import vrckey from '../../../secret/vrc.json';
+import { WorldVrcRaw } from '../../types';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -17,7 +16,6 @@ let authenticationApi = new vrchat.AuthenticationApi();
 
 let user;
 
-authenticationApi.logout();
 export async function login(id: string, pw: string): Promise<boolean> {
   authenticationApi = new vrchat.AuthenticationApi(
     new vrchat.Configuration({
@@ -31,7 +29,7 @@ export async function login(id: string, pw: string): Promise<boolean> {
     .getCurrentUser()
     .then(async (res) => {
       user = res.data;
-      console.log(user);
+      // console.log(user);
       console.log('login success');
       console.log('api displayName :', res.data.displayName);
       return true;
@@ -43,19 +41,18 @@ export async function login(id: string, pw: string): Promise<boolean> {
 }
 
 export async function logout(): Promise<boolean> {
-  let ck = true;
-  authenticationApi
+  return authenticationApi
     .logout()
     .then(async (res) => {
       user = res.data;
-      console.log(user);
+      // console.log(user);
       console.log('logout success');
+      return true;
     })
     .catch((err) => {
-      console.log(err.response.data);
-      ck = false;
+      console.warn(err.response.data);
+      return false;
     });
-  return ck;
 }
 
 function authCheck() {
@@ -184,7 +181,7 @@ export async function generatedWorldInstanceInfo(
 ): Promise<string> {
   let link = '';
   let userId;
-  if (ownerId === undefined){
+  if (ownerId === undefined) {
     userId = (await authenticationApi.getCurrentUser()).data.id;
   } else {
     userId = ownerId;
@@ -232,11 +229,16 @@ export async function sendSelfInvite(
 ): Promise<string> {
   await authCheck();
   const instancesApi = new vrchat.InstancesApi();
-  instancesApi
+  return instancesApi
     .sendSelfInvite(worldId, instanceId)
-    .then((res) => console.log(res.data))
-    .catch((err) => console.log(err.response));
-  return 'ok!';
+    .then((res) => {
+      console.log(res.data);
+      return 'ok';
+    })
+    .catch((err) => {
+      console.log(err.response);
+      return 'error';
+    });
 }
 
 export async function genWorldInstanceName(worldId: string): Promise<string> {

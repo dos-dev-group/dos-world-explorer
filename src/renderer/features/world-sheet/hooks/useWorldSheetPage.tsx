@@ -1,4 +1,3 @@
-/* eslint-disable promise/no-nesting */
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
 import { worldDataState } from '@src/renderer/data/world';
@@ -163,42 +162,27 @@ const useWorldSheetPage = (): HookMember => {
     onAddWorld(world) {
       setIsLoading(true);
       addEditSheetToMain(world)
-        .then(() => {
-          message.info('월드가 추가되었습니다');
-        })
-        .then(() => {
-          getSheetWorldData().then((data) => {
-            setWorldData(data);
-          });
-        })
+        .then(() => message.info('월드가 추가되었습니다'))
+        .then(() => getSheetWorldData())
+        .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onEditWorld(key, world) {
       setIsLoading(true);
       modifyEditSheetToMain(key, world)
-        .then(() => {
-          message.info('월드가 변경되었습니다');
-        })
-        .then(() => {
-          getSheetWorldData().then((data) => {
-            setWorldData(data);
-          });
-        })
+        .then(() => message.info('월드가 변경되었습니다'))
+        .then(() => getSheetWorldData())
+        .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onRemoveWorld(key) {
       setIsLoading(true);
       reomoveEditSheetToMain(key)
-        .then(() => {
-          message.info('월드가 삭제되었습니다');
-        })
-        .then(() => {
-          getSheetWorldData().then((data) => {
-            setWorldData(data);
-          });
-        })
+        .then(() => message.info('월드가 삭제되었습니다'))
+        .then(() => getSheetWorldData())
+        .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
