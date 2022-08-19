@@ -48,7 +48,6 @@ function AddWorldModal(props: Props) {
       setCurUrl(props.defaultWorldInfo.url);
       setIsChecking(true);
       autoFileToMain(props.defaultWorldInfo.url).then((info) => {
-        console.log('autoFileToMain');
         setWorldCheckInfo(info);
         setIsChecking(false);
       });

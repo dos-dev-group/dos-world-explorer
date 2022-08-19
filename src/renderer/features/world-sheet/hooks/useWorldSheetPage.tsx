@@ -4,6 +4,7 @@ import { worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
   addEditSheetToMain,
+  getWorldDataToMain,
   modifyEditSheetToMain,
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
@@ -60,7 +61,7 @@ const useWorldSheetPage = (): HookMember => {
 
   useEffect(() => {
     if (worldData === undefined) {
-      getSheetWorldData().then((data) => {
+      getWorldDataToMain().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
@@ -163,7 +164,7 @@ const useWorldSheetPage = (): HookMember => {
       setIsLoading(true);
       addEditSheetToMain(world)
         .then(() => message.info('월드가 추가되었습니다'))
-        .then(() => getSheetWorldData())
+        .then(() => getWorldDataToMain())
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
@@ -172,7 +173,7 @@ const useWorldSheetPage = (): HookMember => {
       setIsLoading(true);
       modifyEditSheetToMain(key, world)
         .then(() => message.info('월드가 변경되었습니다'))
-        .then(() => getSheetWorldData())
+        .then(() => getWorldDataToMain())
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
@@ -181,14 +182,14 @@ const useWorldSheetPage = (): HookMember => {
       setIsLoading(true);
       reomoveEditSheetToMain(key)
         .then(() => message.info('월드가 삭제되었습니다'))
-        .then(() => getSheetWorldData())
+        .then(() => getWorldDataToMain())
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onClickRefresh() {
       setIsLoading(true);
-      getSheetWorldData()
+      getWorldDataToMain()
         .then((data) => {
           return setWorldData(data);
         })

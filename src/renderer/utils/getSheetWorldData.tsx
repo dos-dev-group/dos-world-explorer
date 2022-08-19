@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import axios, { AxiosError } from 'axios';
-import { World, WorldData, TagStyle, TagStyles } from '@src/types';
+import { World, WorldData, TagStyle } from '@src/types';
 import { NoDataError } from './error';
-import { analytics } from 'googleapis/build/src/apis/analytics';
 
 const sheetUrl =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5aaBlO_r5xaHXz7uac1ya_D_yTQTLMY7KrHinZVLobJ66l7f0999AIsCYoY5gAlhTEbzBIrmBbDA2/pubhtml?gid=209660619&single=true';
@@ -98,7 +97,7 @@ export default function getSheetWorldData() {
 }
 
 export function getTagStyles() {
-  const tagStyles: TagStyles = [];
+  const tagStyles: TagStyle[] = [];
   return getHtml(sheetTagUrl)
     .then((html) => {
       if (!html) throw new NoDataError();
