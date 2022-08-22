@@ -1,3 +1,5 @@
+import { FavoriteGroup, LimitedWorld } from "vrchat";
+
 export interface World {
   key: string; // 월드 고유ID
   name: string;
@@ -43,6 +45,11 @@ export interface TagStyle {
   tag: string;
   content: string[];
   color: string;
+}
+
+export interface DosWorldFavorite {
+  groupInfo: FavoriteGroup;
+  favorites: LimitedWorld[];
 }
 
 // export interface User {

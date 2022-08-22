@@ -5,9 +5,9 @@ import { constants } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { app, shell } from 'electron';
-import { CurrentUser, LimitedUser, User } from 'vrchat';
+import { CurrentUser, FavoriteGroup, FavoriteType, LimitedUser, LimitedWorld, User } from 'vrchat';
 import { off } from 'process';
-import { WorldVrcRaw } from '../../types';
+import { DosWorldFavorite, WorldVrcRaw } from '../../types';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -316,4 +316,131 @@ export async function getUser(userId: string): Promise<User> {
   return usersApi.getUser(userId).then((res) => {
     return res.data;
   });
+}
+
+export async function getFavoritedWorlds(): Promise<DosWorldFavorite[]> {
+  await authCheck();
+  const favoritesApi = new vrchat.FavoritesApi();
+  const favoriteGroup: FavoriteGroup[] = [];
+  const worldsApi = new vrchat.WorldsApi();
+  const worlds: LimitedWorld[] = [];
+  const dosWorldFavorite: DosWorldFavorite[] = [];
+  let cnt = 0;
+  while (true) {
+    if (
+      // eslint-disable-next-line no-await-in-loop
+      await favoritesApi
+        .getFavoriteGroups(100, cnt)
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        .then((res) => {
+          favoriteGroup.push(...res.data);
+          cnt += 100;
+          if (res.data.length < 100) {
+            return true;
+          }
+        })
+    ) {
+      break;
+    }
+  }
+  cnt = 0;
+  while (true) {
+    if (
+      // eslint-disable-next-line no-await-in-loop
+      await worldsApi
+        .getFavoritedWorlds(true, undefined, 100, 'descending', cnt)
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        .then((res) => {
+          worlds.push(...res.data);
+          cnt += 100;
+          if (res.data.length < 100) {
+            return true;
+          }
+        })
+    ) {
+      break;
+    }
+  }
+
+  console.log(worlds.length);
+  for (let i = 0; i < favoriteGroup.length; i++) {
+    if (favoriteGroup[i].type === 'world') {
+      const tempGroupWorld: LimitedWorld[] = [];
+      for (let j = 0; j < worlds.length; j++) {
+        if (worlds[j].favoriteGroup === favoriteGroup[i].name) {
+          tempGroupWorld.push(worlds[j]);
+        }
+      }
+      dosWorldFavorite.push({
+        groupInfo: favoriteGroup[i],
+        favorites: tempGroupWorld,
+      });
+    }
+  }
+  return dosWorldFavorite;
+}
+
+export async function addFavoriteWorld(
+  type: string,
+  worldId: string,
+): Promise<boolean> {
+  await authCheck();
+  const favoritesApi = new vrchat.FavoritesApi();
+  return favoritesApi
+    .addFavorite({
+      type: FavoriteType.World,
+      favoriteId: worldId,
+      tags: [type],
+    })
+    .then((res) => {
+      console.log(res);
+      return true;
+    })
+    .catch((err) => {
+      console.log(err.response.data);
+      return false;
+    });
+}
+
+export async function removeFavoriteWorld(worldId: string): Promise<boolean> {
+  await authCheck();
+  const favoritesApi = new vrchat.FavoritesApi();
+  const worldsApi = new vrchat.WorldsApi();
+  let favoriteId = '';
+  let cnt = 0;
+  while (true) {
+    if (
+      // eslint-disable-next-line no-await-in-loop
+      await worldsApi
+        .getFavoritedWorlds(true, undefined, 100, 'descending', cnt)
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        .then((res) => {
+          for (let i = 0; i < res.data.length; i++) {
+            if (res.data[i].id === worldId) {
+              favoriteId = res.data[i].favoriteId;
+              return true;
+            }
+          }
+          cnt += 100;
+          if (res.data.length < 100) {
+            return true;
+          }
+        })
+    ) {
+      break;
+    }
+  }
+  if (favoriteId !== '') {
+    return favoritesApi
+      .removeFavorite(favoriteId)
+      .then((res) => {
+        console.log(res);
+        return true;
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        return false;
+      });
+  }
+  return false;
 }
