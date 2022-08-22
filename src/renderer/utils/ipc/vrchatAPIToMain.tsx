@@ -1,5 +1,5 @@
-import { WorldVrcRaw } from '@src/types';
-import { CurrentUser, User } from 'vrchat';
+import { DosWorldFavorite, WorldVrcRaw } from '@src/types';
+import { CurrentUser, LimitedWorld, User } from 'vrchat';
 
 export function testVrchatAPIToMain() {
   window.electron.ipcRenderer.sendMessage('testVrchatAPIToMain', []);
@@ -163,5 +163,46 @@ export function getUserToMain(userId: string) {
     window.electron.ipcRenderer.once('getUserToRenderer', (result: unknown) => {
       resolve(result as User);
     });
+  });
+}
+
+export function getFavoritedWorldsToMain() {
+  window.electron.ipcRenderer.sendMessage('getFavoritedWorldsToMain', []);
+  return new Promise<DosWorldFavorite[]>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'getFavoritedWorldsToRenderer',
+      (result: unknown) => {
+        resolve(result as DosWorldFavorite[]);
+      },
+    );
+  });
+}
+
+export function addFavoriteWorldToMain(type: string, worldId: string) {
+  window.electron.ipcRenderer.sendMessage('addFavoriteWorldToMain', [
+    type,
+    worldId,
+  ]);
+  return new Promise<boolean>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'addFavoriteWorldToRenderer',
+      (result: unknown) => {
+        resolve(result as boolean);
+      },
+    );
+  });
+}
+
+export function removeFavoriteWorldToMain(worldId: string) {
+  window.electron.ipcRenderer.sendMessage('removeFavoriteWorldToMain', [
+    worldId,
+  ]);
+  return new Promise<boolean>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'removeFavoriteWorldToRenderer',
+      (result: unknown) => {
+        resolve(result as boolean);
+      },
+    );
   });
 }

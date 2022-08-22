@@ -19,6 +19,9 @@ import {
   sendSelfInvite,
   getCurrentUser,
   getUser,
+  getFavoritedWorlds,
+  addFavoriteWorld,
+  removeFavoriteWorld,
 } from './utils/vrchatAPI';
 import {
   loadBookmarkFromFileDialog,
@@ -108,6 +111,21 @@ export default function setupIpcListener() {
 
   ipcMain.on('getUserToMain', async (event, arg) => {
     event.reply('getUserToRenderer', await getUser(arg[0]));
+  });
+  ipcMain.on('getFavoritedWorldsToMain', async (event, arg) => {
+    event.reply('getFavoritedWorldsToRenderer', await getFavoritedWorlds());
+  });
+  ipcMain.on('addFavoriteWorldToMain', async (event, arg) => {
+    event.reply(
+      'addFavoriteWorldToRenderer',
+      await addFavoriteWorld(arg[0], arg[1]),
+    );
+  });
+  ipcMain.on('removeFavoriteWorldToMain', async (event, arg) => {
+    event.reply(
+      'removeFavoriteWorldToRenderer',
+      await removeFavoriteWorld(arg[0]),
+    );
   });
 
   // ###################################### for editSheet.tsx ######################################
