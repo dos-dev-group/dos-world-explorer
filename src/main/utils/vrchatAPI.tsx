@@ -7,7 +7,7 @@ import * as path from 'path';
 import { app, shell } from 'electron';
 import { CurrentUser, FavoriteGroup, FavoriteType, LimitedUser, LimitedWorld, User } from 'vrchat';
 import { off } from 'process';
-import { DosWorldFavorite, WorldVrcRaw } from '../../types';
+import { DosFavoriteWorldGroup, WorldVrcRaw } from '../../types';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -318,13 +318,13 @@ export async function getUser(userId: string): Promise<User> {
   });
 }
 
-export async function getFavoritedWorlds(): Promise<DosWorldFavorite[]> {
+export async function getFavoritedWorlds(): Promise<DosFavoriteWorldGroup[]> {
   await authCheck();
   const favoritesApi = new vrchat.FavoritesApi();
   const favoriteGroup: FavoriteGroup[] = [];
   const worldsApi = new vrchat.WorldsApi();
   const worlds: LimitedWorld[] = [];
-  const dosWorldFavorite: DosWorldFavorite[] = [];
+  const dosWorldFavorite: DosFavoriteWorldGroup[] = [];
   let cnt = 0;
   while (true) {
     if (
