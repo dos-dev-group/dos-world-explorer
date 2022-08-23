@@ -84,7 +84,7 @@ export async function getWorldData(): Promise<WorldData> {
       name: String(vaule[1]),
       author: String(vaule[2]),
       description: String(vaule[3]),
-      tags: vaule[4].replace(' ', '').substr(1).split('#'),
+      tags: vaule[4].replaceAll(' ', '').substr(1).split('#'),
       score: vaule[5].length,
       url: vaule[6],
       imageUrl: vaule[0].slice(8, -4),
