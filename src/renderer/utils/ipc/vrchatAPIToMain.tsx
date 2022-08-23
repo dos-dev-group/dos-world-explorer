@@ -1,4 +1,4 @@
-import { DosWorldFavorite, WorldVrcRaw } from '@src/types';
+import { DosFavoriteWorldGroup, WorldVrcRaw } from '@src/types';
 import { CurrentUser, LimitedWorld, User } from 'vrchat';
 
 export function testVrchatAPIToMain() {
@@ -168,11 +168,11 @@ export function getUserToMain(userId: string) {
 
 export function getFavoritedWorldsToMain() {
   window.electron.ipcRenderer.sendMessage('getFavoritedWorldsToMain', []);
-  return new Promise<DosWorldFavorite[]>((resolve, reject) => {
+  return new Promise<DosFavoriteWorldGroup[]>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'getFavoritedWorldsToRenderer',
       (result: unknown) => {
-        resolve(result as DosWorldFavorite[]);
+        resolve(result as DosFavoriteWorldGroup[]);
       },
     );
   });

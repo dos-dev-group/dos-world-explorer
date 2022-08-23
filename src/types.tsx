@@ -1,4 +1,4 @@
-import { FavoriteGroup, LimitedWorld } from "vrchat";
+import { FavoriteGroup, LimitedWorld } from 'vrchat';
 
 export interface World {
   key: string; // 월드 고유ID
@@ -28,7 +28,7 @@ export type WorldVrcRaw = Omit<
   'description' | 'tags' | 'score' | 'date' | 'type'
 >;
 
-export interface SheetReviewWorld {
+export interface SheetSuggestWorld {
   key: string; // 유니크한 ID
   name: string;
   author: string;
@@ -47,7 +47,7 @@ export interface TagStyle {
   color: string;
 }
 
-export interface DosWorldFavorite {
+export interface DosFavoriteWorldGroup {
   groupInfo: FavoriteGroup;
   favorites: LimitedWorld[];
 }
