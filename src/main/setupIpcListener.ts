@@ -97,7 +97,19 @@ export default function setupIpcListener() {
   ipcMain.on('getVrchatRencentWorldsToMain', async (event, arg) => {
     event.reply(
       'getVrchatRencentWorldsToRenderer',
-      await getVrchatRecentWorlds(),
+      await getVrchatRecentWorlds(arg[0], arg[1]),
+    );
+  });
+  ipcMain.on('getVrchatlabWorldsToMain', async (event, arg) => {
+    event.reply(
+      'getVrchatlabWorldsToRenderer',
+      await getVrchatRecentWorlds(arg[0], arg[1]),
+    );
+  });
+  ipcMain.on('getVrchatNewWorldsToMain', async (event, arg) => {
+    event.reply(
+      'getVrchatNewWorldsToRenderer',
+      await getVrchatRecentWorlds(arg[0], arg[1]),
     );
   });
 
