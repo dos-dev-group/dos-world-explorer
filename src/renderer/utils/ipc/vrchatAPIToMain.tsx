@@ -130,11 +130,44 @@ export function genWorldInstanceNameToMain(worldId: string) {
   });
 }
 
-export function getVrchatRecentWorldsToMain() {
-  window.electron.ipcRenderer.sendMessage('getVrchatRencentWorldsToMain', []);
+export function getVrchatRecentWorldsToMain(offset?: number, limit?: number) {
+  window.electron.ipcRenderer.sendMessage('getVrchatRencentWorldsToMain', [
+    offset,
+    limit,
+  ]);
   return new Promise<WorldVrcRaw[]>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'getVrchatRencentWorldsToRenderer',
+      (result: unknown) => {
+        resolve(result as WorldVrcRaw[]);
+      },
+    );
+  });
+}
+
+export function getVrchatlabWorldsToMain(offset?: number, limit?: number) {
+  window.electron.ipcRenderer.sendMessage('getVrchatlabWorldsToMain', [
+    offset,
+    limit,
+  ]);
+  return new Promise<WorldVrcRaw[]>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'getVrchatlabWorldsToRenderer',
+      (result: unknown) => {
+        resolve(result as WorldVrcRaw[]);
+      },
+    );
+  });
+}
+
+export function getVrchatNewWorldsToMain(offset?: number, limit?: number) {
+  window.electron.ipcRenderer.sendMessage('getVrchatNewWorldsToMain', [
+    offset,
+    limit,
+  ]);
+  return new Promise<WorldVrcRaw[]>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'getVrchatNewWorldsToRenderer',
       (result: unknown) => {
         resolve(result as WorldVrcRaw[]);
       },

@@ -283,11 +283,82 @@ export async function getNowinstancePeople() {
   console.log();
 }
 
-export async function getVrchatRecentWorlds(): Promise<WorldVrcRaw[]> {
+export async function getVrchatRecentWorlds(
+  offset?: number,
+  limit?: number,
+): Promise<WorldVrcRaw[]> {
   await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   await authenticationApi.getCurrentUser();
-  return WorldsApi.getRecentWorlds().then((res) => {
+  return WorldsApi.getRecentWorlds(
+    false,
+    'order',
+    limit,
+    'descending',
+    offset,
+  ).then((res) => {
+    const worlds: WorldVrcRaw[] = [];
+    const worldRowdata = res.data;
+    for (let i = 0; i < worldRowdata.length; i++) {
+      worlds.push({
+        key: worldRowdata[i].id, // key
+        name: worldRowdata[i].name, // name
+        author: worldRowdata[i].authorName, // author
+        url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
+        imageUrl: worldRowdata[i].imageUrl, // imageUrl
+      });
+    }
+    return worlds;
+  });
+}
+
+export async function getVrchatlabWorlds(
+  offset?: number,
+  limit?: number,
+): Promise<WorldVrcRaw[]> {
+  await authCheck();
+  const WorldsApi = new vrchat.WorldsApi();
+  await authenticationApi.getCurrentUser();
+  return WorldsApi.searchWorlds(
+    false,
+    'labsPublicationDate',
+    undefined,
+    undefined,
+    limit,
+    'descending',
+    offset,
+  ).then((res) => {
+    const worlds: WorldVrcRaw[] = [];
+    const worldRowdata = res.data;
+    for (let i = 0; i < worldRowdata.length; i++) {
+      worlds.push({
+        key: worldRowdata[i].id, // key
+        name: worldRowdata[i].name, // name
+        author: worldRowdata[i].authorName, // author
+        url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
+        imageUrl: worldRowdata[i].imageUrl, // imageUrl
+      });
+    }
+    return worlds;
+  });
+}
+
+export async function getVrchatNewWorlds(
+  offset?: number,
+  limit?: number,
+): Promise<WorldVrcRaw[]> {
+  await authCheck();
+  const WorldsApi = new vrchat.WorldsApi();
+  await authenticationApi.getCurrentUser();
+  return WorldsApi.searchWorlds(
+    false,
+    'publicationDate',
+    undefined,
+    undefined,
+    limit,
+    'descending',
+    offset,
+  ).then((res) => {
     const worlds: WorldVrcRaw[] = [];
     const worldRowdata = res.data;
     for (let i = 0; i < worldRowdata.length; i++) {
