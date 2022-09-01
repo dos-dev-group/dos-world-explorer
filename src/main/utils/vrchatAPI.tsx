@@ -8,7 +8,6 @@ import { app, shell } from 'electron';
 import { CurrentUser, FavoriteGroup, FavoriteType, LimitedUser, LimitedWorld, User } from 'vrchat';
 import { off } from 'process';
 import { DosFavoriteWorldGroup, WorldVrcRaw } from '../../types';
-import { worldSheetUpdate } from './editSheet';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -297,7 +296,6 @@ export async function getVrchatRecentWorlds(
   limit?: number,
 ): Promise<WorldVrcRaw[]> {
   await authCheck();
-  worldSheetUpdate();
   const WorldsApi = new vrchat.WorldsApi();
   await authenticationApi.getCurrentUser();
   return WorldsApi.getRecentWorlds(
@@ -318,6 +316,7 @@ export async function getVrchatRecentWorlds(
         imageUrl: worldRowdata[i].imageUrl, // imageUrl
       });
     }
+    console.log(worlds);
     return worlds;
   });
 }
