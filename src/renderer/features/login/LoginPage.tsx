@@ -26,10 +26,10 @@ export default function LoginPage() {
       <Typography.Title level={4}>Login</Typography.Title>
       <div css={{ width: '300px' }}>
         <Typography.Title css={{ marginTop: '10px' }} level={5}>
-          VRChat Username or Email
+          VRChat ID
         </Typography.Title>
         <Input
-          placeholder="Username/Email"
+          placeholder="ID"
           status={
             hookMember.username === '' ||
             hookMember.checkInputValid(hookMember.username)
