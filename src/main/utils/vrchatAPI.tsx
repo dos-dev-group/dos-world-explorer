@@ -316,7 +316,7 @@ export async function getVrchatRecentWorlds(
         imageUrl: worldRowdata[i].imageUrl, // imageUrl
       });
     }
-    console.log(worlds);
+    // console.log(worlds);
     return worlds;
   });
 }
