@@ -103,18 +103,6 @@ export function getTagStyles() {
       if (!html) throw new NoDataError();
 
       const doc = domparser.parseFromString(html.data, 'text/html');
-      const styleData: string[] =
-        doc
-          .getElementsByTagName('style')[0]
-          .textContent?.split('.ritz .waffle .') || [];
-      // console.log(styleData);
-      const styles: { [k: string]: string } = {};
-      for (let i = 1; i < styleData.length; i++) {
-        styles[styleData[i].split('{')[0]] = styleData[i]
-          .split('background-color:')[1]
-          .split(';')[0];
-      }
-      // console.log(styles);
       const raws = doc
         .getElementsByTagName('tbody')[0]
         .getElementsByTagName('tr');
@@ -125,13 +113,12 @@ export function getTagStyles() {
           tag: row[0].textContent || '',
           content:
             row[1].textContent!.replaceAll(' ', '').slice(1).split('#') || [],
-          color: styles[row[2].className] || '',
+          color: row[2].textContent || '',
+          key: row[3].textContent || '',
         };
-        // doc.styleSheets;
-        // console.log(tagStyle);
         tagStyles.push(tagStyle);
       }
-      // console.log(tagStyles);
+      console.log(tagStyles);
       return tagStyles;
     })
     .catch((reason) => {

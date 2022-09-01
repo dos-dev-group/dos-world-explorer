@@ -8,6 +8,7 @@ import { app, shell } from 'electron';
 import { CurrentUser, FavoriteGroup, FavoriteType, LimitedUser, LimitedWorld, User } from 'vrchat';
 import { off } from 'process';
 import { DosFavoriteWorldGroup, WorldVrcRaw } from '../../types';
+import { worldSheetUpdate } from './editSheet';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -253,9 +254,17 @@ export async function genWorldInstanceName(worldId: string): Promise<string> {
   return randInt;
 }
 
+export async function getWorldAllInfo(worldId: string) {
+  await authCheck();
+  const WorldsApi = new vrchat.WorldsApi();
+  const worldData = await WorldsApi.getWorld(worldId);
+  console.log(await worldData);
+  return worldData.data;
+}
+
 export async function getWorldInfo(
   worldId: string,
-): Promise<{ name: string; authorName: string; thumbnailImageUrl: string }> {
+): Promise<{ name: string; authorName: string; imageUrl: string }> {
   await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   const worldData = (await WorldsApi.getWorld(worldId)).data;
@@ -263,7 +272,7 @@ export async function getWorldInfo(
   return {
     name: worldData.name,
     authorName: worldData.authorName,
-    thumbnailImageUrl: worldData.thumbnailImageUrl,
+    imageUrl: worldData.imageUrl,
   };
 }
 
@@ -288,6 +297,7 @@ export async function getVrchatRecentWorlds(
   limit?: number,
 ): Promise<WorldVrcRaw[]> {
   await authCheck();
+  worldSheetUpdate();
   const WorldsApi = new vrchat.WorldsApi();
   await authenticationApi.getCurrentUser();
   return WorldsApi.getRecentWorlds(
