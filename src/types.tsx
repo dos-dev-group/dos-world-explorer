@@ -18,6 +18,13 @@ export type WorldEditInput = Pick<
   World,
   'url' | 'description' | 'tags' | 'score' | 'type'
 >;
+
+export function isWorldEditInput(obj: any): obj is WorldEditInput {
+  return (
+    Object.keys(obj).sort().join(' ') === 'description score tags type url'
+  );
+}
+
 export type WorldEditOutput = Omit<
   World,
   'url' | 'description' | 'tags' | 'score' | 'type'
@@ -86,4 +93,73 @@ export enum EditResult {
   PROTECTED = 2,
   ALREADYEXIST = 3,
   NOTEXIST = 4,
+  TYPEERROR = 5,
+}
+function test(): string {
+  return 'resr';
+}
+
+// export interface WorldEditInput {
+//   description: string;
+//   tags: string[];
+//   score: number;
+//   type: string;
+//   url: string;
+// }
+
+export interface World extends SheetBaseType {
+  name: string;
+  author: string;
+  description: string;
+  tags: string[];
+  score: number;
+  url: string;
+  imageUrl: string;
+  date: Date;
+  type: string;
+}
+
+export function isWorld(obj: any): obj is World {
+  return (
+    Object.keys(obj).sort().join(' ') ===
+    'author date description imageUrl key name score tags type url'
+  );
+}
+
+export interface TagStyle extends SheetBaseType {
+  tag: string;
+  content: string[];
+  color: string;
+}
+export function isTagStyle(obj: any): obj is TagStyle {
+  return Object.keys(obj).sort().join(' ') === 'color content key tag';
+}
+
+export interface SuggestWorld extends SheetBaseType {
+  name: string;
+  author: string;
+  description: string;
+  tags: string[];
+  score: number;
+  url: string;
+  imageUrl: string;
+  date: Date;
+  checker: string;
+}
+export function isSuggestWorld(obj: any): obj is SuggestWorld {
+  return (
+    Object.keys(obj).sort().join(' ') ===
+    'author checker date description imageUrl key name score tags url'
+  );
+}
+
+export interface SuggestWorldEditInput {
+  name: string;
+  author: string;
+  description: string;
+  tags: string[];
+  score: number;
+}
+export function isSuggestWorldEditInput(obj: any): obj is SuggestWorld {
+  return Object.keys(obj).sort().join(' ') === 'description score tags url';
 }
