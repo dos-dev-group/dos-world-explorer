@@ -2,10 +2,11 @@ import { ipcMain, shell } from 'electron';
 import {
   testEditSheet,
   getWorldData,
-  addEditSheet,
-  removeEditSheet,
   modifyEditSheet,
   autoFile,
+  addSheet,
+  removeSheet,
+  modifySheet,
 } from './utils/editSheet';
 import {
   testVrchatAPI,
@@ -150,19 +151,16 @@ export default function setupIpcListener() {
     event.reply('getWorldDataToRenderer', await getWorldData());
   });
 
-  ipcMain.on('addEditSheetToMain', async (event, arg) => {
-    event.reply('addEditSheetToRenderer', await addEditSheet(arg[0]));
+  ipcMain.on('addSheetToMain', async (event, arg) => {
+    event.reply(arg[2], await addSheet(arg[0], arg[1]));
   });
 
-  ipcMain.on('reomoveEditSheetToMain', async (event, arg) => {
-    event.reply('reomoveEditSheetToRenderer', await removeEditSheet(arg[0]));
+  ipcMain.on('reomoveSheetToMain', async (event, arg) => {
+    event.reply(arg[2], await removeSheet(arg[0], arg[1]));
   });
 
-  ipcMain.on('modifyEditSheetToMain', async (event, arg) => {
-    event.reply(
-      'modifyEditSheetToRenderer',
-      await modifyEditSheet(arg[0], arg[1]),
-    );
+  ipcMain.on('modifySheetToMain', async (event, arg) => {
+    event.reply(arg[3], await modifySheet(arg[0], arg[1], arg[2]));
   });
 
   ipcMain.on('autoFileToMain', async (event, arg) => {

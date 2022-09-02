@@ -91,7 +91,10 @@ const useLoginPage = (): HookMember => {
       if (isTwoFactorAuth) {
         setVisibleTwoFactorAuthModal(true);
       }
-      login(loginSubmitValue);
+      login(loginSubmitValue).catch((err) => {
+        message.error(err.toString());
+        setIsLoginProgress(false);
+      });
     },
     onChangeUsername(u: string): void {
       setUsername(u);

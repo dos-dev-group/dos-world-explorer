@@ -253,9 +253,17 @@ export async function genWorldInstanceName(worldId: string): Promise<string> {
   return randInt;
 }
 
+export async function getWorldAllInfo(worldId: string) {
+  await authCheck();
+  const WorldsApi = new vrchat.WorldsApi();
+  const worldData = await WorldsApi.getWorld(worldId);
+  console.log(await worldData);
+  return worldData.data;
+}
+
 export async function getWorldInfo(
   worldId: string,
-): Promise<{ name: string; authorName: string; thumbnailImageUrl: string }> {
+): Promise<{ name: string; authorName: string; imageUrl: string }> {
   await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   const worldData = (await WorldsApi.getWorld(worldId)).data;
@@ -263,7 +271,7 @@ export async function getWorldInfo(
   return {
     name: worldData.name,
     authorName: worldData.authorName,
-    thumbnailImageUrl: worldData.thumbnailImageUrl,
+    imageUrl: worldData.imageUrl,
   };
 }
 
@@ -308,6 +316,7 @@ export async function getVrchatRecentWorlds(
         imageUrl: worldRowdata[i].imageUrl, // imageUrl
       });
     }
+    // console.log(worlds);
     return worlds;
   });
 }

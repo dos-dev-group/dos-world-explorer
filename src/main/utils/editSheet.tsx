@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+import { google, sheets_v4 } from 'googleapis';
 import axios from 'axios';
 import {
   World,
@@ -6,6 +6,10 @@ import {
   WorldEditInput,
   WorldEditOutput,
   EditResult,
+  SheetBaseType,
+  isWorldEditInput,
+  isSuggestWorld,
+  isTagStyle,
 } from '../../types';
 import keys from '../../../secret/sheetAuth.json';
 import sheetData from '../../../secret/sheetData.json';
@@ -14,6 +18,12 @@ import { getWorldInfo } from './vrchatAPI';
 const spreadsheetId = sheetData.spreadsheetId;
 const sheetId = sheetData.sheetId;
 const sheetName = sheetData.sheetName;
+
+const sheetInfos = {
+  World: { sheetName: 'sheet1', sheetId: 209660619 },
+  TagStyle: { sheetName: 'tagData', sheetId: 1994142434 },
+  SuggestWorld: { sheetName: 'suggest_sheet1', sheetId: 765529254 },
+};
 
 const client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
   'https://www.googleapis.com/auth/drive',
@@ -51,16 +61,16 @@ export async function autoFile(worldUrl: string): Promise<WorldEditOutput> {
   const worldId = worldUrl.replace('https://vrchat.com/home/world/', '');
   const worldData = await getWorldInfo(worldId);
   const nowTime = new Date();
-  console.log(worldId);
-  console.log(transeImageUrl(worldData.thumbnailImageUrl));
-  console.log(worldData.name);
-  console.log(worldData.authorName);
-  console.log(nowTime.toISOString().replace('T', ' ').split('.')[0]);
+  // console.log(worldId);
+  // console.log(worldData.imageUrl);
+  // console.log(worldData.name);
+  // console.log(worldData.authorName);
+  // console.log(nowTime.toISOString().replace('T', ' ').split('.')[0]);
   return {
     key: worldId,
     name: String(worldData.name),
     author: String(worldData.authorName),
-    imageUrl: await transeImageUrl(worldData.thumbnailImageUrl),
+    imageUrl: worldData.imageUrl,
     date: nowTime,
   };
 }
@@ -77,19 +87,19 @@ export async function getWorldData(): Promise<WorldData> {
   };
   const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
   const worldData: World[] = [];
-  const vaules = sheetResponse.data.values || [[]];
-  vaules.slice(1).forEach((vaule) => {
+  const values = sheetResponse.data.values || [[]];
+  values.slice(1).forEach((value) => {
     const world: World = {
-      key: vaule[9], // 월드 고유ID
-      name: String(vaule[1]),
-      author: String(vaule[2]),
-      description: String(vaule[3]),
-      tags: vaule[4].replaceAll(' ', '').substr(1).split('#'),
-      score: vaule[5].length,
-      url: vaule[6],
-      imageUrl: vaule[0].slice(8, -4),
-      date: new Date(vaule[8] + 'z'),
-      type: vaule[7],
+      key: value[9], // 월드 고유ID
+      name: String(value[1]),
+      author: String(value[2]),
+      description: String(value[3]),
+      tags: value[4].replaceAll(' ', '').substr(1).split('#'),
+      score: value[5],
+      url: value[6],
+      imageUrl: value[0],
+      date: new Date(value[8] + 'z'),
+      type: value[7],
     };
     // console.log(world);
     worldData.push(world);
@@ -177,72 +187,136 @@ function overLapCheck(worldData: WorldData, key: string) {
   return false;
 }
 
-export async function addEditSheet(
-  worldInput: WorldEditInput,
+function sheetExistCheck(data: any[][], key: string): number {
+  const keyIndex: number = data[0].indexOf('key');
+  for (let i = 1; i < data.length; i++) {
+    if (key === data[i][keyIndex]) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+export async function getSheet(sheets: sheets_v4.Sheets, sheetname: string) {
+  // const sheets = google.sheets({ version: 'v4', auth: client });
+  // client.authorize();
+  const sheetRequest = {
+    spreadsheetId: spreadsheetId,
+    range: sheetname,
+    valueRenderOption: 'FORMULA',
+    dateTimeRenderOption: 'FORMATTED_STRING',
+  };
+  // 추가할 항목의 중복 확인
+  return (
+    (await sheets.spreadsheets.values.get(sheetRequest)).data.values || [[]]
+  );
+}
+
+export async function addSheet(
+  type: 'World' | 'SuggestWorld' | 'TagStyle',
+  input: any,
 ): Promise<EditResult> {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
-  const protectedRangeId = await protectSheet(sheetId);
+
+  // 다른사람이 수정중인지확인
+  const protectedRangeId = await protectSheet(sheetInfos[type].sheetId);
   if (protectedRangeId < 0) {
     console.log('시트 수정중');
     return EditResult.PROTECTED;
   }
-  const worldData = await getWorldData();
-  const worldOutput = await autoFile(worldInput.url);
-  if (overLapCheck(worldData, worldOutput.key)) {
-    await unprotectSheet(protectedRangeId);
-    return EditResult.ALREADYEXIST;
+
+  // 추가할 항목의 중복검사를 위한 시트 요청생성
+  // const sheetRequest = {
+  //   spreadsheetId: spreadsheetId,
+  //   range: sheetInfos[type].sheetName,
+  //   valueRenderOption: 'FORMULA',
+  //   dateTimeRenderOption: 'FORMATTED_STRING',
+  // };
+  // 추가할 항목의 중복 확인
+  // const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
+  const values = await getSheet(sheets, sheetInfos[type].sheetName);
+  // console.log(values);
+  let sheetInput: any[] = [];
+  if (type === 'World') {
+    if (isWorldEditInput(input)) {
+      const worldOutput = await autoFile(input.url);
+      const index = sheetExistCheck(values, worldOutput.key);
+      if (index < 0) {
+        sheetInput = [
+          worldOutput.imageUrl,
+          worldOutput.name,
+          worldOutput.author,
+          input.description,
+          '#' + input.tags.join(' #'),
+          input.score,
+          input.url,
+          input.type,
+          worldOutput.date.toISOString().replace('T', ' ').split('.')[0],
+          worldOutput.key,
+        ];
+      } else {
+        await unprotectSheet(protectedRangeId);
+        return EditResult.ALREADYEXIST;
+      }
+    } else {
+      await unprotectSheet(protectedRangeId);
+      return EditResult.TYPEERROR;
+    }
+  } else if (type === 'SuggestWorld') {
+    if (!isSuggestWorld(input)) {
+      await unprotectSheet(protectedRangeId);
+      return EditResult.TYPEERROR;
+    }
+  } else if (type === 'TagStyle') {
+    if (!isTagStyle(input)) {
+      await unprotectSheet(protectedRangeId);
+      return EditResult.TYPEERROR;
+    }
+  } else {
+    return EditResult.TYPEERROR;
   }
-  try {
-    const values = [
-      [
-        '=Image("' + worldOutput.imageUrl + '",2)',
-        worldOutput.name,
-        worldOutput.author,
-        worldInput.description,
-        '#' + worldInput.tags.join(' #'),
-        '★'.repeat(worldInput.score),
-        worldInput.url,
-        worldInput.type,
-        worldOutput.date.toISOString().replace('T', ' ').split('.')[0],
-        worldOutput.key,
-      ],
-    ];
-    console.log('test');
-    const addrequest = {
-      spreadsheetId: spreadsheetId,
-      range: sheetName,
-      valueInputOption: 'USER_ENTERED',
-      resource: {
-        values: values,
-      },
-    };
-    await sheets.spreadsheets.values.append(addrequest);
-    await unprotectSheet(protectedRangeId);
-    return EditResult.SUCCESS;
-  } catch (e) {
-    console.log(e);
-    await unprotectSheet(protectedRangeId);
-    return EditResult.UNKNOWN;
-  }
+
+  const addrequest = {
+    spreadsheetId: spreadsheetId,
+    range: sheetInfos[type].sheetName,
+    valueInputOption: 'USER_ENTERED',
+    resource: {
+      values: [sheetInput],
+    },
+  };
+  await sheets.spreadsheets.values.append(addrequest);
+  await unprotectSheet(protectedRangeId);
+  return EditResult.SUCCESS;
 }
 
-export async function removeEditSheet(key: string): Promise<EditResult> {
+export async function removeSheet(
+  type: 'World' | 'SuggestWorld' | 'TagStyle',
+  key: string,
+): Promise<EditResult> {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
+
+  // 다른사람이 수정중인지확인
   const protectedRangeId = await protectSheet(sheetId);
   if (protectedRangeId < 0) {
     console.log('시트 수정중');
     return EditResult.PROTECTED;
   }
-  const worldData = await getWorldData();
-  let index = -1;
-  for (let i = 0; i < worldData.length; i++) {
-    if (key === worldData[i].key) {
-      index = i;
-      break;
-    }
-  }
+
+  // // 삭제할 항목의 위치를 얻기위한 시트 요청생성
+  // const sheetRequest = {
+  //   spreadsheetId: spreadsheetId,
+  //   range: sheetInfos[type].sheetName,
+  //   valueRenderOption: 'FORMULA',
+  //   dateTimeRenderOption: 'FORMATTED_STRING',
+  // };
+
+  // // 시트 요청및 삭제할 항목의 위치를 검색
+  // const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
+  // const values =
+  const values = await getSheet(sheets, sheetInfos[type].sheetName);
+  const index = sheetExistCheck(values, key);
 
   try {
     if (index !== -1) {
@@ -254,9 +328,9 @@ export async function removeEditSheet(key: string): Promise<EditResult> {
               deleteDimension: {
                 range: {
                   dimension: 'ROWS',
-                  sheetId: sheetId,
-                  startIndex: index + 1,
-                  endIndex: index + 2,
+                  sheetId: sheetInfos[type].sheetId,
+                  startIndex: index,
+                  endIndex: index + 1,
                 },
               },
             },
@@ -268,6 +342,86 @@ export async function removeEditSheet(key: string): Promise<EditResult> {
       return EditResult.SUCCESS;
     }
     await unprotectSheet(protectedRangeId);
+    return EditResult.NOTEXIST;
+  } catch (e) {
+    await unprotectSheet(protectedRangeId);
+    console.log(e);
+    return EditResult.UNKNOWN;
+  }
+}
+
+export async function modifySheet(
+  type: 'World' | 'SuggestWorld' | 'TagStyle',
+  key: string,
+  input: any,
+): Promise<EditResult> {
+  const sheets = google.sheets({ version: 'v4', auth: client });
+  const authClient = client.authorize();
+
+  // 다른사람이 수정중인지확인
+  const protectedRangeId = await protectSheet(sheetId);
+  if (protectedRangeId < 0) {
+    console.log('시트 수정중');
+    return EditResult.PROTECTED;
+  }
+  // 수정 항목의 위치를 얻기위한 시트 요청생성
+  // const sheetRequest = {
+  //   spreadsheetId: spreadsheetId,
+  //   range: sheetInfos[type].sheetName,
+  //   valueRenderOption: 'FORMULA',
+  //   dateTimeRenderOption: 'FORMATTED_STRING',
+  // };
+
+  // // 시트에서 수정할 항목의 위치를 검색
+  // const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
+  // const values =
+  const values = await getSheet(sheets, sheetInfos[type].sheetName);
+  const index = sheetExistCheck(values, key);
+
+  try {
+    if (index !== -1) {
+      let sheetInput: any[] = [];
+      let sheetRange = '';
+
+      // 수정내용 가공 및 수정 범위설정
+      if (type === 'World') {
+        sheetInput = [
+          input.description,
+          '#' + input.tags.join(' #'),
+          input.score,
+          input.url,
+          input.type,
+        ];
+        sheetRange = '!D' + (index + 1) + ':H' + (index + 1);
+      } else if (type === 'TagStyle') {
+        sheetInput = [input.tag, input.content, input.color];
+        sheetRange = '!A' + (index + 1) + ':C' + (index + 1);
+      } else if (type === 'SuggestWorld') {
+        sheetInput = [];
+        sheetRange = '!D' + (index + 1) + ':H' + (index + 1);
+      } else {
+        await unprotectSheet(protectedRangeId);
+        return EditResult.TYPEERROR;
+      }
+
+      // 수정할 시트에 대한 요청 생성
+      const request = {
+        spreadsheetId: spreadsheetId,
+        range: sheetInfos[type].sheetName + sheetRange,
+        valueInputOption: 'USER_ENTERED',
+        resource: {
+          values: [sheetInput],
+        },
+      };
+
+      // 요청보내기
+      await sheets.spreadsheets.values.update(request);
+      console.log('success');
+      await unprotectSheet(protectedRangeId);
+      return EditResult.SUCCESS;
+    }
+    await unprotectSheet(protectedRangeId);
+    //console.log(world);
     return EditResult.NOTEXIST;
   } catch (e) {
     await unprotectSheet(protectedRangeId);
@@ -302,7 +456,7 @@ export async function modifyEditSheet(
         [
           worldInput.description,
           '#' + worldInput.tags.join(' #'),
-          '★'.repeat(worldInput.score),
+          worldInput.score,
           worldInput.url,
           worldInput.type,
         ],
@@ -329,3 +483,102 @@ export async function modifyEditSheet(
     return EditResult.UNKNOWN;
   }
 }
+
+// export async function addEditSheet(
+//   worldInput: WorldEditInput,
+// ): Promise<EditResult> {
+//   const sheets = google.sheets({ version: 'v4', auth: client });
+//   const authClient = client.authorize();
+//   const protectedRangeId = await protectSheet(sheetId);
+//   if (protectedRangeId < 0) {
+//     console.log('시트 수정중');
+//     return EditResult.PROTECTED;
+//   }
+//   const worldData = await getWorldData();
+//   const worldOutput = await autoFile(worldInput.url);
+//   if (overLapCheck(worldData, worldOutput.key)) {
+//     await unprotectSheet(protectedRangeId);
+//     return EditResult.ALREADYEXIST;
+//   }
+//   try {
+//     const values = [
+//       [
+//         '=Image("' + worldOutput.imageUrl + '",2)',
+//         worldOutput.name,
+//         worldOutput.author,
+//         worldInput.description,
+//         '#' + worldInput.tags.join(' #'),
+//         '★'.repeat(worldInput.score),
+//         worldInput.url,
+//         worldInput.type,
+//         worldOutput.date.toISOString().replace('T', ' ').split('.')[0],
+//         worldOutput.key,
+//       ],
+//     ];
+//     console.log('test');
+//     const addrequest = {
+//       spreadsheetId: spreadsheetId,
+//       range: sheetName,
+//       valueInputOption: 'USER_ENTERED',
+//       resource: {
+//         values: values,
+//       },
+//     };
+//     await sheets.spreadsheets.values.append(addrequest);
+//     await unprotectSheet(protectedRangeId);
+//     return EditResult.SUCCESS;
+//   } catch (e) {
+//     console.log(e);
+//     await unprotectSheet(protectedRangeId);
+//     return EditResult.UNKNOWN;
+//   }
+// }
+
+// export async function removeEditSheet(key: string): Promise<EditResult> {
+//   const sheets = google.sheets({ version: 'v4', auth: client });
+//   const authClient = client.authorize();
+//   const protectedRangeId = await protectSheet(sheetId);
+//   if (protectedRangeId < 0) {
+//     console.log('시트 수정중');
+//     return EditResult.PROTECTED;
+//   }
+//   const worldData = await getWorldData();
+//   let index = -1;
+//   for (let i = 0; i < worldData.length; i++) {
+//     if (key === worldData[i].key) {
+//       index = i;
+//       break;
+//     }
+//   }
+
+//   try {
+//     if (index !== -1) {
+//       const request = {
+//         spreadsheetId: spreadsheetId,
+//         resource: {
+//           requests: [
+//             {
+//               deleteDimension: {
+//                 range: {
+//                   dimension: 'ROWS',
+//                   sheetId: sheetId,
+//                   startIndex: index + 1,
+//                   endIndex: index + 2,
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       };
+//       await sheets.spreadsheets.batchUpdate(request);
+//       await unprotectSheet(protectedRangeId);
+//       return EditResult.SUCCESS;
+//     }
+//     await unprotectSheet(protectedRangeId);
+//     return EditResult.NOTEXIST;
+//   } catch (e) {
+//     await unprotectSheet(protectedRangeId);
+//     console.log(e);
+//     return EditResult.UNKNOWN;
+//   }
+// }
