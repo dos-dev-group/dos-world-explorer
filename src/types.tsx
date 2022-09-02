@@ -77,7 +77,7 @@ export interface UserLogin {
 export type WorldData = World[];
 
 export interface Bookmarks {
-  [worldKeys: string]: string[];
+  [bookmarkType: string]: string[];
 }
 
 export enum EditResult {
