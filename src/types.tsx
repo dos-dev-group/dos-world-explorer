@@ -35,19 +35,6 @@ export type WorldVrcRaw = Omit<
   'description' | 'tags' | 'score' | 'date' | 'type'
 >;
 
-export interface SheetSuggestWorld {
-  key: string; // 유니크한 ID
-  name: string;
-  author: string;
-  description: string;
-  tags: string[];
-  score: number;
-  url: string;
-  imageUrl: string;
-  date: Date;
-  reviewer: string;
-}
-
 export interface TagStyle {
   tag: string;
   content: string[];
@@ -84,7 +71,7 @@ export interface UserLogin {
 export type WorldData = World[];
 
 export interface Bookmarks {
-  [worldKeys: string]: string[];
+  [bookmarkType: string]: string[];
 }
 
 export enum EditResult {
@@ -107,18 +94,6 @@ function test(): string {
 //   url: string;
 // }
 
-export interface World extends SheetBaseType {
-  name: string;
-  author: string;
-  description: string;
-  tags: string[];
-  score: number;
-  url: string;
-  imageUrl: string;
-  date: Date;
-  type: string;
-}
-
 export function isWorld(obj: any): obj is World {
   return (
     Object.keys(obj).sort().join(' ') ===
@@ -126,16 +101,11 @@ export function isWorld(obj: any): obj is World {
   );
 }
 
-export interface TagStyle extends SheetBaseType {
-  tag: string;
-  content: string[];
-  color: string;
-}
 export function isTagStyle(obj: any): obj is TagStyle {
   return Object.keys(obj).sort().join(' ') === 'color content key tag';
 }
 
-export interface SuggestWorld extends SheetBaseType {
+export interface SuggestWorld {
   name: string;
   author: string;
   description: string;
