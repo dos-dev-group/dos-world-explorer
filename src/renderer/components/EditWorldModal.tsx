@@ -90,7 +90,9 @@ function EditWorldModal(props: Props) {
       width="80%"
       okButtonProps={{
         disabled:
-          !URL_REGEX.test(curUrl || '') || worldCheckInfo === undefined
+          !URL_REGEX.test(curUrl || '') ||
+          worldCheckInfo === undefined ||
+          curType === undefined
             ? true
             : false,
       }}
@@ -102,6 +104,7 @@ function EditWorldModal(props: Props) {
         }}
         onSelect={(e: string) => setCurType(e)}
         value={curType}
+        status={curType === undefined ? 'error' : undefined}
       >
         {renderedOptions}
       </Select>

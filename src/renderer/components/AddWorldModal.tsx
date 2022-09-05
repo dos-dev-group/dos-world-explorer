@@ -91,7 +91,8 @@ function AddWorldModal(props: Props) {
         disabled:
           isChecking ||
           !URL_REGEX.test(curUrl || '') ||
-          worldCheckInfo === undefined
+          worldCheckInfo === undefined ||
+          curType === undefined
             ? true
             : false,
       }}
@@ -102,6 +103,7 @@ function AddWorldModal(props: Props) {
           width: 200,
         }}
         onSelect={(e: string) => setCurType(e)}
+        status={curType === undefined ? 'error' : undefined}
       >
         {renderedOptions}
       </Select>
