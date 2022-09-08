@@ -2,11 +2,11 @@ import { ipcMain, shell } from 'electron';
 import {
   testEditSheet,
   getWorldData,
-  modifyEditSheet,
   autoFile,
   addSheet,
   removeSheet,
   modifySheet,
+  getCheckerWorldData,
 } from './utils/editSheet';
 import {
   testVrchatAPI,
@@ -151,6 +151,10 @@ export default function setupIpcListener() {
     event.reply('getWorldDataToRenderer', await getWorldData());
   });
 
+  ipcMain.on('getCheckerWorldDataToMain', async (event, arg) => {
+    event.reply('getCheckerWorldDataToRenderer', await getCheckerWorldData());
+  });
+
   ipcMain.on('addSheetToMain', async (event, arg) => {
     event.reply(arg[2], await addSheet(arg[0], arg[1]));
   });
@@ -207,3 +211,7 @@ export default function setupIpcListener() {
 function getCurrentUserWorlds(): any {
   throw new Error('Function not implemented.');
 }
+function getCheckerWorlddData(): any {
+  throw new Error('Function not implemented.');
+}
+

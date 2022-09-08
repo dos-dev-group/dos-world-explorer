@@ -12,7 +12,12 @@ export interface World {
   date: Date;
   type: string;
 }
-
+export function isWorld(obj: any): obj is World {
+  return (
+    Object.keys(obj).sort().join(' ') ===
+    'author date description imageUrl key name score tags type url'
+  );
+}
 export type WorldPartialNonVrcInfo = Partial<World> & WorldVrcRaw;
 export type WorldEditInput = Pick<
   World,
@@ -39,6 +44,47 @@ export interface TagStyle {
   tag: string;
   content: string[];
   color: string;
+  key: string;
+}
+export function isTagStyle(obj: any): obj is TagStyle {
+  return Object.keys(obj).sort().join(' ') === 'color content key tag';
+}
+
+export type TagStyleInput = Pick<TagStyle, 'tag' | 'content' | 'color'>;
+
+export function isTagStyleInput(obj: any): obj is TagStyle {
+  return Object.keys(obj).sort().join(' ') === 'color content tag';
+}
+
+export interface CheckerWorld {
+  key: string;
+  name: string;
+  author: string;
+  description: string;
+  tags: string[];
+  score: number;
+  url: string;
+  imageUrl: string;
+  date: Date;
+  checker: string;
+}
+
+export function isCheckerWorld(obj: any): obj is CheckerWorld {
+  return (
+    Object.keys(obj).sort().join(' ') ===
+    'author checker date description imageUrl key name score tags url'
+  );
+}
+
+export type CheckerWorldEditInput = Pick<
+  CheckerWorld,
+  'description' | 'tags' | 'score' | 'url' | 'checker'
+>;
+
+export function isCheckerWorldEditInput(obj: any): obj is CheckerWorld {
+  return (
+    Object.keys(obj).sort().join(' ') === 'checker description score tags url'
+  );
 }
 
 export interface DosFavoriteWorldGroup {
@@ -69,6 +115,7 @@ export interface UserLogin {
 }
 
 export type WorldData = World[];
+export type CheckerWorldData = CheckerWorld[];
 
 export interface Bookmarks {
   [bookmarkType: string]: string[];
@@ -84,52 +131,4 @@ export enum EditResult {
 }
 function test(): string {
   return 'resr';
-}
-
-// export interface WorldEditInput {
-//   description: string;
-//   tags: string[];
-//   score: number;
-//   type: string;
-//   url: string;
-// }
-
-export function isWorld(obj: any): obj is World {
-  return (
-    Object.keys(obj).sort().join(' ') ===
-    'author date description imageUrl key name score tags type url'
-  );
-}
-
-export function isTagStyle(obj: any): obj is TagStyle {
-  return Object.keys(obj).sort().join(' ') === 'color content key tag';
-}
-
-export interface SuggestWorld {
-  name: string;
-  author: string;
-  description: string;
-  tags: string[];
-  score: number;
-  url: string;
-  imageUrl: string;
-  date: Date;
-  checker: string;
-}
-export function isSuggestWorld(obj: any): obj is SuggestWorld {
-  return (
-    Object.keys(obj).sort().join(' ') ===
-    'author checker date description imageUrl key name score tags url'
-  );
-}
-
-export interface SuggestWorldEditInput {
-  name: string;
-  author: string;
-  description: string;
-  tags: string[];
-  score: number;
-}
-export function isSuggestWorldEditInput(obj: any): obj is SuggestWorld {
-  return Object.keys(obj).sort().join(' ') === 'description score tags url';
 }

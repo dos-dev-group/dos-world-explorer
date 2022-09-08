@@ -1,5 +1,6 @@
 import { google, sheets_v4 } from 'googleapis';
 import axios from 'axios';
+import { v4 } from 'uuid';
 import {
   World,
   WorldData,
@@ -8,8 +9,12 @@ import {
   EditResult,
   SheetBaseType,
   isWorldEditInput,
-  isSuggestWorld,
+  isCheckerWorld,
   isTagStyle,
+  isTagStyleInput,
+  isCheckerWorldEditInput,
+  CheckerWorld,
+  CheckerWorldData,
 } from '../../types';
 import keys from '../../../secret/sheetAuth.json';
 import sheetData from '../../../secret/sheetData.json';
@@ -22,7 +27,7 @@ const sheetName = sheetData.sheetName;
 const sheetInfos = {
   World: { sheetName: 'sheet1', sheetId: 209660619 },
   TagStyle: { sheetName: 'tagData', sheetId: 1994142434 },
-  SuggestWorld: { sheetName: 'suggest_sheet1', sheetId: 765529254 },
+  CheckerWorld: { sheetName: 'checker_sheet1', sheetId: 765529254 },
 };
 
 const client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
@@ -105,6 +110,39 @@ export async function getWorldData(): Promise<WorldData> {
     worldData.push(world);
   });
   return worldData;
+}
+
+export async function getCheckerWorldData(): Promise<CheckerWorldData> {
+  const sheets = google.sheets({ version: 'v4', auth: client });
+  const authClient = client.authorize();
+  //console.log(types);
+  const sheetRequest = {
+    spreadsheetId: spreadsheetId,
+    range: 'checker_sheet1',
+    valueRenderOption: 'FORMULA',
+    dateTimeRenderOption: 'FORMATTED_STRING',
+  };
+  const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
+  const checkerWorldData: CheckerWorld[] = [];
+  const values = sheetResponse.data.values || [[]];
+  console.log(values[0]);
+  values.slice(1).forEach((value) => {
+    const checkerWorld: CheckerWorld = {
+      key: value[9], // 월드 고유ID
+      name: String(value[1]),
+      author: String(value[2]),
+      description: String(value[3]),
+      tags: value[4].replaceAll(' ', '').substr(1).split('#'),
+      score: value[5],
+      url: value[6],
+      imageUrl: value[0],
+      date: new Date(value[8] + 'z'),
+      checker: value[7],
+    };
+    // console.log(world);
+    checkerWorldData.push(checkerWorld);
+  });
+  return checkerWorldData;
 }
 
 async function protectSheet(sheetID: number): Promise<number> {
@@ -213,7 +251,7 @@ export async function getSheet(sheets: sheets_v4.Sheets, sheetname: string) {
 }
 
 export async function addSheet(
-  type: 'World' | 'SuggestWorld' | 'TagStyle',
+  type: 'World' | 'CheckerWorld' | 'TagStyle',
   input: any,
 ): Promise<EditResult> {
   const sheets = google.sheets({ version: 'v4', auth: client });
@@ -263,13 +301,52 @@ export async function addSheet(
       await unprotectSheet(protectedRangeId);
       return EditResult.TYPEERROR;
     }
-  } else if (type === 'SuggestWorld') {
-    if (!isSuggestWorld(input)) {
+  } else if (type === 'CheckerWorld') {
+    if (isCheckerWorldEditInput(input)) {
+      const worldOutput = await autoFile(input.url);
+      const index = sheetExistCheck(
+        values,
+        'cwrld_' +
+          input.checker.split('_')[1] +
+          '_' +
+          worldOutput.key.split('_')[1],
+      );
+      if (index < 0) {
+        sheetInput = [
+          worldOutput.imageUrl,
+          worldOutput.name,
+          worldOutput.author,
+          input.description,
+          '#' + input.tags.join(' #'),
+          input.score,
+          input.url,
+          input.checker,
+          worldOutput.date.toISOString().replace('T', ' ').split('.')[0],
+          'cwrld_' +
+            input.checker.split('_')[1] +
+            '_' +
+            worldOutput.key.split('_')[1],
+        ];
+      } else {
+        await unprotectSheet(protectedRangeId);
+        return EditResult.ALREADYEXIST;
+      }
+
+    } else {
       await unprotectSheet(protectedRangeId);
       return EditResult.TYPEERROR;
     }
   } else if (type === 'TagStyle') {
-    if (!isTagStyle(input)) {
+    if (isTagStyleInput(input)) {
+      console.log('test!!!');
+      let key = '';
+      while (true) {
+        key = 'tagid_' + v4();
+        if (sheetExistCheck(values, key) < 0) break;
+      }
+      sheetInput = [input.tag, input.content.join(','), input.color, key];
+    } else {
+      console.log('test2!!!');
       await unprotectSheet(protectedRangeId);
       return EditResult.TYPEERROR;
     }
@@ -291,14 +368,14 @@ export async function addSheet(
 }
 
 export async function removeSheet(
-  type: 'World' | 'SuggestWorld' | 'TagStyle',
+  type: 'World' | 'CheckerWorld' | 'TagStyle',
   key: string,
 ): Promise<EditResult> {
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
 
   // 다른사람이 수정중인지확인
-  const protectedRangeId = await protectSheet(sheetId);
+  const protectedRangeId = await protectSheet(sheetInfos[type].sheetId);
   if (protectedRangeId < 0) {
     console.log('시트 수정중');
     return EditResult.PROTECTED;
@@ -351,7 +428,7 @@ export async function removeSheet(
 }
 
 export async function modifySheet(
-  type: 'World' | 'SuggestWorld' | 'TagStyle',
+  type: 'World' | 'CheckerWorld' | 'TagStyle',
   key: string,
   input: any,
 ): Promise<EditResult> {
@@ -359,7 +436,7 @@ export async function modifySheet(
   const authClient = client.authorize();
 
   // 다른사람이 수정중인지확인
-  const protectedRangeId = await protectSheet(sheetId);
+  const protectedRangeId = await protectSheet(sheetInfos[type].sheetId);
   if (protectedRangeId < 0) {
     console.log('시트 수정중');
     return EditResult.PROTECTED;
@@ -394,11 +471,15 @@ export async function modifySheet(
         ];
         sheetRange = '!D' + (index + 1) + ':H' + (index + 1);
       } else if (type === 'TagStyle') {
-        sheetInput = [input.tag, input.content, input.color];
+        sheetInput = [input.tag, input.content.join(','), input.color];
         sheetRange = '!A' + (index + 1) + ':C' + (index + 1);
-      } else if (type === 'SuggestWorld') {
-        sheetInput = [];
-        sheetRange = '!D' + (index + 1) + ':H' + (index + 1);
+      } else if (type === 'CheckerWorld') {
+        sheetInput = [
+          input.description,
+          '#' + input.tags.join(' #'),
+          input.score,
+        ];
+        sheetRange = '!D' + (index + 1) + ':F' + (index + 1);
       } else {
         await unprotectSheet(protectedRangeId);
         return EditResult.TYPEERROR;
@@ -430,59 +511,59 @@ export async function modifySheet(
   }
 }
 
-export async function modifyEditSheet(
-  key: string,
-  worldInput: WorldEditInput,
-): Promise<EditResult> {
-  const sheets = google.sheets({ version: 'v4', auth: client });
-  const authClient = client.authorize();
-  const protectedRangeId = await protectSheet(sheetId);
-  if (protectedRangeId < 0) {
-    console.log('시트 수정중');
-    return EditResult.PROTECTED;
-  }
-  const worldData = await getWorldData();
-  let index = -1;
-  for (let i = 0; i < worldData.length; i++) {
-    if (key === worldData[i].key) {
-      index = i;
-      break;
-    }
-  }
+// export async function modifyEditSheet(
+//   key: string,
+//   worldInput: WorldEditInput,
+// ): Promise<EditResult> {
+//   const sheets = google.sheets({ version: 'v4', auth: client });
+//   const authClient = client.authorize();
+//   const protectedRangeId = await protectSheet(sheetId);
+//   if (protectedRangeId < 0) {
+//     console.log('시트 수정중');
+//     return EditResult.PROTECTED;
+//   }
+//   const worldData = await getWorldData();
+//   let index = -1;
+//   for (let i = 0; i < worldData.length; i++) {
+//     if (key === worldData[i].key) {
+//       index = i;
+//       break;
+//     }
+//   }
 
-  try {
-    if (index !== -1) {
-      const values = [
-        [
-          worldInput.description,
-          '#' + worldInput.tags.join(' #'),
-          worldInput.score,
-          worldInput.url,
-          worldInput.type,
-        ],
-      ];
+//   try {
+//     if (index !== -1) {
+//       const values = [
+//         [
+//           worldInput.description,
+//           '#' + worldInput.tags.join(' #'),
+//           worldInput.score,
+//           worldInput.url,
+//           worldInput.type,
+//         ],
+//       ];
 
-      const request = {
-        spreadsheetId: spreadsheetId,
-        range: sheetName + '!D' + (index + 2) + ':H' + (index + 2),
-        valueInputOption: 'USER_ENTERED',
-        resource: {
-          values: values,
-        },
-      };
-      await sheets.spreadsheets.values.update(request);
-      await unprotectSheet(protectedRangeId);
-      return EditResult.SUCCESS;
-    }
-    await unprotectSheet(protectedRangeId);
-    //console.log(world);
-    return EditResult.NOTEXIST;
-  } catch (e) {
-    await unprotectSheet(protectedRangeId);
-    console.log(e);
-    return EditResult.UNKNOWN;
-  }
-}
+//       const request = {
+//         spreadsheetId: spreadsheetId,
+//         range: sheetName + '!D' + (index + 2) + ':H' + (index + 2),
+//         valueInputOption: 'USER_ENTERED',
+//         resource: {
+//           values: values,
+//         },
+//       };
+//       await sheets.spreadsheets.values.update(request);
+//       await unprotectSheet(protectedRangeId);
+//       return EditResult.SUCCESS;
+//     }
+//     await unprotectSheet(protectedRangeId);
+//     //console.log(world);
+//     return EditResult.NOTEXIST;
+//   } catch (e) {
+//     await unprotectSheet(protectedRangeId);
+//     console.log(e);
+//     return EditResult.UNKNOWN;
+//   }
+// }
 
 // export async function addEditSheet(
 //   worldInput: WorldEditInput,
