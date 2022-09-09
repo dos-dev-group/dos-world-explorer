@@ -15,6 +15,8 @@ import {
   isCheckerWorldEditInput,
   CheckerWorld,
   CheckerWorldData,
+  TagStyle,
+  TagStyleData,
 } from '../../types';
 import keys from '../../../secret/sheetAuth.json';
 import sheetData from '../../../secret/sheetData.json';
@@ -105,6 +107,32 @@ export async function getWorldData(): Promise<WorldData> {
       imageUrl: value[0],
       date: new Date(value[8] + 'z'),
       type: value[7],
+    };
+    // console.log(world);
+    worldData.push(world);
+  });
+  return worldData;
+}
+
+export async function getTagStyleData(): Promise<TagStyleData> {
+  const sheets = google.sheets({ version: 'v4', auth: client });
+  const authClient = client.authorize();
+  //console.log(types);
+  const sheetRequest = {
+    spreadsheetId: spreadsheetId,
+    range: 'tagData',
+    valueRenderOption: 'FORMULA',
+    dateTimeRenderOption: 'FORMATTED_STRING',
+  };
+  const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
+  const worldData: TagStyle[] = [];
+  const values = sheetResponse.data.values || [[]];
+  values.slice(1).forEach((value) => {
+    const world: TagStyle = {
+      tag: value[0],
+      content: value[1].split(','),
+      color: value[2],
+      key: value[3],
     };
     // console.log(world);
     worldData.push(world);
