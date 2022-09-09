@@ -5,7 +5,14 @@ import { constants } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { app, shell } from 'electron';
-import { CurrentUser, FavoriteGroup, FavoriteType, LimitedUser, LimitedWorld, User } from 'vrchat';
+import {
+  CurrentUser,
+  FavoriteGroup,
+  FavoriteType,
+  LimitedUser,
+  LimitedWorld,
+  User,
+} from 'vrchat';
 import { off } from 'process';
 import { DosFavoriteWorldGroup, WorldVrcRaw } from '../../types';
 
@@ -228,9 +235,10 @@ export async function sendSelfInvite(
   instanceId: string,
 ): Promise<string> {
   await authCheck();
-  const instancesApi = new vrchat.InstancesApi();
-  return instancesApi
-    .sendSelfInvite(worldId, instanceId)
+  const inviteApi = new vrchat.InviteApi();
+
+  return inviteApi
+    .inviteMyselfTo(worldId, instanceId)
     .then((res) => {
       console.log(res.data);
       return 'ok';
