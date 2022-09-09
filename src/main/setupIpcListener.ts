@@ -7,6 +7,7 @@ import {
   removeSheet,
   modifySheet,
   getCheckerWorldData,
+  getTagStyleData,
 } from './utils/editSheet';
 import {
   testVrchatAPI,
@@ -153,6 +154,10 @@ export default function setupIpcListener() {
 
   ipcMain.on('getCheckerWorldDataToMain', async (event, arg) => {
     event.reply('getCheckerWorldDataToRenderer', await getCheckerWorldData());
+  });
+
+  ipcMain.on('getTagStyleDataToMain', async (event, arg) => {
+    event.reply('getTagStyleDataToRenderer', await getTagStyleData());
   });
 
   ipcMain.on('addSheetToMain', async (event, arg) => {

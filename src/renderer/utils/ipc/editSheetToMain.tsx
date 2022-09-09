@@ -9,6 +9,7 @@ import {
   TagStyleInput,
   CheckerWorldEditInput,
   CheckerWorldData,
+  TagStyleData,
 } from '@src/types';
 import { NoDataError } from '../error';
 
@@ -44,6 +45,19 @@ export function getCheckerWorldDataToMain() {
       'getCheckerWorldDataToRenderer',
       (result: unknown) => {
         resolve(result as CheckerWorldData);
+      },
+    );
+  });
+}
+
+export function getTagStyleDataToMain() {
+  console.log('getTagStyleDataToMain test');
+  window.electron.ipcRenderer.sendMessage('getTagStyleDataToMain', []);
+  return new Promise<TagStyleData>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'getTagStyleDataToRenderer',
+      (result: unknown) => {
+        resolve(result as TagStyleData);
       },
     );
   });

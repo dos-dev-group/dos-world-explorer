@@ -1,3 +1,4 @@
+import { type } from 'os';
 import { FavoriteGroup, LimitedWorld } from 'vrchat';
 
 export interface World {
@@ -116,6 +117,7 @@ export interface UserLogin {
 
 export type WorldData = World[];
 export type CheckerWorldData = CheckerWorld[];
+export type TagStyleData = TagStyle[];
 
 export interface Bookmarks {
   [bookmarkType: string]: string[];
