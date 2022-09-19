@@ -24,6 +24,8 @@ import {
   getFavoritedWorlds,
   addFavoriteWorld,
   removeFavoriteWorld,
+  getVrchatlabWorlds,
+  getVrchatNewWorlds,
 } from './utils/vrchatAPI';
 import {
   loadBookmarkFromFileDialog,
@@ -105,13 +107,13 @@ export default function setupIpcListener() {
   ipcMain.on('getVrchatlabWorldsToMain', async (event, arg) => {
     event.reply(
       'getVrchatlabWorldsToRenderer',
-      await getVrchatRecentWorlds(arg[0], arg[1]),
+      await getVrchatlabWorlds(arg[0], arg[1]),
     );
   });
   ipcMain.on('getVrchatNewWorldsToMain', async (event, arg) => {
     event.reply(
       'getVrchatNewWorldsToRenderer',
-      await getVrchatRecentWorlds(arg[0], arg[1]),
+      await getVrchatNewWorlds(arg[0], arg[1]),
     );
   });
 
@@ -219,4 +221,3 @@ function getCurrentUserWorlds(): any {
 function getCheckerWorlddData(): any {
   throw new Error('Function not implemented.');
 }
-

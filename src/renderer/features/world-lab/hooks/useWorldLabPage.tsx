@@ -4,7 +4,10 @@ import {
   addEditSheetToMain,
   getWorldDataToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
-import { getVrchatRecentWorldsToMain } from '@src/renderer/utils/ipc/vrchatAPIToMain';
+import {
+  getVrchatlabWorldsToMain,
+  getVrchatRecentWorldsToMain,
+} from '@src/renderer/utils/ipc/vrchatAPIToMain';
 import { World, WorldEditInput, WorldVrcRaw } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
@@ -21,7 +24,7 @@ interface HookMember {
   typeList: string[];
 
   onClickRefresh(): void;
-  onChangePage(page: number): void;
+  onChangePage(page: number, pageSize: number): void;
   onOpenAddWorldModal(world: WorldVrcRaw): void;
   onCloseAddWorldModal(): void;
   onOpenWorldInfoModal(world: WorldVrcRaw): void;
@@ -30,9 +33,9 @@ interface HookMember {
   onClickLoadMore(): void;
 }
 
-const useWorldRecentPage = (): HookMember => {
+const useWorldLabPage = (): HookMember => {
   const [worldData, setWorldData] = useRecoilState(worldDataState);
-  const [recentWorlds, setRecentWorlds] = useState<WorldVrcRaw[]>([]);
+  const [newWorlds, setNewWorlds] = useState<WorldVrcRaw[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [queryOffset, setQueryOffset] = useState(0);
@@ -48,8 +51,8 @@ const useWorldRecentPage = (): HookMember => {
   }, [setWorldData, worldData]);
 
   useEffect(() => {
-    getVrchatRecentWorldsToMain().then((w) => {
-      setRecentWorlds(w);
+    getVrchatlabWorldsToMain(0, LIMIT).then((w) => {
+      setNewWorlds(w);
       setIsLoading(false);
       setQueryOffset(0 + LIMIT);
     });
@@ -68,7 +71,7 @@ const useWorldRecentPage = (): HookMember => {
 
   const hookMember: HookMember = {
     isLoading,
-    currentTableData: recentWorlds,
+    currentTableData: newWorlds,
     currentPage,
     infoModalWorld,
     addModalWorld,
@@ -77,11 +80,11 @@ const useWorldRecentPage = (): HookMember => {
     onClickRefresh(): void {
       setIsLoading(true);
       getVrchatRecentWorldsToMain().then((w) => {
-        setRecentWorlds(w);
+        setNewWorlds(w);
         setIsLoading(false);
       });
     },
-    onChangePage(page: number): void {
+    onChangePage(page: number, pageSize: number): void {
       setCurrentPage(page);
     },
     onOpenAddWorldModal(world: WorldVrcRaw): void {
@@ -105,8 +108,8 @@ const useWorldRecentPage = (): HookMember => {
     },
     onClickLoadMore(): void {
       setIsLoading(true);
-      getVrchatRecentWorldsToMain(queryOffset, LIMIT).then((w) => {
-        setRecentWorlds((old) => [...old, ...w]);
+      getVrchatlabWorldsToMain(queryOffset, LIMIT).then((w) => {
+        setNewWorlds((old) => old.concat(w));
         setIsLoading(false);
         setQueryOffset(queryOffset + LIMIT);
       });
@@ -114,4 +117,4 @@ const useWorldRecentPage = (): HookMember => {
   };
   return hookMember;
 };
-export default useWorldRecentPage;
+export default useWorldLabPage;
