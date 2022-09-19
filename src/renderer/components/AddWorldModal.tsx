@@ -126,7 +126,6 @@ function AddWorldModal(props: Props) {
             onClick={() => {
               setIsChecking(true);
               autoFileToMain(curUrl!).then((info) => {
-                console.log('autoFileToMain');
                 setWorldCheckInfo(info);
                 setIsChecking(false);
               });

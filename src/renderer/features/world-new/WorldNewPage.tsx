@@ -28,15 +28,15 @@ import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World, WorldVrcRaw } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import AddWorldModal from '@src/renderer/components/AddWorldModal';
-import useWorldRecentPage from './hooks/useWorldRecentPage';
+import useWorldNewPage from './hooks/useWorldNewPage';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
 
-export default function WorldRecentPage() {
-  const hookMember = useWorldRecentPage();
+export default function WorldNewPage() {
+  const hookMember = useWorldNewPage();
 
   return (
     <Flex

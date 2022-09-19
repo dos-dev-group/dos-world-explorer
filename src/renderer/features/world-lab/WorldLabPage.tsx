@@ -28,15 +28,15 @@ import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World, WorldVrcRaw } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import AddWorldModal from '@src/renderer/components/AddWorldModal';
-import useWorldRecentPage from './hooks/useWorldRecentPage';
+import useWorldLabPage from './hooks/useWorldLabPage';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
 
-export default function WorldRecentPage() {
-  const hookMember = useWorldRecentPage();
+export default function WorldLabPage() {
+  const hookMember = useWorldLabPage();
 
   return (
     <Flex
@@ -83,7 +83,7 @@ export default function WorldRecentPage() {
           pagination={{
             showQuickJumper: true,
             onChange: (page, pageSize) => {
-              hookMember.onChangePage(page);
+              hookMember.onChangePage(page, pageSize);
             },
             current: hookMember.currentPage,
           }}
