@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Flex, FlexCenter } from '@src/renderer/components/styledComponents';
-import {
-  World,
-  WorldEditInput,
-  WorldPartialNonVrcInfo,
-  WorldVrcRaw,
-} from '@src/types';
-import { Button, Image, Input, message, Modal, Select, Typography } from 'antd';
-import { URL_REGEX } from '@src/renderer/utils/constants';
+import { FlexCenter } from '@src/renderer/components/styledComponents';
+import { WorldPartial } from '@src/types';
+import { Button, Image, message, Modal, Select, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { spacing } from '@src/renderer/utils/styling';
 import { useVrcCurrentUser } from '../data/user';
@@ -16,7 +10,7 @@ import { sendSelfInviteToMain } from '../utils/ipc/vrchatAPIToMain';
 interface Props {
   onCancel?: () => void;
   visible: boolean;
-  world?: WorldPartialNonVrcInfo;
+  world?: WorldPartial;
 }
 
 const InstanceTypes: string[] = [
@@ -71,7 +65,7 @@ function WorldInstanceCreationModal(props: Props) {
       width="50%"
       onCancel={props.onCancel}
       onOk={async () => {
-        if (props.world && instanceId) {
+        if (props.world?.key && instanceId) {
           try {
             await sendSelfInviteToMain(props.world.key, instanceId);
             message.success('셀프초대를 보냈습니다!');

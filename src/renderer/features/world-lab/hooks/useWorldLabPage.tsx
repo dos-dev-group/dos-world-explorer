@@ -1,33 +1,30 @@
 import { worldDataState } from '@src/renderer/data/world';
-import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
+import convertLimitedWorldToDosWorld from '@src/renderer/utils/convertLimitedWorldToDosWorld';
 import {
   addEditSheetToMain,
   getWorldDataToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
-import {
-  getVrchatlabWorldsToMain,
-  getVrchatRecentWorldsToMain,
-} from '@src/renderer/utils/ipc/vrchatAPIToMain';
-import { World, WorldEditInput, WorldVrcRaw } from '@src/types';
+import { getVrchatlabWorldsToMain } from '@src/renderer/utils/ipc/vrchatAPIToMain';
+import { World, WorldEditInput, WorldPartial } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 interface HookMember {
   isLoading: boolean;
-  currentTableData: WorldVrcRaw[];
+  currentTableData: WorldPartial[];
   currentPage: number;
-  infoModalWorld?: WorldVrcRaw;
-  addModalWorld?: WorldVrcRaw;
+  infoModalWorld?: WorldPartial;
+  addModalWorld?: WorldPartial;
   typeList: string[];
   canLoadMore: boolean;
   queryLimit: number;
 
   onClickRefresh(): void;
   onChangePage(page: number, pageSize: number): void;
-  onOpenAddWorldModal(world: WorldVrcRaw): void;
+  onOpenAddWorldModal(world: WorldPartial): void;
   onCloseAddWorldModal(): void;
-  onOpenWorldInfoModal(world: WorldVrcRaw): void;
+  onOpenWorldInfoModal(world: WorldPartial): void;
   onCloseWorldInfoModal(): void;
   onAddWorld(world: WorldEditInput): void;
   onClickLoadMore(): void;
@@ -36,14 +33,14 @@ interface HookMember {
 
 const useWorldLabPage = (): HookMember => {
   const [worldData, setWorldData] = useRecoilState(worldDataState);
-  const [newWorlds, setNewWorlds] = useState<WorldVrcRaw[]>([]);
+  const [newWorlds, setNewWorlds] = useState<WorldPartial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [queryOffset, setQueryOffset] = useState(0);
   const [queryLimit, setQueryLimit] = useState(30);
   const [canLoadMore, setCanLoadMore] = useState(true);
-  const [infoModalWorld, setInfoModalWorld] = useState<WorldVrcRaw>();
-  const [addModalWorld, setAddModalWorld] = useState<WorldVrcRaw>();
+  const [infoModalWorld, setInfoModalWorld] = useState<WorldPartial>();
+  const [addModalWorld, setAddModalWorld] = useState<WorldPartial>();
 
   useEffect(() => {
     if (worldData === undefined) {
@@ -55,7 +52,7 @@ const useWorldLabPage = (): HookMember => {
 
   useEffect(() => {
     getVrchatlabWorldsToMain(0, queryLimit).then((w) => {
-      setNewWorlds(w);
+      setNewWorlds(w.map(convertLimitedWorldToDosWorld));
       setIsLoading(false);
       setQueryOffset(0 + queryLimit);
       if (w.length < queryLimit) {
@@ -90,7 +87,7 @@ const useWorldLabPage = (): HookMember => {
       setIsLoading(true);
       getVrchatlabWorldsToMain(0, queryLimit).then((w) => {
         setQueryOffset(queryLimit);
-        setNewWorlds(w);
+        setNewWorlds(w.map(convertLimitedWorldToDosWorld));
         setIsLoading(false);
         setCanLoadMore(true);
       });
@@ -98,13 +95,13 @@ const useWorldLabPage = (): HookMember => {
     onChangePage(page: number, pageSize: number): void {
       setCurrentPage(page);
     },
-    onOpenAddWorldModal(world: WorldVrcRaw): void {
+    onOpenAddWorldModal(world: WorldPartial): void {
       setAddModalWorld(world);
     },
     onCloseAddWorldModal(): void {
       setAddModalWorld(undefined);
     },
-    onOpenWorldInfoModal(world: WorldVrcRaw): void {
+    onOpenWorldInfoModal(world: WorldPartial): void {
       setInfoModalWorld(world);
     },
     onCloseWorldInfoModal(): void {
@@ -120,7 +117,7 @@ const useWorldLabPage = (): HookMember => {
     onClickLoadMore(): void {
       setIsLoading(true);
       getVrchatlabWorldsToMain(queryOffset, queryLimit).then((w) => {
-        setNewWorlds((old) => old.concat(w));
+        setNewWorlds((old) => old.concat(w.map(convertLimitedWorldToDosWorld)));
         setIsLoading(false);
         setQueryOffset(queryOffset + queryLimit);
         if (w.length < queryLimit) {

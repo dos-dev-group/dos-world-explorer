@@ -14,7 +14,7 @@ import {
   User,
 } from 'vrchat';
 import { off } from 'process';
-import { DosFavoriteWorldGroup, WorldVrcRaw } from '../../types';
+import { DosFavoriteWorldGroup } from '../../types';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -302,7 +302,7 @@ export async function getNowinstancePeople() {
 export async function getVrchatRecentWorlds(
   offset?: number,
   limit?: number,
-): Promise<WorldVrcRaw[]> {
+): Promise<LimitedWorld[]> {
   await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   await authenticationApi.getCurrentUser();
@@ -313,26 +313,26 @@ export async function getVrchatRecentWorlds(
     'descending',
     offset,
   ).then((res) => {
-    const worlds: WorldVrcRaw[] = [];
-    const worldRowdata = res.data;
-    for (let i = 0; i < worldRowdata.length; i++) {
-      worlds.push({
-        key: worldRowdata[i].id, // key
-        name: worldRowdata[i].name, // name
-        author: worldRowdata[i].authorName, // author
-        url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
-        imageUrl: worldRowdata[i].imageUrl, // imageUrl
-      });
-    }
+    // const worlds: WorldVrcRaw[] = [];
+    // const worldRowdata = res.data;
+    // for (let i = 0; i < worldRowdata.length; i++) {
+    //   worlds.push({
+    //     key: worldRowdata[i].id, // key
+    //     name: worldRowdata[i].name, // name
+    //     author: worldRowdata[i].authorName, // author
+    //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
+    //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
+    //   });
+    // }
     // console.log(worlds);
-    return worlds;
+    return res.data;
   });
 }
 
 export async function getVrchatlabWorlds(
   offset?: number,
   limit?: number,
-): Promise<WorldVrcRaw[]> {
+): Promise<LimitedWorld[]> {
   await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   await authenticationApi.getCurrentUser();
@@ -345,25 +345,25 @@ export async function getVrchatlabWorlds(
     'descending',
     offset,
   ).then((res) => {
-    const worlds: WorldVrcRaw[] = [];
-    const worldRowdata = res.data;
-    for (let i = 0; i < worldRowdata.length; i++) {
-      worlds.push({
-        key: worldRowdata[i].id, // key
-        name: worldRowdata[i].name, // name
-        author: worldRowdata[i].authorName, // author
-        url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
-        imageUrl: worldRowdata[i].imageUrl, // imageUrl
-      });
-    }
-    return worlds;
+    // const worlds: WorldVrcRaw[] = [];
+    // const worldRowdata = res.data;
+    // for (let i = 0; i < worldRowdata.length; i++) {
+    //   worlds.push({
+    //     key: worldRowdata[i].id, // key
+    //     name: worldRowdata[i].name, // name
+    //     author: worldRowdata[i].authorName, // author
+    //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
+    //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
+    //   });
+    // }
+    return res.data;
   });
 }
 
 export async function getVrchatNewWorlds(
   offset?: number,
   limit?: number,
-): Promise<WorldVrcRaw[]> {
+): Promise<LimitedWorld[]> {
   await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   await authenticationApi.getCurrentUser();
@@ -376,18 +376,18 @@ export async function getVrchatNewWorlds(
     'descending',
     offset,
   ).then((res) => {
-    const worlds: WorldVrcRaw[] = [];
-    const worldRowdata = res.data;
-    for (let i = 0; i < worldRowdata.length; i++) {
-      worlds.push({
-        key: worldRowdata[i].id, // key
-        name: worldRowdata[i].name, // name
-        author: worldRowdata[i].authorName, // author
-        url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
-        imageUrl: worldRowdata[i].imageUrl, // imageUrl
-      });
-    }
-    return worlds;
+    // const worlds: LimitedWorld[] = [];
+    // const worldRowdata = res.data;
+    // for (let i = 0; i < worldRowdata.length; i++) {
+    //   worlds.push({
+    //     key: worldRowdata[i].id, // key
+    //     name: worldRowdata[i].name, // name
+    //     author: worldRowdata[i].authorName, // author
+    //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
+    //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
+    //   });
+    // }
+    return res.data;
   });
 }
 

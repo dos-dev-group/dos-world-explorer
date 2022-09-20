@@ -27,7 +27,7 @@ import {
 } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
-import { World, WorldVrcRaw } from '@src/types';
+import { World, WorldPartial } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import AddWorldModal from '@src/renderer/components/AddWorldModal';
 import useWorldLabPage from './hooks/useWorldLabPage';
@@ -160,7 +160,7 @@ export default function WorldLabPage() {
             width={20}
             title="Link"
             key="link"
-            render={(_, world: WorldVrcRaw) => (
+            render={(_, world: WorldPartial) => (
               <a href={world.url} target="_blank" rel="noreferrer">
                 <Typography.Paragraph
                   copyable={{ text: world.url }}

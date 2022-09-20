@@ -19,7 +19,7 @@ export function isWorld(obj: any): obj is World {
     'author date description imageUrl key name score tags type url'
   );
 }
-export type WorldPartialNonVrcInfo = Partial<World> & WorldVrcRaw;
+export type WorldPartial = Partial<World>;
 export type WorldEditInput = Pick<
   World,
   'url' | 'description' | 'tags' | 'score' | 'type'
@@ -34,11 +34,6 @@ export function isWorldEditInput(obj: any): obj is WorldEditInput {
 export type WorldEditOutput = Omit<
   World,
   'url' | 'description' | 'tags' | 'score' | 'type'
->;
-
-export type WorldVrcRaw = Omit<
-  World,
-  'description' | 'tags' | 'score' | 'date' | 'type'
 >;
 
 export interface TagStyle {
