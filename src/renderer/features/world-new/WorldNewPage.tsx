@@ -8,6 +8,7 @@ import {
   Button,
   Image,
   Input,
+  InputNumber,
   Popconfirm,
   Select,
   Spin,
@@ -217,11 +218,11 @@ export default function WorldNewPage() {
         </Table>
         <FlexRow>
           <FlexRowCenter css={{ marginLeft: 'auto' }}>
-            <Input
+            <InputNumber
+              min={0}
+              max={100}
               value={hookMember.queryLimit}
-              onChange={(e) =>
-                hookMember.onChangeQueryLimit(Number(e.target.value))
-              }
+              onChange={(e) => hookMember.onChangeQueryLimit(e)}
             />
             개
             <Button
