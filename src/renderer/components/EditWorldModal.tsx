@@ -7,7 +7,7 @@ import {
   World,
   WorldEditInput,
   WorldEditOutput,
-  WorldPartialNonVrcInfo,
+  WorldPartial,
 } from '@src/types';
 import {
   Button,
@@ -30,7 +30,7 @@ interface Props {
   onEdit?: (key: string, e: WorldEditInput) => void;
   onCancel?: () => void;
   types: string[];
-  world?: WorldPartialNonVrcInfo;
+  world?: WorldPartial;
 }
 function EditWorldModal(props: Props) {
   const [curType, setCurType] = useState<string>();
@@ -57,13 +57,13 @@ function EditWorldModal(props: Props) {
       setCurDesc(props.world.description);
       setCurTags(props.world.tags || []);
       setCurScore(props.world.score || 1);
-      setWorldCheckInfo({
-        author: props.world.author,
-        date: props.world.date || new Date(),
-        key: props.world.key,
-        name: props.world.name,
-        imageUrl: props.world.imageUrl,
-      });
+      // setWorldCheckInfo({
+      //   author: props.world.author,
+      //   date: props.world.date || new Date(),
+      //   key: props.world.key,
+      //   name: props.world.name,
+      //   imageUrl: props.world.imageUrl,
+      // });
     }
   }, [props.world]);
 

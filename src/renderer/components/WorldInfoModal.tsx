@@ -1,13 +1,8 @@
 import { HeartFilled, HeartOutlined } from '@ant-design/icons';
-import { gold, red } from '@ant-design/colors';
+import { red } from '@ant-design/colors';
 import { FlexCenter, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
-import {
-  World,
-  WorldEditInput,
-  WorldPartialNonVrcInfo,
-  WorldVrcRaw,
-} from '@src/types';
+import { WorldPartial } from '@src/types';
 import { Button, Image, Modal, Popconfirm, Tag, Typography } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { format } from 'date-fns';
@@ -17,16 +12,13 @@ import WorldInstanceCreationModal from './WorldInstanceCreationModal';
 
 interface Props {
   onCancel?: () => void;
-  onEdit?: (world: WorldPartialNonVrcInfo) => void;
-  onRemove?: (world: WorldPartialNonVrcInfo) => void;
-  onClickBookmark?: (
-    world: WorldPartialNonVrcInfo,
-    isBookmarked: boolean,
-  ) => void;
+  onEdit?: (world: WorldPartial) => void;
+  onRemove?: (world: WorldPartial) => void;
+  onClickBookmark?: (world: WorldPartial, isBookmarked: boolean) => void;
 
   visible: boolean;
   isBookmarked?: boolean;
-  world?: WorldPartialNonVrcInfo;
+  world?: WorldPartial;
 }
 
 function WorldInfoModal(props: Props) {
@@ -127,15 +119,19 @@ function WorldInfoModal(props: Props) {
 
             <div css={{ flex: 1 }}>
               <FlexRow css={{ gap: spacing(1) }}>
-                <ButtonWorldLink
-                  worldKey={props.world.key}
-                  url={props.world.url}
-                />
-                {/* TODO: 월드 인스턴스 생성 */}
-                <ButtonInstanceCreation
-                  worldKey={props.world.key}
-                  onClickInstance={() => setVisibleInstanceModal(true)}
-                />
+                {props.world?.key && props.world?.url && (
+                  <>
+                    <ButtonWorldLink
+                      worldKey={props.world.key}
+                      url={props.world.url}
+                    />
+                    {/* TODO: 월드 인스턴스 생성 */}
+                    <ButtonInstanceCreation
+                      worldKey={props.world.key}
+                      onClickInstance={() => setVisibleInstanceModal(true)}
+                    />
+                  </>
+                )}
                 {props.onEdit && (
                   <Button
                     type="primary"

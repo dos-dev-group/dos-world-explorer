@@ -1,12 +1,12 @@
 import { worldBookmarksState } from '@src/renderer/data/bookmarks';
 import copyDeep from '@src/renderer/utils/copyDeep';
-import { World, WorldPartialNonVrcInfo } from '@src/types';
+import { World, WorldPartial } from '@src/types';
 import { message } from 'antd';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 interface HookMember {
-  onClickOpenBookmarkModal(world: WorldPartialNonVrcInfo): void;
+  onClickOpenBookmarkModal(world: WorldPartial): void;
   onCloseBookmarkModal(): void;
   onAddBookmarkType(bookmarkType: string): void;
   onEditBookmarkType(oldType: string, newType: string): void;
@@ -26,12 +26,12 @@ interface HookMember {
 
 const useBookmark = (): HookMember => {
   const [bookmarkTargetWorld, setBookmarkTargetWorld] =
-    useState<WorldPartialNonVrcInfo>();
+    useState<WorldPartial>();
   const [recoilBookmarks, setRecoilBookmarks] =
     useRecoilState(worldBookmarksState);
 
   const hookMember: HookMember = {
-    onClickOpenBookmarkModal(world: WorldPartialNonVrcInfo): void {
+    onClickOpenBookmarkModal(world: WorldPartial): void {
       setBookmarkTargetWorld(world);
     },
     onCloseBookmarkModal(): void {
@@ -95,12 +95,12 @@ const useBookmark = (): HookMember => {
       });
     },
     onAddBookmarkWorld(bookmarkType: string): void {
-      if (!bookmarkTargetWorld) return;
+      if (!bookmarkTargetWorld?.key) return;
       if (!recoilBookmarks) return;
 
       setRecoilBookmarks((b) => {
         const clone = copyDeep(b)!;
-        clone[bookmarkType] = [bookmarkTargetWorld.key].concat(
+        clone[bookmarkType] = [bookmarkTargetWorld.key!].concat(
           clone[bookmarkType],
         );
         return clone;

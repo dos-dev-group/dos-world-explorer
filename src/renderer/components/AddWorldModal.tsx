@@ -7,7 +7,7 @@ import {
   World,
   WorldEditInput,
   WorldEditOutput,
-  WorldPartialNonVrcInfo,
+  WorldPartial,
 } from '@src/types';
 import {
   Button,
@@ -31,7 +31,7 @@ interface Props {
   onCancel?: () => void;
   visible: boolean;
   types: string[];
-  defaultWorldInfo?: WorldPartialNonVrcInfo;
+  defaultWorldInfo?: WorldPartial;
 }
 function AddWorldModal(props: Props) {
   const [curType, setCurType] = useState<string>();
@@ -44,7 +44,7 @@ function AddWorldModal(props: Props) {
   const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
-    if (props.defaultWorldInfo && props.visible) {
+    if (props.defaultWorldInfo?.url && props.visible) {
       setCurUrl(props.defaultWorldInfo.url);
       setIsChecking(true);
       autoFileToMain(props.defaultWorldInfo.url).then((info) => {

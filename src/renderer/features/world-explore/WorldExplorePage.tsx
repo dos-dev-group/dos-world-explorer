@@ -27,25 +27,37 @@ import {
 } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
-import { World, WorldVrcRaw } from '@src/types';
+import { World, WorldPartial } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import AddWorldModal from '@src/renderer/components/AddWorldModal';
-import useWorldRecentPage from './hooks/useWorldRecentPage';
+import useWorldExplorePage, { TabKey } from './hooks/useWorldExplorePage';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
 
-export default function WorldRecentPage() {
-  const hookMember = useWorldRecentPage();
+export default function WorldExplorePage() {
+  const hookMember = useWorldExplorePage();
+
+  const renderedTabs = ['recent', 'new', 'lab'].map((e) => {
+    switch (e) {
+      case 'recent':
+        return <TabPane tab={'최근 월드'} key={e} />;
+      case 'new':
+        return <TabPane tab={'New 월드'} key={e} />;
+      case 'lab':
+        return <TabPane tab={'Lab 월드'} key={e} />;
+      default:
+        return <TabPane tab={'에러 key Name: ' + e} key={e} />;
+    }
+  });
 
   return (
     <Flex
       css={{
         paddingLeft: spacing(1),
         paddingRight: spacing(1),
-        paddingTop: spacing(4),
         position: 'relative',
       }}
     >
@@ -67,6 +79,13 @@ export default function WorldRecentPage() {
         types={hookMember.typeList}
         defaultWorldInfo={hookMember.addModalWorld}
       />
+
+      <Tabs
+        activeKey={hookMember.currentTab}
+        onChange={(e) => hookMember.onClickChangeTab(e as TabKey)}
+      >
+        {renderedTabs}
+      </Tabs>
 
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
         <Button
@@ -160,7 +179,7 @@ export default function WorldRecentPage() {
             width={20}
             title="Link"
             key="link"
-            render={(_, world: WorldVrcRaw) => (
+            render={(_, world: WorldPartial) => (
               <a href={world.url} target="_blank" rel="noreferrer">
                 <Typography.Paragraph
                   copyable={{ text: world.url }}
@@ -229,7 +248,6 @@ export default function WorldRecentPage() {
               type="primary"
               css={{ marginLeft: spacing(1) }}
               onClick={() => hookMember.onClickLoadMore()}
-              disabled={!hookMember.canLoadMore}
             >
               더 불러오기
             </Button>

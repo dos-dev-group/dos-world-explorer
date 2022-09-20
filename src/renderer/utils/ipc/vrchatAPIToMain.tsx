@@ -1,4 +1,4 @@
-import { DosFavoriteWorldGroup, WorldVrcRaw } from '@src/types';
+import { DosFavoriteWorldGroup } from '@src/types';
 import { CurrentUser, LimitedWorld, User } from 'vrchat';
 
 export function testVrchatAPIToMain() {
@@ -135,11 +135,11 @@ export function getVrchatRecentWorldsToMain(offset?: number, limit?: number) {
     offset,
     limit,
   ]);
-  return new Promise<WorldVrcRaw[]>((resolve, reject) => {
+  return new Promise<LimitedWorld[]>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'getVrchatRencentWorldsToRenderer',
       (result: unknown) => {
-        resolve(result as WorldVrcRaw[]);
+        resolve(result as LimitedWorld[]);
       },
     );
   });
@@ -150,11 +150,11 @@ export function getVrchatlabWorldsToMain(offset?: number, limit?: number) {
     offset,
     limit,
   ]);
-  return new Promise<WorldVrcRaw[]>((resolve, reject) => {
+  return new Promise<LimitedWorld[]>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'getVrchatlabWorldsToRenderer',
       (result: unknown) => {
-        resolve(result as WorldVrcRaw[]);
+        resolve(result as LimitedWorld[]);
       },
     );
   });
@@ -165,11 +165,11 @@ export function getVrchatNewWorldsToMain(offset?: number, limit?: number) {
     offset,
     limit,
   ]);
-  return new Promise<WorldVrcRaw[]>((resolve, reject) => {
+  return new Promise<LimitedWorld[]>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'getVrchatNewWorldsToRenderer',
       (result: unknown) => {
-        resolve(result as WorldVrcRaw[]);
+        resolve(result as LimitedWorld[]);
       },
     );
   });
