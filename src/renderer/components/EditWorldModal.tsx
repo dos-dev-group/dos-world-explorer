@@ -67,6 +67,16 @@ function EditWorldModal(props: Props) {
     }
   }, [props.world]);
 
+  useEffect(() => {
+    if (!curUrl && props.world?.url) {
+      setIsChecking(true);
+      autoFileToMain(props.world.url).then((info) => {
+        setWorldCheckInfo(info);
+        setIsChecking(false);
+      });
+    }
+  }, [curUrl, props.world]);
+
   const renderedOptions = props.types
     .filter((e) => e !== '전체')
     .map((e) => <Select.Option key={e}>{e}</Select.Option>);
@@ -117,6 +127,7 @@ function EditWorldModal(props: Props) {
               setCurUrl(e.target.value);
               setWorldCheckInfo(undefined);
             }}
+            value={curUrl}
           />
           <Button
             css={{ marginLeft: spacing(1) }}
