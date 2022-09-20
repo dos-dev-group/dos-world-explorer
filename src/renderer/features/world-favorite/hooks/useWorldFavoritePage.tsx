@@ -1,14 +1,15 @@
+import { useFavoritedWorld } from '@src/renderer/data/favoritedWorld';
 import { worldDataState } from '@src/renderer/data/world';
 import convertLimitedWorldToDosWorld from '@src/renderer/utils/convertLimitedWorldToDosWorld';
 import {
   addEditSheetToMain,
   getWorldDataToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
-import { getVrchatlabWorldsToMain } from '@src/renderer/utils/ipc/vrchatAPIToMain';
 import { World, WorldEditInput, WorldPartial } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { FavoriteGroup } from 'vrchat';
 
 interface HookMember {
   isLoading: boolean;
@@ -17,50 +18,33 @@ interface HookMember {
   infoModalWorld?: WorldPartial;
   addModalWorld?: WorldPartial;
   typeList: string[];
-  canLoadMore: boolean;
-  queryLimit: number;
+  currentTab: string;
+  favoriteTabs: FavoriteGroup[];
 
   onClickRefresh(): void;
-  onChangePage(page: number, pageSize: number): void;
+  onChangePage(page: number): void;
   onOpenAddWorldModal(world: WorldPartial): void;
   onCloseAddWorldModal(): void;
   onOpenWorldInfoModal(world: WorldPartial): void;
   onCloseWorldInfoModal(): void;
   onAddWorld(world: WorldEditInput): void;
-  onClickLoadMore(): void;
-  onChangeQueryLimit(limit: number): void;
+  onClickChangeTab(tabKey: string): void;
 }
 
-const useWorldLabPage = (): HookMember => {
+const useWorldFavoritePage = (): HookMember => {
   const [worldData, setWorldData] = useRecoilState(worldDataState);
-  const [newWorlds, setNewWorlds] = useState<WorldPartial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [queryOffset, setQueryOffset] = useState(0);
-  const [queryLimit, setQueryLimit] = useState(30);
-  const [canLoadMore, setCanLoadMore] = useState(true);
+  const [currentTabId, setCurrentTabId] = useState<string>();
   const [infoModalWorld, setInfoModalWorld] = useState<WorldPartial>();
   const [addModalWorld, setAddModalWorld] = useState<WorldPartial>();
+  const favoritedWorldHookMember = useFavoritedWorld();
 
-  useEffect(() => {
-    if (worldData === undefined) {
-      getWorldDataToMain().then((data) => {
-        return setWorldData(data);
-      });
-    }
-  }, [setWorldData, worldData]);
-
-  useEffect(() => {
-    getVrchatlabWorldsToMain(0, queryLimit).then((w) => {
-      setNewWorlds(w.map(convertLimitedWorldToDosWorld));
-      setIsLoading(false);
-      setQueryOffset(0 + queryLimit);
-      if (w.length < queryLimit) {
-        setCanLoadMore(false);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const favoriteTabs = useMemo(
+    () =>
+      favoritedWorldHookMember.favoritedWorlds?.map((f) => f.groupInfo) || [],
+    [favoritedWorldHookMember.favoritedWorlds],
+  );
 
   const typeList = useMemo(
     () =>
@@ -73,26 +57,45 @@ const useWorldLabPage = (): HookMember => {
     [worldData],
   );
 
+  const currentTableData = useMemo(
+    () =>
+      favoritedWorldHookMember.favoritedWorlds
+        ?.filter((f) => f.groupInfo.id === currentTabId)
+        .flatMap((f) => f.favorites.map(convertLimitedWorldToDosWorld)) || [],
+    [currentTabId, favoritedWorldHookMember.favoritedWorlds],
+  );
+
+  useEffect(() => {
+    if (worldData === undefined) {
+      getWorldDataToMain().then((data) => {
+        return setWorldData(data);
+      });
+    }
+  }, [setWorldData, worldData]);
+
+  useEffect(() => {
+    if (favoritedWorldHookMember.favoritedWorlds && worldData !== undefined) {
+      setIsLoading(false);
+      const firstTab = favoriteTabs.concat().shift();
+      setCurrentTabId(firstTab?.id);
+    }
+  }, [favoriteTabs, favoritedWorldHookMember.favoritedWorlds, worldData]);
+
   const hookMember: HookMember = {
     isLoading,
-    currentTableData: newWorlds,
+    currentTableData: currentTableData || [],
     currentPage,
     infoModalWorld,
     addModalWorld,
     typeList,
-    canLoadMore,
-    queryLimit,
+    currentTab: currentTabId || '',
+    favoriteTabs,
 
     onClickRefresh(): void {
       setIsLoading(true);
-      getVrchatlabWorldsToMain(0, queryLimit).then((w) => {
-        setQueryOffset(queryLimit);
-        setNewWorlds(w.map(convertLimitedWorldToDosWorld));
-        setIsLoading(false);
-        setCanLoadMore(true);
-      });
+      favoritedWorldHookMember.refresh().then(() => setIsLoading(false));
     },
-    onChangePage(page: number, pageSize: number): void {
+    onChangePage(page: number): void {
       setCurrentPage(page);
     },
     onOpenAddWorldModal(world: WorldPartial): void {
@@ -114,21 +117,10 @@ const useWorldLabPage = (): HookMember => {
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()));
     },
-    onClickLoadMore(): void {
-      setIsLoading(true);
-      getVrchatlabWorldsToMain(queryOffset, queryLimit).then((w) => {
-        setNewWorlds((old) => old.concat(w.map(convertLimitedWorldToDosWorld)));
-        setIsLoading(false);
-        setQueryOffset(queryOffset + queryLimit);
-        if (w.length < queryLimit) {
-          setCanLoadMore(false);
-        }
-      });
-    },
-    onChangeQueryLimit(limit: number): void {
-      setQueryLimit(limit);
+    onClickChangeTab(tabId: string): void {
+      setCurrentTabId(tabId);
     },
   };
   return hookMember;
 };
-export default useWorldLabPage;
+export default useWorldFavoritePage;

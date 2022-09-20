@@ -30,22 +30,34 @@ import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World, WorldPartial } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import AddWorldModal from '@src/renderer/components/AddWorldModal';
-import useWorldLabPage from './hooks/useWorldLabPage';
+import useWorldExplorePage, { TabKey } from './hooks/useWorldExplorePage';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
 
-export default function WorldLabPage() {
-  const hookMember = useWorldLabPage();
+export default function WorldExplorePage() {
+  const hookMember = useWorldExplorePage();
+
+  const renderedTabs = ['recent', 'new', 'lab'].map((e) => {
+    switch (e) {
+      case 'recent':
+        return <TabPane tab={'최근 월드'} key={e} />;
+      case 'new':
+        return <TabPane tab={'New 월드'} key={e} />;
+      case 'lab':
+        return <TabPane tab={'Lab 월드'} key={e} />;
+      default:
+        return <TabPane tab={'에러 key Name: ' + e} key={e} />;
+    }
+  });
 
   return (
     <Flex
       css={{
         paddingLeft: spacing(1),
         paddingRight: spacing(1),
-        paddingTop: spacing(4),
         position: 'relative',
       }}
     >
@@ -68,6 +80,13 @@ export default function WorldLabPage() {
         defaultWorldInfo={hookMember.addModalWorld}
       />
 
+      <Tabs
+        activeKey={hookMember.currentTab}
+        onChange={(e) => hookMember.onClickChangeTab(e as TabKey)}
+      >
+        {renderedTabs}
+      </Tabs>
+
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
         <Button
           size="small"
@@ -85,7 +104,7 @@ export default function WorldLabPage() {
           pagination={{
             showQuickJumper: true,
             onChange: (page, pageSize) => {
-              hookMember.onChangePage(page, pageSize);
+              hookMember.onChangePage(page);
             },
             current: hookMember.currentPage,
           }}
@@ -229,7 +248,6 @@ export default function WorldLabPage() {
               type="primary"
               css={{ marginLeft: spacing(1) }}
               onClick={() => hookMember.onClickLoadMore()}
-              disabled={!hookMember.canLoadMore}
             >
               더 불러오기
             </Button>

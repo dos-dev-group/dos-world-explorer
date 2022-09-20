@@ -29,9 +29,8 @@ import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
-import WorldLabPage from './features/world-lab/WorldLabPage';
-import WorldNewPage from './features/world-new/WorldNewPage';
-import WorldRecentPage from './features/world-recent/WorldRecentPage';
+import WorldExplorePage from './features/world-explore/WorldExplorePage';
+import WorldFavoritePage from './features/world-favorite/WorldFavoritePage';
 import WorldSheetPage from './features/world-sheet/WorldSheetPage';
 
 const { Sider } = Layout;
@@ -50,9 +49,8 @@ export default function App() {
           <Route index element={<Navigate to="/sheet" />} />
           <Route path="sheet" element={<WorldSheetPage />} />
           <Route path="bookmark" element={<BookmarkPage />} />
-          <Route path="recent" element={<WorldRecentPage />} />
-          <Route path="new" element={<WorldNewPage />} />
-          <Route path="lab" element={<WorldLabPage />} />
+          <Route path="explore" element={<WorldExplorePage />} />
+          <Route path="favorite" element={<WorldFavoritePage />} />
         </Route>
         <Route path="login" element={<LoginPage />} />
       </Routes>
@@ -114,27 +112,19 @@ function MenuLayout() {
                 },
               },
               {
-                label: 'Recent',
-                key: 'recent',
+                label: 'Explore',
+                key: 'explore',
                 icon: <EyeOutlined />,
                 onClick(ev) {
-                  navigate('/recent');
+                  navigate('/explore');
                 },
               },
               {
-                label: 'New World',
-                key: 'new',
-                icon: <ThunderboltOutlined />,
+                label: 'VRC Favorite',
+                key: 'favorite',
+                icon: <StarOutlined />,
                 onClick(ev) {
-                  navigate('/new');
-                },
-              },
-              {
-                label: 'Lab World',
-                key: 'lab',
-                icon: <ExperimentOutlined />,
-                onClick(ev) {
-                  navigate('/lab');
+                  navigate('/favorite');
                 },
               },
               {

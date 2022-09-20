@@ -30,22 +30,25 @@ import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World, WorldPartial } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import AddWorldModal from '@src/renderer/components/AddWorldModal';
-import useWorldRecentPage from './hooks/useWorldRecentPage';
+import useWorldFavoritePage from './hooks/useWorldFavoritePage';
 
 const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
 
-export default function WorldRecentPage() {
-  const hookMember = useWorldRecentPage();
+export default function WorldFavoritePage() {
+  const hookMember = useWorldFavoritePage();
+
+  const renderedTabs = hookMember.favoriteTabs.map((e) => {
+    return <TabPane tab={e.displayName} key={e.id} />;
+  });
 
   return (
     <Flex
       css={{
         paddingLeft: spacing(1),
         paddingRight: spacing(1),
-        paddingTop: spacing(4),
         position: 'relative',
       }}
     >
@@ -67,6 +70,13 @@ export default function WorldRecentPage() {
         types={hookMember.typeList}
         defaultWorldInfo={hookMember.addModalWorld}
       />
+
+      <Tabs
+        activeKey={hookMember.currentTab}
+        onChange={(e) => hookMember.onClickChangeTab(e)}
+      >
+        {renderedTabs}
+      </Tabs>
 
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
         <Button
@@ -216,25 +226,6 @@ export default function WorldRecentPage() {
             )}
           />
         </Table>
-        <FlexRow>
-          <FlexRowCenter css={{ marginLeft: 'auto' }}>
-            <InputNumber
-              min={0}
-              max={100}
-              value={hookMember.queryLimit}
-              onChange={(e) => hookMember.onChangeQueryLimit(e)}
-            />
-            개
-            <Button
-              type="primary"
-              css={{ marginLeft: spacing(1) }}
-              onClick={() => hookMember.onClickLoadMore()}
-              disabled={!hookMember.canLoadMore}
-            >
-              더 불러오기
-            </Button>
-          </FlexRowCenter>
-        </FlexRow>
       </Spin>
     </Flex>
   );

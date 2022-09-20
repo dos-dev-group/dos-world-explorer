@@ -19,7 +19,7 @@ export function isWorld(obj: any): obj is World {
     'author date description imageUrl key name score tags type url'
   );
 }
-export type WorldPartial = Partial<World>;
+export type WorldPartial = Partial<World> & Pick<World, 'key'>;
 export type WorldEditInput = Pick<
   World,
   'url' | 'description' | 'tags' | 'score' | 'type'
