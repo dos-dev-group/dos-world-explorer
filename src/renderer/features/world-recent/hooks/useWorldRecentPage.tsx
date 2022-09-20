@@ -10,8 +10,6 @@ import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
-const LIMIT = 30;
-
 interface HookMember {
   isLoading: boolean;
   currentTableData: WorldVrcRaw[];
@@ -19,6 +17,8 @@ interface HookMember {
   infoModalWorld?: WorldVrcRaw;
   addModalWorld?: WorldVrcRaw;
   typeList: string[];
+  canLoadMore: boolean;
+  queryLimit: number;
 
   onClickRefresh(): void;
   onChangePage(page: number): void;
@@ -28,6 +28,7 @@ interface HookMember {
   onCloseWorldInfoModal(): void;
   onAddWorld(world: WorldEditInput): void;
   onClickLoadMore(): void;
+  onChangeQueryLimit(limit: number): void;
 }
 
 const useWorldRecentPage = (): HookMember => {
@@ -36,6 +37,8 @@ const useWorldRecentPage = (): HookMember => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [queryOffset, setQueryOffset] = useState(0);
+  const [queryLimit, setQueryLimit] = useState(30);
+  const [canLoadMore, setCanLoadMore] = useState(true);
   const [infoModalWorld, setInfoModalWorld] = useState<WorldVrcRaw>();
   const [addModalWorld, setAddModalWorld] = useState<WorldVrcRaw>();
 
@@ -51,8 +54,12 @@ const useWorldRecentPage = (): HookMember => {
     getVrchatRecentWorldsToMain().then((w) => {
       setRecentWorlds(w);
       setIsLoading(false);
-      setQueryOffset(0 + LIMIT);
+      setQueryOffset(0 + queryLimit);
+      if (w.length < queryLimit) {
+        setCanLoadMore(false);
+      }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const typeList = useMemo(
@@ -73,12 +80,16 @@ const useWorldRecentPage = (): HookMember => {
     infoModalWorld,
     addModalWorld,
     typeList,
+    canLoadMore,
+    queryLimit,
 
     onClickRefresh(): void {
       setIsLoading(true);
-      getVrchatRecentWorldsToMain().then((w) => {
+      getVrchatRecentWorldsToMain(0, queryLimit).then((w) => {
+        setQueryOffset(queryLimit);
         setRecentWorlds(w);
         setIsLoading(false);
+        setCanLoadMore(true);
       });
     },
     onChangePage(page: number): void {
@@ -105,11 +116,17 @@ const useWorldRecentPage = (): HookMember => {
     },
     onClickLoadMore(): void {
       setIsLoading(true);
-      getVrchatRecentWorldsToMain(queryOffset, LIMIT).then((w) => {
+      getVrchatRecentWorldsToMain(queryOffset, queryLimit).then((w) => {
         setRecentWorlds((old) => [...old, ...w]);
         setIsLoading(false);
-        setQueryOffset(queryOffset + LIMIT);
+        setQueryOffset(queryOffset + queryLimit);
+        if (w.length < queryLimit) {
+          setCanLoadMore(false);
+        }
       });
+    },
+    onChangeQueryLimit(limit: number): void {
+      setQueryLimit(limit);
     },
   };
   return hookMember;

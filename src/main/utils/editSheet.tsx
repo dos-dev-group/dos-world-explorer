@@ -7,7 +7,6 @@ import {
   WorldEditInput,
   WorldEditOutput,
   EditResult,
-  SheetBaseType,
   isWorldEditInput,
   isCheckerWorld,
   isTagStyle,
@@ -359,7 +358,6 @@ export async function addSheet(
         await unprotectSheet(protectedRangeId);
         return EditResult.ALREADYEXIST;
       }
-
     } else {
       await unprotectSheet(protectedRangeId);
       return EditResult.TYPEERROR;
