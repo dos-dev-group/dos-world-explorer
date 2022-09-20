@@ -21,6 +21,7 @@ import { PresetColorTypes } from 'antd/lib/_util/colors';
 import {
   Flex,
   FlexRow,
+  FlexRowCenter,
   HoverOpacity,
 } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
@@ -215,13 +216,23 @@ export default function WorldRecentPage() {
           />
         </Table>
         <FlexRow>
-          <Button
-            type="primary"
-            css={{ marginLeft: 'auto' }}
-            onClick={() => hookMember.onClickLoadMore()}
-          >
-            더 불러오기
-          </Button>
+          <FlexRowCenter css={{ marginLeft: 'auto' }}>
+            <Input
+              value={hookMember.queryLimit}
+              onChange={(e) =>
+                hookMember.onChangeQueryLimit(Number(e.target.value))
+              }
+            />
+            개
+            <Button
+              type="primary"
+              css={{ marginLeft: spacing(1) }}
+              onClick={() => hookMember.onClickLoadMore()}
+              disabled={!hookMember.canLoadMore}
+            >
+              더 불러오기
+            </Button>
+          </FlexRowCenter>
         </FlexRow>
       </Spin>
     </Flex>
