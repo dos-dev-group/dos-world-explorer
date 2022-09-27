@@ -4,8 +4,6 @@ import {
   WorldEditInput,
   WorldEditOutput,
   EditResult,
-  SheetBaseType,
-  TagStyle,
   TagStyleInput,
   CheckerWorldEditInput,
   CheckerWorldData,

@@ -43,7 +43,7 @@ export default function WorldExplorePage() {
   const renderedTabs = ['recent', 'new', 'lab'].map((e) => {
     switch (e) {
       case 'recent':
-        return <TabPane tab={'최근 월드'} key={e} />;
+        return <TabPane tab={'최근 갔던 월드'} key={e} />;
       case 'new':
         return <TabPane tab={'New 월드'} key={e} />;
       case 'lab':

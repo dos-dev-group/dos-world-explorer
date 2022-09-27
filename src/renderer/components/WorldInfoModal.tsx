@@ -1,14 +1,29 @@
-import { HeartFilled, HeartOutlined } from '@ant-design/icons';
+import {
+  HeartFilled,
+  HeartOutlined,
+  StarFilled,
+  StarOutlined,
+} from '@ant-design/icons';
 import { red } from '@ant-design/colors';
 import { FlexCenter, FlexRow } from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { WorldPartial } from '@src/types';
-import { Button, Image, Modal, Popconfirm, Tag, Typography } from 'antd';
+import {
+  Button,
+  Image,
+  message,
+  Modal,
+  Popconfirm,
+  Tag,
+  Typography,
+} from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { spacing } from '../utils/styling';
 import WorldInstanceCreationModal from './WorldInstanceCreationModal';
+import { useFavoritedWorld } from '../data/favoritedWorld';
+import FavoriteWorldSelectModal from './FavoriteWorldSelectModal';
 
 interface Props {
   onCancel?: () => void;
@@ -23,6 +38,18 @@ interface Props {
 
 function WorldInfoModal(props: Props) {
   const [visibleInstanceModal, setVisibleInstanceModal] = useState(false);
+  const [visibleFavoriteModal, setVisibleFavoriteModal] = useState(false);
+
+  const favoritedWorldHookMember = useFavoritedWorld();
+
+  // memoized check is world favorited
+  const favoriteGroup = useMemo(
+    () =>
+      props.world?.key
+        ? favoritedWorldHookMember.checkHasFavorite(props.world?.key)
+        : undefined,
+    [favoritedWorldHookMember, props.world?.key],
+  );
 
   return (
     <Modal
@@ -44,6 +71,18 @@ function WorldInfoModal(props: Props) {
         visible={visibleInstanceModal}
         world={props.world}
       />
+      {props.world && (
+        <FavoriteWorldSelectModal
+          onCancel={() => {
+            setVisibleFavoriteModal(false);
+          }}
+          onOk={() => {
+            setVisibleFavoriteModal(false);
+          }}
+          visible={visibleFavoriteModal}
+          world={props.world}
+        />
+      )}
 
       {props.world && (
         <>
@@ -153,6 +192,44 @@ function WorldInfoModal(props: Props) {
                   </Popconfirm>
                 )}
               </FlexRow>
+
+              {props.world?.key && (
+                <FlexRow
+                  css={{
+                    alignItems: 'center',
+                    marginTop: spacing(1),
+                    fontSize: 18,
+                    fontWeight: 500,
+                  }}
+                >
+                  <Button
+                    onClick={() => {
+                      if (favoriteGroup) {
+                        favoritedWorldHookMember
+                          .removeFavorite(props.world!.key)
+                          .then(() =>
+                            message.info('즐겨찾기에서 제거되었습니다.'),
+                          )
+                          .catch((e) => message.error(String(e)));
+                      } else {
+                        setVisibleFavoriteModal(true);
+                      }
+                    }}
+                    type="link"
+                    icon={
+                      favoriteGroup ? (
+                        <StarFilled css={{ color: 'orange', fontSize: 18 }} />
+                      ) : (
+                        <StarOutlined css={{ color: 'orange', fontSize: 18 }} />
+                      )
+                    }
+                  >
+                    {favoriteGroup
+                      ? `VRC즐겨찾기 제거 (${favoriteGroup.groupInfo.displayName})`
+                      : `VRC즐겨찾기 추가`}
+                  </Button>
+                </FlexRow>
+              )}
 
               <br />
               <Typography.Paragraph css={{ marginTop: 20 }}>

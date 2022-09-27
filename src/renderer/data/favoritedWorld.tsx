@@ -1,6 +1,5 @@
 import { Bookmarks, DosFavoriteWorldGroup } from '@src/types';
 import { atom, AtomEffect, useRecoilState } from 'recoil';
-import { loadBookmarks, saveBookmarks } from '../utils/ipc/bookmarksUtils';
 import {
   addFavoriteWorldToMain,
   getFavoritedWorldsToMain,
@@ -12,6 +11,7 @@ interface HookMember {
   addFavorite(where: string, worldId: string): Promise<void>;
   removeFavorite(worldId: string): Promise<void>;
   refresh(): Promise<void>;
+  checkHasFavorite(worldId: string): DosFavoriteWorldGroup | undefined;
 }
 
 const favoriteEffect =
@@ -40,15 +40,22 @@ export const useFavoritedWorld = () => {
     async addFavorite(where: string, worldId: string) {
       const result = await addFavoriteWorldToMain(where, worldId);
       if (!result) throw new Error('Fail to Add Favorite');
-      setFavoritedWorlds(await getFavoritedWorldsToMain());
+      await hookMember.refresh();
     },
     async removeFavorite(worldId: string) {
       const result = await removeFavoriteWorldToMain(worldId);
       if (!result) throw new Error('Fail to Remove Favorite');
-      setFavoritedWorlds(await getFavoritedWorldsToMain());
+      await hookMember.refresh();
     },
     async refresh(): Promise<void> {
       setFavoritedWorlds(await getFavoritedWorldsToMain());
+    },
+    checkHasFavorite(favoriteName: string): DosFavoriteWorldGroup | undefined {
+      if (!favoritedWorlds) return undefined;
+      const result = favoritedWorlds.find((e) =>
+        e.favorites.find((f) => f.id === favoriteName),
+      );
+      return result;
     },
   };
   return hookMember;

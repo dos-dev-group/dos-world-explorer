@@ -60,7 +60,7 @@ const useWorldFavoritePage = (): HookMember => {
   const currentTableData = useMemo(
     () =>
       favoritedWorldHookMember.favoritedWorlds
-        ?.filter((f) => f.groupInfo.id === currentTabId)
+        ?.filter((f) => f.groupInfo.name === currentTabId)
         .flatMap((f) => f.favorites.map(convertLimitedWorldToDosWorld)) || [],
     [currentTabId, favoritedWorldHookMember.favoritedWorlds],
   );
@@ -77,7 +77,7 @@ const useWorldFavoritePage = (): HookMember => {
     if (favoritedWorldHookMember.favoritedWorlds && worldData !== undefined) {
       setIsLoading(false);
       const firstTab = favoriteTabs.concat().shift();
-      setCurrentTabId(firstTab?.id);
+      setCurrentTabId(firstTab?.name);
     }
   }, [favoriteTabs, favoritedWorldHookMember.favoritedWorlds, worldData]);
 
