@@ -41,7 +41,7 @@ export default function WorldFavoritePage() {
   const hookMember = useWorldFavoritePage();
 
   const renderedTabs = hookMember.favoriteTabs.map((e) => {
-    return <TabPane tab={e.displayName} key={e.id} />;
+    return <TabPane tab={e.displayName} key={e.name} />;
   });
 
   return (

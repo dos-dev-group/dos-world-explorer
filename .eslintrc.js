@@ -17,6 +17,12 @@ module.exports = {
     'no-unneeded-ternary': 'off',
     'no-bitwise': 'off',
     'default-case': 'off',
+    'no-restricted-syntax': [
+      'off',
+      'ForInStatement',
+      'LabeledStatement',
+      'WithStatement',
+    ],
     'import/prefer-default-export': 'off',
     'promise/catch-or-return': 'off',
     'promise/always-return': 'off',
