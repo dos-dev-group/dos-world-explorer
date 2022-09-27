@@ -1,6 +1,5 @@
 import { Bookmarks, DosFavoriteWorldGroup } from '@src/types';
 import { atom, AtomEffect, useRecoilState } from 'recoil';
-import { loadBookmarks, saveBookmarks } from '../utils/ipc/bookmarksUtils';
 import {
   addFavoriteWorldToMain,
   getFavoritedWorldsToMain,
@@ -12,7 +11,7 @@ interface HookMember {
   addFavorite(where: string, worldId: string): Promise<void>;
   removeFavorite(worldId: string): Promise<void>;
   refresh(): Promise<void>;
-  checkHasFavorite(worldId: string): boolean;
+  checkHasFavorite(worldId: string): DosFavoriteWorldGroup | undefined;
 }
 
 const favoriteEffect =
@@ -51,12 +50,12 @@ export const useFavoritedWorld = () => {
     async refresh(): Promise<void> {
       setFavoritedWorlds(await getFavoritedWorldsToMain());
     },
-    checkHasFavorite(favoriteName: string): boolean {
-      if (!favoritedWorlds) return false;
+    checkHasFavorite(favoriteName: string): DosFavoriteWorldGroup | undefined {
+      if (!favoritedWorlds) return undefined;
       const result = favoritedWorlds.find((e) =>
         e.favorites.find((f) => f.id === favoriteName),
       );
-      return result ? true : false;
+      return result;
     },
   };
   return hookMember;

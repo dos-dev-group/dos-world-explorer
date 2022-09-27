@@ -43,11 +43,11 @@ function WorldInfoModal(props: Props) {
   const favoritedWorldHookMember = useFavoritedWorld();
 
   // memoized check is world favorited
-  const isFavorited = useMemo(
+  const favoriteGroup = useMemo(
     () =>
       props.world?.key
         ? favoritedWorldHookMember.checkHasFavorite(props.world?.key)
-        : false,
+        : undefined,
     [favoritedWorldHookMember, props.world?.key],
   );
 
@@ -202,10 +202,9 @@ function WorldInfoModal(props: Props) {
                     fontWeight: 500,
                   }}
                 >
-                  <div>VRC 즐겨찾기 :</div>
                   <Button
                     onClick={() => {
-                      if (isFavorited) {
+                      if (favoriteGroup) {
                         favoritedWorldHookMember
                           .removeFavorite(props.world!.key)
                           .then(() =>
@@ -218,13 +217,17 @@ function WorldInfoModal(props: Props) {
                     }}
                     type="link"
                     icon={
-                      isFavorited ? (
+                      favoriteGroup ? (
                         <StarFilled css={{ color: 'orange', fontSize: 18 }} />
                       ) : (
                         <StarOutlined css={{ color: 'orange', fontSize: 18 }} />
                       )
                     }
-                  />
+                  >
+                    {favoriteGroup
+                      ? `VRC즐겨찾기 제거 (${favoriteGroup.groupInfo.displayName})`
+                      : `VRC즐겨찾기 추가`}
+                  </Button>
                 </FlexRow>
               )}
 
