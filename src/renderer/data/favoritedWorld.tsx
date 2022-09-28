@@ -19,7 +19,6 @@ const favoriteEffect =
   ({ trigger, onSet, setSelf }) => {
     if (trigger === 'get') {
       getFavoritedWorldsToMain().then((value) => {
-        console.log('favorite', value);
         setSelf(value);
       });
     }

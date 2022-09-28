@@ -76,10 +76,14 @@ const useWorldFavoritePage = (): HookMember => {
   useEffect(() => {
     if (favoritedWorldHookMember.favoritedWorlds && worldData !== undefined) {
       setIsLoading(false);
-      const firstTab = favoriteTabs.concat().shift();
-      setCurrentTabId(firstTab?.name);
     }
-  }, [favoriteTabs, favoritedWorldHookMember.favoritedWorlds, worldData]);
+  }, [favoritedWorldHookMember.favoritedWorlds, worldData]);
+
+  useEffect(() => {
+    if (!currentTabId && favoriteTabs.length > 0) {
+      setCurrentTabId(favoriteTabs[0]?.name || '');
+    }
+  }, [favoriteTabs, currentTabId]);
 
   const hookMember: HookMember = {
     isLoading,
