@@ -5,7 +5,11 @@ import {
   StarOutlined,
 } from '@ant-design/icons';
 import { red } from '@ant-design/colors';
-import { FlexCenter, FlexRow } from '@src/renderer/components/styledComponents';
+import {
+  Flex,
+  FlexCenter,
+  FlexRow,
+} from '@src/renderer/components/styledComponents';
 import simpleStringHash from '@src/renderer/utils/simpleStringHash';
 import { WorldPartial } from '@src/types';
 import {
@@ -51,6 +55,15 @@ function WorldInfoModal(props: Props) {
     [favoritedWorldHookMember, props.world?.key],
   );
 
+  // useEffect(() => {
+  //   if (props.world?.url && props.visible) {
+  //     autoFileToMain(props.world.url).then((info) => {
+  //       setWorldCheckInfo(info);
+  //       setIsChecking(false);
+  //     });
+  //   }
+  // }, [props.world, props.visible]);
+
   return (
     <Modal
       title={props.world?.name}
@@ -60,7 +73,7 @@ function WorldInfoModal(props: Props) {
       destroyOnClose
       onCancel={props.onCancel}
       visible={props.visible}
-      width="60%"
+      width="80%"
       footer={false}
       zIndex={2}
     >
@@ -157,7 +170,13 @@ function WorldInfoModal(props: Props) {
             </div>
 
             <div css={{ flex: 1 }}>
-              <FlexRow css={{ gap: spacing(1) }}>
+              <div
+                css={{
+                  '& > *': {
+                    margin: 4,
+                  },
+                }}
+              >
                 {props.world?.key && props.world?.url && (
                   <>
                     <ButtonWorldLink
@@ -191,7 +210,7 @@ function WorldInfoModal(props: Props) {
                     <Button danger>삭제</Button>
                   </Popconfirm>
                 )}
-              </FlexRow>
+              </div>
 
               {props.world?.key && (
                 <FlexRow
@@ -236,6 +255,41 @@ function WorldInfoModal(props: Props) {
                 {props.world.description}
               </Typography.Paragraph>
             </div>
+            <Flex
+              css={{
+                flex: 1,
+                paddingLeft: spacing(1),
+                '& *': {
+                  wordBreak: 'break-word',
+                },
+              }}
+            >
+              <Typography.Title level={5}>VRC 정보</Typography.Title>
+              <FlexRow css={{ gap: spacing(2) }}>
+                <span>
+                  <strong>인원 :</strong> 20 / 40
+                </span>
+              </FlexRow>
+              <FlexRow css={{ gap: spacing(2) }}>
+                <span>
+                  <strong>방문 수 :</strong> 532532
+                </span>
+                <span>
+                  <strong>즐겨찾기 수 :</strong> 543
+                </span>
+              </FlexRow>
+              <FlexRow css={{ gap: spacing(2) }}>
+                <span>
+                  <strong>생성날짜 :</strong> {format(new Date(), 'yyyy-MM-dd')}
+                </span>
+              </FlexRow>
+              <FlexRow css={{ gap: spacing(2) }}>
+                <span>
+                  <strong>업데이트날짜 :</strong>{' '}
+                  {format(new Date(), 'yyyy-MM-dd')}
+                </span>
+              </FlexRow>
+            </Flex>
           </FlexRow>
         </>
       )}
