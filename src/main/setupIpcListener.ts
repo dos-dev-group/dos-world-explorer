@@ -26,6 +26,7 @@ import {
   removeFavoriteWorld,
   getVrchatlabWorlds,
   getVrchatNewWorlds,
+  getWorldAllInfo,
 } from './utils/vrchatAPI';
 import {
   loadBookmarkFromFileDialog,
@@ -142,6 +143,10 @@ export default function setupIpcListener() {
       'removeFavoriteWorldToRenderer',
       await removeFavoriteWorld(arg[0]),
     );
+  });
+
+  ipcMain.on('getWorldAllInfoToMain', async (event, arg) => {
+    event.reply('getWorldAllInfoToRenderer', await getWorldAllInfo(arg[0]));
   });
 
   // ###################################### for editSheet.tsx ######################################
