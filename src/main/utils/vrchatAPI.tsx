@@ -450,6 +450,8 @@ export async function getFavoritedWorlds(): Promise<DosFavoriteWorldGroup[]> {
     }
   }
 
+  console.log(worlds);
+
   console.log(worlds.length);
   for (let i = 0; i < favoriteGroup.length; i++) {
     if (favoriteGroup[i].type === 'world') {
