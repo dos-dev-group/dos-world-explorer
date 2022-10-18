@@ -1,5 +1,5 @@
 import { DosFavoriteWorldGroup } from '@src/types';
-import { CurrentUser, LimitedWorld, User } from 'vrchat';
+import { CurrentUser, LimitedWorld, User, World } from 'vrchat';
 
 export function testVrchatAPIToMain() {
   window.electron.ipcRenderer.sendMessage('testVrchatAPIToMain', []);
@@ -235,6 +235,18 @@ export function removeFavoriteWorldToMain(worldId: string) {
       'removeFavoriteWorldToRenderer',
       (result: unknown) => {
         resolve(result as boolean);
+      },
+    );
+  });
+}
+
+export function getWorldAllInfoToMain(worldId: string) {
+  window.electron.ipcRenderer.sendMessage('getWorldAllInfoToMain', [worldId]);
+  return new Promise<World>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'getWorldAllInfoToRenderer',
+      (result: unknown) => {
+        resolve(result as World);
       },
     );
   });
