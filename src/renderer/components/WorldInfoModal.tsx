@@ -23,11 +23,13 @@ import {
 } from 'antd';
 import { PresetColorTypes } from 'antd/lib/_util/colors';
 import { format } from 'date-fns';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { World as VRCWorld } from 'vrchat';
 import { spacing } from '../utils/styling';
 import WorldInstanceCreationModal from './WorldInstanceCreationModal';
 import { useFavoritedWorld } from '../data/favoritedWorld';
 import FavoriteWorldSelectModal from './FavoriteWorldSelectModal';
+import { getWorldAllInfoToMain } from '../utils/ipc/vrchatAPIToMain';
 
 interface Props {
   onCancel?: () => void;
@@ -43,6 +45,7 @@ interface Props {
 function WorldInfoModal(props: Props) {
   const [visibleInstanceModal, setVisibleInstanceModal] = useState(false);
   const [visibleFavoriteModal, setVisibleFavoriteModal] = useState(false);
+  const [vrcWorldInfo, setVRCWorldInfo] = useState<VRCWorld>();
 
   const favoritedWorldHookMember = useFavoritedWorld();
 
@@ -55,14 +58,13 @@ function WorldInfoModal(props: Props) {
     [favoritedWorldHookMember, props.world?.key],
   );
 
-  // useEffect(() => {
-  //   if (props.world?.url && props.visible) {
-  //     autoFileToMain(props.world.url).then((info) => {
-  //       setWorldCheckInfo(info);
-  //       setIsChecking(false);
-  //     });
-  //   }
-  // }, [props.world, props.visible]);
+  useEffect(() => {
+    if (props.world && props.visible) {
+      getWorldAllInfoToMain(props.world.key).then((world) =>
+        setVRCWorldInfo(world),
+      );
+    }
+  }, [props.world, props.visible]);
 
   return (
     <Modal
@@ -267,26 +269,38 @@ function WorldInfoModal(props: Props) {
               <Typography.Title level={5}>VRC 정보</Typography.Title>
               <FlexRow css={{ gap: spacing(2) }}>
                 <span>
-                  <strong>인원 :</strong> 20 / 40
+                  <strong>인원 :</strong>{' '}
+                  {vrcWorldInfo?.capacity + ' / ' + vrcWorldInfo?.capacity ??
+                    0 * 2}
                 </span>
               </FlexRow>
               <FlexRow css={{ gap: spacing(2) }}>
                 <span>
-                  <strong>방문 수 :</strong> 532532
+                  <strong>방문 수 :</strong> {vrcWorldInfo?.visits}
                 </span>
                 <span>
-                  <strong>즐겨찾기 수 :</strong> 543
+                  <strong>즐겨찾기 수 :</strong> {vrcWorldInfo?.favorites}
                 </span>
               </FlexRow>
               <FlexRow css={{ gap: spacing(2) }}>
                 <span>
-                  <strong>생성날짜 :</strong> {format(new Date(), 'yyyy-MM-dd')}
+                  <strong>인기도 :</strong> {vrcWorldInfo?.popularity}
+                </span>
+              </FlexRow>
+              <FlexRow css={{ gap: spacing(2) }}>
+                <span>
+                  <strong>생성날짜 :</strong>{' '}
+                  {vrcWorldInfo?.created_at
+                    ? new Date(vrcWorldInfo?.created_at).toLocaleString()
+                    : '알 수 없음'}
                 </span>
               </FlexRow>
               <FlexRow css={{ gap: spacing(2) }}>
                 <span>
                   <strong>업데이트날짜 :</strong>{' '}
-                  {format(new Date(), 'yyyy-MM-dd')}
+                  {vrcWorldInfo?.updated_at
+                    ? new Date(vrcWorldInfo?.updated_at).toLocaleString()
+                    : '알 수 없음'}
                 </span>
               </FlexRow>
             </Flex>

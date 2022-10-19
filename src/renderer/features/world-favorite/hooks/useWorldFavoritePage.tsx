@@ -1,6 +1,6 @@
 import { useFavoritedWorld } from '@src/renderer/data/favoritedWorld';
 import { worldDataState } from '@src/renderer/data/world';
-import convertLimitedWorldToDosWorld from '@src/renderer/utils/convertLimitedWorldToDosWorld';
+import convertLimitedWorldToDosWorld from '@src/renderer/utils/vrc/convertLimitedWorldToDosWorld';
 import {
   addEditSheetToMain,
   getWorldDataToMain,
@@ -9,11 +9,11 @@ import { World, WorldEditInput, WorldPartial } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { FavoriteGroup } from 'vrchat';
+import { FavoriteGroup, LimitedWorld } from 'vrchat';
 
 interface HookMember {
   isLoading: boolean;
-  currentTableData: WorldPartial[];
+  currentTableData: LimitedWorld[];
   currentPage: number;
   infoModalWorld?: WorldPartial;
   addModalWorld?: WorldPartial;
@@ -23,9 +23,9 @@ interface HookMember {
 
   onClickRefresh(): void;
   onChangePage(page: number): void;
-  onOpenAddWorldModal(world: WorldPartial): void;
+  onOpenAddWorldModal(world: LimitedWorld): void;
   onCloseAddWorldModal(): void;
-  onOpenWorldInfoModal(world: WorldPartial): void;
+  onOpenWorldInfoModal(world: LimitedWorld): void;
   onCloseWorldInfoModal(): void;
   onAddWorld(world: WorldEditInput): void;
   onClickChangeTab(tabKey: string): void;
@@ -61,7 +61,7 @@ const useWorldFavoritePage = (): HookMember => {
     () =>
       favoritedWorldHookMember.favoritedWorlds
         ?.filter((f) => f.groupInfo.name === currentTabId)
-        .flatMap((f) => f.favorites.map(convertLimitedWorldToDosWorld)) || [],
+        .flatMap((f) => f.favorites) || [],
     [currentTabId, favoritedWorldHookMember.favoritedWorlds],
   );
 
@@ -102,14 +102,14 @@ const useWorldFavoritePage = (): HookMember => {
     onChangePage(page: number): void {
       setCurrentPage(page);
     },
-    onOpenAddWorldModal(world: WorldPartial): void {
-      setAddModalWorld(world);
+    onOpenAddWorldModal(world: LimitedWorld): void {
+      setAddModalWorld(convertLimitedWorldToDosWorld(world));
     },
     onCloseAddWorldModal(): void {
       setAddModalWorld(undefined);
     },
-    onOpenWorldInfoModal(world: WorldPartial): void {
-      setInfoModalWorld(world);
+    onOpenWorldInfoModal(world: LimitedWorld): void {
+      setInfoModalWorld(convertLimitedWorldToDosWorld(world));
     },
     onCloseWorldInfoModal(): void {
       setInfoModalWorld(undefined);

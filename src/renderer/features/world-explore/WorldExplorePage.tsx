@@ -30,6 +30,8 @@ import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { World, WorldPartial } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import AddWorldModal from '@src/renderer/components/AddWorldModal';
+import { LimitedWorld } from 'vrchat';
+import convertWorldKeyToUrl from '@src/renderer/utils/vrc/convertWorldKeyToUrl';
 import useWorldExplorePage, { TabKey } from './hooks/useWorldExplorePage';
 
 const { TabPane } = Tabs;
@@ -108,15 +110,16 @@ export default function WorldExplorePage() {
             },
             current: hookMember.currentPage,
           }}
+          rowKey={(record) => record.id}
         >
           <Column
             width={10}
             title="이미지"
-            dataIndex="imageUrl"
-            render={(imageUrl, record: World) => (
+            dataIndex="thumbnailImageUrl"
+            render={(thumbnailImageUrl, record: LimitedWorld) => (
               <HoverOpacity>
                 <Image
-                  src={imageUrl}
+                  src={thumbnailImageUrl}
                   preview={false}
                   onClick={(e) => {
                     hookMember.onOpenWorldInfoModal(record);
@@ -129,74 +132,82 @@ export default function WorldExplorePage() {
             width={20}
             title="제목"
             dataIndex="name"
-            sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
-            render={(_, world) => (
+            sorter={(a: LimitedWorld, b: LimitedWorld) =>
+              a.name.localeCompare(b.name)
+            }
+            render={(name, world) => (
               <Typography.Text
                 css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ tooltip: world.name }}
+                ellipsis={{ tooltip: name }}
               >
                 <Typography.Link
                   onClick={(e) => {
                     hookMember.onOpenWorldInfoModal(world);
                   }}
                 >
-                  {world.name}
+                  {name}
                 </Typography.Link>
               </Typography.Text>
-              //
-              // <Typography.Paragraph
-              //   css={{ wordBreak: 'keep-all' }}
-              //   ellipsis={{ rows: 3, expandable: true }}
-              // >
-              //   {world.name}
-              // </Typography.Paragraph>
             )}
-            // onCell={(w) => ({
-            //   style: {
-            //     width: 200,
-            //     wordBreak: 'keep-all',
-            //   },
-            // })}
-            // ellipsis
-            // render={(_, world) => (
-            //   <Typography.Link
-            //     onClick={(e) => {
-            //       hookMember.onClickOpenWorldInfoModal(world);
-            //     }}
-            //   >
-            //     {world.name}
-            //   </Typography.Link>
-            // )}
           />
           <Column
             width={10}
             title="제작자"
-            dataIndex="author"
-            sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
+            dataIndex="authorName"
+            sorter={(a: LimitedWorld, b: LimitedWorld) =>
+              a.authorName.localeCompare(b.authorName)
+            }
             ellipsis
+          />
+          <Column
+            width={10}
+            title="인원수"
+            dataIndex="capacity"
+            sorter
+            ellipsis
+          />
+          <Column
+            width={10}
+            title="업뎃일"
+            dataIndex="updated_at"
+            sorter={(a: LimitedWorld, b: LimitedWorld) =>
+              a.updated_at.localeCompare(b.updated_at)
+            }
+            render={(isoDate, world) => (
+              <Typography.Text
+                css={{ wordBreak: 'keep-all' }}
+                ellipsis={{ tooltip: isoDate }}
+              >
+                {new Date(isoDate).toLocaleDateString()}
+              </Typography.Text>
+            )}
           />
           <Column
             width={20}
             title="Link"
             key="link"
-            render={(_, world: WorldPartial) => (
-              <a href={world.url} target="_blank" rel="noreferrer">
+            render={(_, world: LimitedWorld) => (
+              <a
+                href={convertWorldKeyToUrl(world.id)}
+                target="_blank"
+                rel="noreferrer"
+              >
                 <Typography.Paragraph
-                  copyable={{ text: world.url }}
+                  copyable={{ text: convertWorldKeyToUrl(world.id) }}
                   css={{ wordBreak: 'keep-all' }}
                   ellipsis={true}
                   type="secondary"
                 >
-                  {world.key}
+                  {world.id}
                 </Typography.Paragraph>
               </a>
             )}
           />
           <Column
             width={7}
-            dataIndex="key"
+            key="actions"
             responsive={['xl']}
-            render={(k, record: World) => (
+            render={(k, record: LimitedWorld) => (
               <Flex
                 css={{
                   [mqMinWidth(1200)]: {
