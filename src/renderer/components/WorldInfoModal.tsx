@@ -270,8 +270,9 @@ function WorldInfoModal(props: Props) {
               <FlexRow css={{ gap: spacing(2) }}>
                 <span>
                   <strong>인원 :</strong>{' '}
-                  {vrcWorldInfo?.capacity + ' / ' + vrcWorldInfo?.capacity ??
-                    0 * 2}
+                  {vrcWorldInfo?.capacity +
+                    ' / ' +
+                    (vrcWorldInfo?.capacity ?? 0) * 2}
                 </span>
               </FlexRow>
               <FlexRow css={{ gap: spacing(2) }}>
