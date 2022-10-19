@@ -40,7 +40,7 @@ const client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
 async function transeImageUrl(imageUrl: string): Promise<string> {
   try {
     const html = await axios.get(imageUrl);
-    console.log(html.request.res.responseUrl);
+    // console.log(html.request.res.responseUrl);
     return html.request.res.responseUrl;
   } catch (error) {
     console.error(error);
@@ -152,7 +152,7 @@ export async function getCheckerWorldData(): Promise<CheckerWorldData> {
   const sheetResponse = await sheets.spreadsheets.values.get(sheetRequest);
   const checkerWorldData: CheckerWorld[] = [];
   const values = sheetResponse.data.values || [[]];
-  console.log(values[0]);
+  // console.log(values[0]);
   values.slice(1).forEach((value) => {
     const checkerWorld: CheckerWorld = {
       key: value[9], // 월드 고유ID
