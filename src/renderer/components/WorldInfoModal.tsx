@@ -271,7 +271,7 @@ function WorldInfoModal(props: Props) {
                 <span>
                   <strong>인원 :</strong>{' '}
                   {vrcWorldInfo?.capacity +
-                    '(' +
+                    ' (' +
                     (vrcWorldInfo?.capacity ?? 0) * 2 +
                     ')'}
                 </span>

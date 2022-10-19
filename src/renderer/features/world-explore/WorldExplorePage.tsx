@@ -169,7 +169,7 @@ export default function WorldExplorePage() {
                 css={{ wordBreak: 'keep-all' }}
                 ellipsis={{ tooltip: capacity }}
               >
-                {capacity + '(' + (capacity ?? 0) * 2 + ')'}
+                {capacity + ' (' + (capacity ?? 0) * 2 + ')'}
               </Typography.Text>
             )}
           />
