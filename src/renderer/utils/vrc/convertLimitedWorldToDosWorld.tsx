@@ -9,6 +9,6 @@ export default function convertLimitedWorldToDosWorld(
     name: worldRowdata.name, // name
     author: worldRowdata.authorName, // author
     url: 'https://vrchat.com/home/world/' + worldRowdata.id, // url
-    imageUrl: worldRowdata.imageUrl, // imageUrl
+    imageUrl: worldRowdata.thumbnailImageUrl, // imageUrl
   };
 }

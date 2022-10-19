@@ -1,5 +1,5 @@
 import { worldDataState } from '@src/renderer/data/world';
-import convertLimitedWorldToDosWorld from '@src/renderer/utils/convertLimitedWorldToDosWorld';
+import convertLimitedWorldToDosWorld from '@src/renderer/utils/vrc/convertLimitedWorldToDosWorld';
 import {
   addEditSheetToMain,
   getWorldDataToMain,
@@ -13,12 +13,13 @@ import { World, WorldEditInput, WorldPartial } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { LimitedWorld } from 'vrchat';
 
 export type TabKey = 'new' | 'lab' | 'recent';
 
 interface HookMember {
   isLoading: boolean;
-  currentTableData: WorldPartial[];
+  currentTableData: LimitedWorld[];
   currentPage: number;
   infoModalWorld?: WorldPartial;
   addModalWorld?: WorldPartial;
@@ -28,9 +29,9 @@ interface HookMember {
 
   onClickRefresh(): void;
   onChangePage(page: number): void;
-  onOpenAddWorldModal(world: WorldPartial): void;
+  onOpenAddWorldModal(world: LimitedWorld): void;
   onCloseAddWorldModal(): void;
-  onOpenWorldInfoModal(world: WorldPartial): void;
+  onOpenWorldInfoModal(world: LimitedWorld): void;
   onCloseWorldInfoModal(): void;
   onAddWorld(world: WorldEditInput): void;
   onClickLoadMore(): void;
@@ -40,9 +41,9 @@ interface HookMember {
 
 const useWorldExplorePage = (): HookMember => {
   const [worldData, setWorldData] = useRecoilState(worldDataState);
-  const [newWorlds, setNewWorlds] = useState<WorldPartial[]>([]);
-  const [labWorlds, setLabWorlds] = useState<WorldPartial[]>([]);
-  const [recentWorlds, setRecentWorlds] = useState<WorldPartial[]>([]);
+  const [newWorlds, setNewWorlds] = useState<LimitedWorld[]>([]);
+  const [labWorlds, setLabWorlds] = useState<LimitedWorld[]>([]);
+  const [recentWorlds, setRecentWorlds] = useState<LimitedWorld[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [queryLimit, setQueryLimit] = useState(30);
@@ -62,13 +63,13 @@ const useWorldExplorePage = (): HookMember => {
     setIsLoading(true);
     Promise.all([
       getVrchatNewWorldsToMain(0, queryLimit).then((w) => {
-        setNewWorlds(w.map(convertLimitedWorldToDosWorld));
+        setNewWorlds(w);
       }),
       getVrchatlabWorldsToMain(0, queryLimit).then((w) => {
-        setLabWorlds(w.map(convertLimitedWorldToDosWorld));
+        setLabWorlds(w);
       }),
       getVrchatRecentWorldsToMain(0, queryLimit).then((w) => {
-        setRecentWorlds(w.map(convertLimitedWorldToDosWorld));
+        setRecentWorlds(w);
       }),
     ]).then(() => setIsLoading(false));
 
@@ -113,27 +114,27 @@ const useWorldExplorePage = (): HookMember => {
       setIsLoading(true);
       Promise.all([
         getVrchatNewWorldsToMain(0, queryLimit).then((w) => {
-          setNewWorlds(w.map(convertLimitedWorldToDosWorld));
+          setNewWorlds(w);
         }),
         getVrchatlabWorldsToMain(0, queryLimit).then((w) => {
-          setLabWorlds(w.map(convertLimitedWorldToDosWorld));
+          setLabWorlds(w);
         }),
         getVrchatRecentWorldsToMain(0, queryLimit).then((w) => {
-          setRecentWorlds(w.map(convertLimitedWorldToDosWorld));
+          setRecentWorlds(w);
         }),
       ]).then(() => setIsLoading(false));
     },
     onChangePage(page: number): void {
       setCurrentPage(page);
     },
-    onOpenAddWorldModal(world: WorldPartial): void {
-      setAddModalWorld(world);
+    onOpenAddWorldModal(world: LimitedWorld): void {
+      setAddModalWorld(convertLimitedWorldToDosWorld(world));
     },
     onCloseAddWorldModal(): void {
       setAddModalWorld(undefined);
     },
-    onOpenWorldInfoModal(world: WorldPartial): void {
-      setInfoModalWorld(world);
+    onOpenWorldInfoModal(world: LimitedWorld): void {
+      setInfoModalWorld(convertLimitedWorldToDosWorld(world));
     },
     onCloseWorldInfoModal(): void {
       setInfoModalWorld(undefined);
@@ -149,20 +150,14 @@ const useWorldExplorePage = (): HookMember => {
       setIsLoading(true);
       Promise.all([
         getVrchatNewWorldsToMain(newWorlds.length, queryLimit).then((w) => {
-          setNewWorlds((old) =>
-            old.concat(w.map(convertLimitedWorldToDosWorld)),
-          );
+          setNewWorlds((old) => old.concat(w));
         }),
         getVrchatlabWorldsToMain(labWorlds.length, queryLimit).then((w) => {
-          setLabWorlds((old) =>
-            old.concat(w.map(convertLimitedWorldToDosWorld)),
-          );
+          setLabWorlds((old) => old.concat(w));
         }),
         getVrchatRecentWorldsToMain(recentWorlds.length, queryLimit).then(
           (w) => {
-            setRecentWorlds((old) =>
-              old.concat(w.map(convertLimitedWorldToDosWorld)),
-            );
+            setRecentWorlds((old) => old.concat(w));
           },
         ),
       ]).then(() => setIsLoading(false));
