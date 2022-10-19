@@ -155,7 +155,14 @@ export default function WorldFavoritePage() {
             title="인원수"
             dataIndex="capacity"
             sorter
-            ellipsis
+            render={(capacity, world) => (
+              <Typography.Text
+                css={{ wordBreak: 'keep-all' }}
+                ellipsis={{ tooltip: capacity }}
+              >
+                {capacity + '(' + (capacity ?? 0) * 2 + ')'}
+              </Typography.Text>
+            )}
           />
           <Column
             width={10}
