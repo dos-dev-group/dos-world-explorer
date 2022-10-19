@@ -253,7 +253,7 @@ export async function genWorldInstanceName(worldId: string): Promise<string> {
   let randInt = Math.floor(Math.random() * 100000)
     .toString()
     .padStart(5, '0');
-  console.log(randInt);
+  // console.log(randInt);
   const worldInstaceInfo = await getWorldInstanceInfo(worldId);
   if (worldInstaceInfo.includes(randInt)) {
     randInt = await genWorldInstanceName(worldId);
@@ -265,7 +265,7 @@ export async function getWorldAllInfo(worldId: string) {
   await authCheck();
   const WorldsApi = new vrchat.WorldsApi();
   const worldData = await WorldsApi.getWorld(worldId);
-  console.log(await worldData);
+  // console.log(await worldData);
   return worldData.data;
 }
 
@@ -450,9 +450,9 @@ export async function getFavoritedWorlds(): Promise<DosFavoriteWorldGroup[]> {
     }
   }
 
-  console.log(worlds);
+  // console.log(worlds);
 
-  console.log(worlds.length);
+  // console.log(worlds.length);
   for (let i = 0; i < favoriteGroup.length; i++) {
     if (favoriteGroup[i].type === 'world') {
       const tempGroupWorld: LimitedWorld[] = [];
