@@ -305,6 +305,21 @@ function WorldInfoModal(props: Props) {
                     : '알 수 없음'}
                 </span>
               </FlexRow>
+              <FlexRow css={{ gap: spacing(2) }}>
+                <span>
+                  <strong>VRC설명 :</strong>{' '}
+                  <Typography.Paragraph
+                    css={{
+                      display: 'inline-block',
+                      margin: 0,
+                      wordBreak: 'keep-all',
+                    }}
+                    ellipsis={{ rows: 3, expandable: true, symbol: '더보기' }}
+                  >
+                    {vrcWorldInfo?.description}
+                  </Typography.Paragraph>
+                </span>
+              </FlexRow>
             </Flex>
           </FlexRow>
         </>
