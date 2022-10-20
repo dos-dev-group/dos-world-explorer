@@ -8,7 +8,8 @@ import {
   Space,
   Typography,
 } from 'antd';
-import { useEffect, useState } from 'react';
+import { RefSelectProps } from 'antd/lib/select';
+import { useEffect, useRef, useState } from 'react';
 import { Flex } from './styledComponents';
 
 const { Option } = Select;
@@ -23,6 +24,8 @@ interface Props {
   onAddBookmarkItem: (type: string) => void;
 }
 export default function BookmarkSelectModal(props: Props) {
+  const selectRef = useRef<RefSelectProps>(null);
+
   const [insertedItemName, setInsertedItemName] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<string[]>();
 
@@ -64,10 +67,14 @@ export default function BookmarkSelectModal(props: Props) {
     >
       <Flex>
         <Select
+          ref={selectRef}
           placeholder="북마크를 선택해주세요"
           mode="multiple"
           value={selectedTypes}
-          onChange={(value) => setSelectedTypes(value)}
+          onChange={(value) => {
+            setSelectedTypes(value);
+            selectRef.current?.blur();
+          }}
           dropdownRender={(menu) => (
             <>
               {menu}
