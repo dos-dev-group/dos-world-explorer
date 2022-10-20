@@ -180,7 +180,8 @@ export default function WorldFavoritePage() {
               </Typography.Text>
             )}
           />
-          <Column
+          <Column width={6} title="즐찾수" dataIndex="favorites" sorter />
+          {/* <Column
             width={20}
             title="Link"
             key="link"
@@ -200,7 +201,7 @@ export default function WorldFavoritePage() {
                 </Typography.Paragraph>
               </a>
             )}
-          />
+          /> */}
           <Column
             width={7}
             key="actions"
