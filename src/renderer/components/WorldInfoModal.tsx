@@ -76,6 +76,7 @@ function WorldInfoModal(props: Props) {
       onCancel={props.onCancel}
       visible={props.visible}
       width="80%"
+      css={{ maxWidth: 992 }}
       footer={false}
       zIndex={2}
     >
@@ -102,7 +103,7 @@ function WorldInfoModal(props: Props) {
       {props.world && (
         <>
           <FlexCenter>
-            <Image src={props.world.imageUrl} width="70%"></Image>
+            <Image src={props.world.imageUrl} css={{ maxHeight: 400 }}></Image>
           </FlexCenter>
           <br />
           <FlexRow>

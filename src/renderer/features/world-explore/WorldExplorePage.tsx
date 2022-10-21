@@ -189,7 +189,13 @@ export default function WorldExplorePage() {
               </Typography.Text>
             )}
           />
-          <Column width={6} title="즐찾수" dataIndex="favorites" sorter />
+          <Column
+            width={8}
+            title="즐찾수"
+            dataIndex="favorites"
+            sorter
+            ellipsis
+          />
           {/* <Column
             width={20}
             title="Link"
