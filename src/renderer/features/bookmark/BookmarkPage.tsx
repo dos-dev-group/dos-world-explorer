@@ -41,7 +41,6 @@ import useBookmark from '@src/renderer/utils/hooks/useBookmark';
 import useBookmarkPage from './hooks/useBookmarkPage';
 import BookmarkTypeModal from './BookmarkTypeModal';
 
-const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
@@ -50,9 +49,10 @@ export default function BookmarkPage() {
   const hookMember = useBookmarkPage();
   const bookmarkHookMember = useBookmark();
 
-  const renderedTabs = hookMember.typeList.map((e) => (
-    <TabPane tab={e} key={e} />
-  ));
+  const tabItems = hookMember.typeList.map((e) => ({
+    label: e,
+    key: e,
+  }));
 
   return (
     <Flex
@@ -141,9 +141,8 @@ export default function BookmarkPage() {
             css={{ flex: 1, overflowX: 'auto' }}
             activeKey={hookMember.currentType}
             onChange={hookMember.onChangeType}
-          >
-            {renderedTabs}
-          </Tabs>
+            items={tabItems}
+          />
 
           <Dropdown.Button
             onClick={() => hookMember.onClickOpenTypeModal()}

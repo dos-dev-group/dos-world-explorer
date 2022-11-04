@@ -8,11 +8,12 @@ import {
   LoginOutlined,
   LogoutOutlined,
   StarOutlined,
+  TeamOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
-import { ReactElement, ReactNode, useEffect } from 'react';
+import { ReactElement, ReactNode, Suspense, useEffect } from 'react';
 import {
   MemoryRouter as Router,
   Routes,
@@ -27,6 +28,7 @@ import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 import { Flex } from './components/styledComponents';
 import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
+import FriendsPage from './features/friends/FriendsPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
 import WorldExplorePage from './features/world-explore/WorldExplorePage';
@@ -51,6 +53,14 @@ export default function App() {
           <Route path="bookmark" element={<BookmarkPage />} />
           <Route path="explore" element={<WorldExplorePage />} />
           <Route path="favorite" element={<WorldFavoritePage />} />
+          <Route
+            path="friends"
+            element={
+              <Suspense>
+                <FriendsPage />
+              </Suspense>
+            }
+          />
         </Route>
         <Route path="login" element={<LoginPage />} />
       </Routes>
@@ -125,6 +135,14 @@ function MenuLayout() {
                 icon: <StarOutlined />,
                 onClick(ev) {
                   navigate('/favorite');
+                },
+              },
+              {
+                label: 'Friends',
+                key: 'friends',
+                icon: <TeamOutlined />,
+                onClick(ev) {
+                  navigate('/friends');
                 },
               },
               {
