@@ -74,7 +74,7 @@ function WorldInfoModal(props: Props) {
       }}
       destroyOnClose
       onCancel={props.onCancel}
-      visible={props.visible}
+      open={props.visible}
       width="80%"
       css={{ maxWidth: 992 }}
       footer={false}

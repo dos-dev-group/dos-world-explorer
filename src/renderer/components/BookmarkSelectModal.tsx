@@ -52,7 +52,7 @@ export default function BookmarkSelectModal(props: Props) {
   return (
     <Modal
       title="북마크를 선택해주세요"
-      visible={props.visible}
+      open={props.visible}
       onOk={() => {
         if (!selectedTypes) {
           message.error('타입을 골라주세요.');

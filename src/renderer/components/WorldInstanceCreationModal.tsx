@@ -61,7 +61,7 @@ function WorldInstanceCreationModal(props: Props) {
   return (
     <Modal
       title={title}
-      visible={props.visible}
+      open={props.visible}
       width="50%"
       onCancel={props.onCancel}
       onOk={async () => {

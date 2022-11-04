@@ -31,7 +31,7 @@ export default function BookmarkTypeModal(props: Props) {
 
   return (
     <Modal
-      visible={props.visible}
+      open={props.visible}
       onCancel={() => props.onCancel()}
       title="북마크 관리"
       destroyOnClose

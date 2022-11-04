@@ -266,7 +266,7 @@ export default function WorldExplorePage() {
               min={0}
               max={100}
               value={hookMember.queryLimit}
-              onChange={(e) => hookMember.onChangeQueryLimit(e)}
+              onChange={(e) => hookMember.onChangeQueryLimit(e || 0)}
             />
             개
             <Button

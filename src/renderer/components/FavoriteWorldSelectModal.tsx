@@ -51,7 +51,7 @@ export default function FavoriteWorldSelectModal(props: Props) {
     <>
       <Modal
         title="즐겨찾기 추가"
-        visible={props.visible}
+        open={props.visible}
         onOk={handleOk}
         onCancel={props.onCancel}
         confirmLoading={loading}
