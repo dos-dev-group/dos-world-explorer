@@ -18,8 +18,57 @@ interface Props {
   user: User;
 }
 function UserCard(props: Props) {
-  const renderedStatusIcon = useMemo(() => {
-    switch (props.user.status) {
+  const renderedStatusIcon = useMemo(
+    () => convertToStatusCurcle(props.user),
+    [props.user],
+  );
+  return (
+    <Card
+      className={props.className}
+      actions={[
+        <SettingOutlined key="setting" />,
+        <EditOutlined key="edit" />,
+        <EllipsisOutlined key="ellipsis" />,
+      ]}
+    >
+      <Meta
+        avatar={<Avatar src={props.user.currentAvatarThumbnailImageUrl} />}
+        title={props.user.displayName}
+        css={{
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+          overflowX: 'hidden',
+        }}
+        description={
+          <FlexRow css={{ alignItems: 'center' }}>
+            {renderedStatusIcon}
+            <div
+              css={{
+                marginLeft: spacing(1),
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflowX: 'hidden',
+                visibility:
+                  props.user.statusDescription.trim() === ''
+                    ? 'hidden'
+                    : 'visible',
+              }}
+            >
+              {props.user.statusDescription.trim() === ''
+                ? 'No status'
+                : props.user.statusDescription}
+            </div>
+          </FlexRow>
+        }
+      />
+    </Card>
+  );
+}
+export default UserCard;
+
+function convertToStatusCurcle(user: User) {
+  if (user.location === 'offline') {
+    switch (user.status) {
       case 'active':
         return (
           <div
@@ -27,7 +76,7 @@ function UserCard(props: Props) {
               width: SIZE,
               height: SIZE,
               borderRadius: SIZE / 2,
-              backgroundColor: 'green',
+              border: '2px solid green',
             }}
           />
         );
@@ -38,7 +87,7 @@ function UserCard(props: Props) {
               width: SIZE,
               height: SIZE,
               borderRadius: SIZE / 2,
-              backgroundColor: 'aqua',
+              border: '2px solid dodgerblue',
             }}
           />
         );
@@ -49,7 +98,7 @@ function UserCard(props: Props) {
               width: SIZE,
               height: SIZE,
               borderRadius: SIZE / 2,
-              backgroundColor: 'orange',
+              border: '2px solid orange',
             }}
           />
         );
@@ -60,7 +109,7 @@ function UserCard(props: Props) {
               width: SIZE,
               height: SIZE,
               borderRadius: SIZE / 2,
-              backgroundColor: 'tomato',
+              border: '2px solid tomato',
             }}
           />
         );
@@ -82,34 +131,79 @@ function UserCard(props: Props) {
               width: SIZE,
               height: SIZE,
               borderRadius: SIZE / 2,
-              backgroundColor: 'green',
+              border: '2px solid gray',
             }}
           />
         );
     }
-  }, [props.user.status]);
-  return (
-    <Card
-      className={props.className}
-      actions={[
-        <SettingOutlined key="setting" />,
-        <EditOutlined key="edit" />,
-        <EllipsisOutlined key="ellipsis" />,
-      ]}
-    >
-      <Meta
-        avatar={<Avatar src={props.user.currentAvatarThumbnailImageUrl} />}
-        title={props.user.displayName}
-        description={
-          <FlexRow css={{ alignItems: 'center' }}>
-            {renderedStatusIcon}
-            <div css={{ marginLeft: spacing(1) }}>
-              {props.user.statusDescription}
-            </div>
-          </FlexRow>
-        }
-      />
-    </Card>
-  );
+  }
+
+  switch (user.status) {
+    case 'active':
+      return (
+        <div
+          css={{
+            width: SIZE,
+            height: SIZE,
+            borderRadius: SIZE / 2,
+            backgroundColor: 'green',
+          }}
+        />
+      );
+    case 'join me':
+      return (
+        <div
+          css={{
+            width: SIZE,
+            height: SIZE,
+            borderRadius: SIZE / 2,
+            backgroundColor: 'dodgerblue',
+          }}
+        />
+      );
+    case 'ask me':
+      return (
+        <div
+          css={{
+            width: SIZE,
+            height: SIZE,
+            borderRadius: SIZE / 2,
+            backgroundColor: 'orange',
+          }}
+        />
+      );
+    case 'busy':
+      return (
+        <div
+          css={{
+            width: SIZE,
+            height: SIZE,
+            borderRadius: SIZE / 2,
+            backgroundColor: 'tomato',
+          }}
+        />
+      );
+    case 'offline':
+      return (
+        <div
+          css={{
+            width: SIZE,
+            height: SIZE,
+            borderRadius: SIZE / 2,
+            backgroundColor: 'gray',
+          }}
+        />
+      );
+    default:
+      return (
+        <div
+          css={{
+            width: SIZE,
+            height: SIZE,
+            borderRadius: SIZE / 2,
+            border: '2px solid gray',
+          }}
+        />
+      );
+  }
 }
-export default UserCard;
