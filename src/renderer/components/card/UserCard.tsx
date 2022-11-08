@@ -4,7 +4,7 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import { spacing } from '@src/renderer/utils/styling';
-import { Avatar, Card } from 'antd';
+import { Avatar, Card, Tooltip, Typography } from 'antd';
 import { useMemo } from 'react';
 import { User } from 'vrchat';
 import { Flex, FlexRow } from '../styledComponents';
@@ -33,32 +33,39 @@ function UserCard(props: Props) {
     >
       <Meta
         avatar={<Avatar src={props.user.currentAvatarThumbnailImageUrl} />}
-        title={props.user.displayName}
-        css={{
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis',
-          overflowX: 'hidden',
-        }}
+        title={
+          <Tooltip title={props.user.displayName}>
+            {props.user.displayName}
+          </Tooltip>
+        }
         description={
-          <FlexRow css={{ alignItems: 'center' }}>
-            {renderedStatusIcon}
-            <div
-              css={{
-                marginLeft: spacing(1),
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                overflowX: 'hidden',
-                visibility:
-                  props.user.statusDescription.trim() === ''
-                    ? 'hidden'
-                    : 'visible',
-              }}
-            >
-              {props.user.statusDescription.trim() === ''
-                ? 'No status'
-                : props.user.statusDescription}
-            </div>
-          </FlexRow>
+          <Flex>
+            <FlexRow css={{ alignItems: 'center' }}>
+              <div css={{ flex: `0 1 ${SIZE}px` }}>{renderedStatusIcon}</div>
+              <Tooltip
+                title={props.user.statusDescription}
+                css={{
+                  marginLeft: spacing(1),
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  visibility:
+                    props.user.statusDescription.trim() === ''
+                      ? 'hidden'
+                      : 'visible',
+                }}
+              >
+                {props.user.statusDescription.trim() === ''
+                  ? 'No status'
+                  : props.user.statusDescription}
+              </Tooltip>
+            </FlexRow>
+            {/* 
+            <FlexRow>
+              <Typography.Text ellipsis>
+                in {props.user.location}
+              </Typography.Text>
+            </FlexRow> */}
+          </Flex>
         }
       />
     </Card>

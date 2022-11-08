@@ -19,8 +19,8 @@ const friendsQuery = selector({
   },
 });
 
-const sortedFriendsQuery = selector({
-  key: 'VRCSortedFriendsQuery',
+const sortedFriendsState = selector({
+  key: 'VRCSortedFriendsState',
   get: ({ get }) => {
     const friends = get(friendsQuery);
     const sortedFriends = [...friends].sort((a, b) => {
@@ -47,7 +47,7 @@ interface FriendsHookMember {
   refresh(): void;
 }
 export const useFriends = (): FriendsHookMember => {
-  const friends = useRecoilValue(sortedFriendsQuery);
+  const friends = useRecoilValue(sortedFriendsState);
   const refreshFriends = useRecoilRefresher_UNSTABLE(friendsQuery);
   useDebugValue(friends);
 

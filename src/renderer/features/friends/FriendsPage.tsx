@@ -11,7 +11,7 @@ function FriendsPage() {
       css={{
         gridTemplateColumns: 'repeat(3, 1fr)',
         // gridAutoColumns: 'minmax(100px, 1fr)',
-        gridAutoRows: 146,
+        gridAutoRows: 150,
         gap: spacing(1),
         padding: spacing(1),
         [mqMinWidth(1200)]: {
@@ -20,7 +20,7 @@ function FriendsPage() {
       }}
     >
       {friends.map((friend) => (
-        <UserCard key={friend.id} user={friend} />
+        <UserCard key={friend.id} user={friend} css={{ overflowX: 'hidden' }} />
       ))}
     </Grid>
   );
