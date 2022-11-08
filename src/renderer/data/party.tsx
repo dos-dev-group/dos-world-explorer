@@ -1,14 +1,7 @@
 import { useDebugValue } from 'react';
-import {
-  atom,
-  AtomEffect,
-  selector,
-  useRecoilRefresher_UNSTABLE,
-  useRecoilValue,
-} from 'recoil';
+import { atom, selector, useRecoilValue, useSetRecoilState } from 'recoil';
 import { User } from 'vrchat';
-import { VRCHAT_STATUS } from '../utils/constants';
-import { getFriednListToMain } from '../utils/ipc/vrchatAPIToMain';
+import { sortedFriendsState } from './friends';
 
 // const friendsQuery = selector({
 //   key: 'VRCFriendsQuery',
@@ -41,31 +34,55 @@ import { getFriednListToMain } from '../utils/ipc/vrchatAPIToMain';
 //   },
 // });
 
-const partyState = atom({
+const partyUserKeyState = atom({
   key: 'partyState',
-  default: [] as User[],
+  default: [] as string[],
   effects: [
-    ({ onSet }) => {
-      onSet((newValue) => {
-        console.log('partyState', newValue);
+    ({ setSelf, onSet }) => {
+      const savedValue = localStorage.getItem('partyState');
+      if (savedValue != null) {
+        setSelf(JSON.parse(savedValue));
+      }
+
+      onSet((newValue, _, isReset) => {
+        if (isReset) {
+          localStorage.removeItem('partyState');
+          return;
+        }
+        localStorage.setItem('partyState', JSON.stringify(newValue));
       });
     },
   ],
 });
 
+const partyDerivedState = selector({
+  key: 'partyDerivedState',
+  get: async ({ get }) => {
+    const userKeys = get(partyUserKeyState);
+    const friends = get(sortedFriendsState);
+
+    return friends.filter((f) => userKeys.includes(f.id));
+  },
+});
+
 interface PartyHookMember {
-  friends: User[];
-  refresh(): void;
+  party: User[];
+  addUser(user: User): void;
+  removeUser(user: User): void;
 }
 export const useParty = (): PartyHookMember => {
-  const friends = useRecoilValue(sortedFriendsState);
-  const refreshFriends = useRecoilRefresher_UNSTABLE(friendsQuery);
-  useDebugValue(friends);
+  const partyUserKeys = useRecoilValue(partyUserKeyState);
+  const partyUsers = useRecoilValue(partyDerivedState);
+  const setParty = useSetRecoilState(partyUserKeyState);
+  useDebugValue(partyUsers);
 
   const hookMember: PartyHookMember = {
-    friends,
-    refresh(): void {
-      refreshFriends();
+    party: partyUsers,
+    addUser(user) {
+      setParty([...partyUserKeys, user.id]);
+    },
+    removeUser(user) {
+      setParty(partyUserKeys.filter((p) => p !== user.id));
     },
   };
 

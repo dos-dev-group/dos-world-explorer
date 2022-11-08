@@ -11,7 +11,7 @@ import {
   TeamOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Typography } from 'antd';
+import { Layout, Menu, Spin, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
 import { ReactElement, ReactNode, Suspense, useEffect } from 'react';
 import {
@@ -25,7 +25,7 @@ import {
 } from 'react-router-dom';
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 // import './App.css';
-import { Flex } from './components/styledComponents';
+import { Flex, FlexCenter } from './components/styledComponents';
 import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import FriendsPage from './features/friends/FriendsPage';
@@ -56,7 +56,13 @@ export default function App() {
           <Route
             path="friends"
             element={
-              <Suspense>
+              <Suspense
+                fallback={
+                  <FlexCenter>
+                    <Spin />
+                  </FlexCenter>
+                }
+              >
                 <FriendsPage />
               </Suspense>
             }

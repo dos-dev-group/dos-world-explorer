@@ -19,7 +19,7 @@ const friendsQuery = selector({
   },
 });
 
-const sortedFriendsState = selector({
+export const sortedFriendsState = selector({
   key: 'VRCSortedFriendsState',
   get: ({ get }) => {
     const friends = get(friendsQuery);
