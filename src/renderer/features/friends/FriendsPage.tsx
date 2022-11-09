@@ -1,10 +1,11 @@
 import UserCard from '@src/renderer/components/card/UserCard';
 import { Grid } from '@src/renderer/components/styledComponents';
-import { useFriends } from '@src/renderer/data/friends';
+import { useFriendsData } from '@src/renderer/data/friends';
 import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
+import useFriendsPage from './hooks/useFriendsPage';
 
 function FriendsPage() {
-  const { friends, refresh } = useFriends();
+  const hookMember = useFriendsPage();
 
   return (
     <Grid
@@ -19,8 +20,20 @@ function FriendsPage() {
         },
       }}
     >
-      {friends.map((friend) => (
-        <UserCard key={friend.id} user={friend} css={{ overflowX: 'hidden' }} />
+      {hookMember.friends.map((friend) => (
+        <UserCard
+          key={friend.id}
+          user={friend}
+          css={{ overflowX: 'hidden' }}
+          usersGroupNames={[]}
+          allGroupNames={[]}
+          onSetUsersGroup={(groupNames) =>
+            hookMember.onSetUsersGroup(groupNames, friend)
+          }
+          onCreateGroup={(groupName) =>
+            hookMember.onCreateGroup(groupName, friend)
+          }
+        />
       ))}
     </Grid>
   );

@@ -46,7 +46,7 @@ interface FriendsHookMember {
   friends: User[];
   refresh(): void;
 }
-export const useFriends = (): FriendsHookMember => {
+export const useFriendsData = (): FriendsHookMember => {
   const friends = useRecoilValue(sortedFriendsState);
   const refreshFriends = useRecoilRefresher_UNSTABLE(friendsQuery);
   useDebugValue(friends);

@@ -34,9 +34,16 @@ import { sortedFriendsState } from './friends';
 //   },
 // });
 
+interface UserKeyPartyGroup {
+  [s: string]: string[];
+}
+export interface PartyGroup {
+  [s: string]: User[];
+}
+
 const partyUserKeyState = atom({
   key: 'partyState',
-  default: [] as string[],
+  default: { group1: [] } as UserKeyPartyGroup,
   effects: [
     ({ setSelf, onSet }) => {
       const savedValue = localStorage.getItem('partyState');
@@ -58,31 +65,68 @@ const partyUserKeyState = atom({
 const partyDerivedState = selector({
   key: 'partyDerivedState',
   get: async ({ get }) => {
-    const userKeys = get(partyUserKeyState);
+    const groups = get(partyUserKeyState);
     const friends = get(sortedFriendsState);
 
-    return friends.filter((f) => userKeys.includes(f.id));
+    const derivedGroups: PartyGroup = {};
+    for (const g of Object.keys(groups)) {
+      derivedGroups[g] = friends.filter((f) => groups[g].includes(f.id));
+    }
+    return derivedGroups;
   },
 });
 
 interface PartyHookMember {
-  party: User[];
-  addUser(user: User): void;
-  removeUser(user: User): void;
+  party: PartyGroup;
+  addUser(groupName: string, user: User): void;
+  removeUser(groupName: string, user: User): void;
+  setUsersGroup(groupNames: string[], user: User): void;
+  addGroup(groupName: string): void;
+  removeGroup(groupName: string): void;
+  checkUserGroups(userKey: string): string[];
 }
-export const useParty = (): PartyHookMember => {
-  const partyUserKeys = useRecoilValue(partyUserKeyState);
-  const partyUsers = useRecoilValue(partyDerivedState);
-  const setParty = useSetRecoilState(partyUserKeyState);
-  useDebugValue(partyUsers);
+export const usePartyData = (): PartyHookMember => {
+  const partyUserKeyGroup = useRecoilValue(partyUserKeyState);
+  const partyGroup = useRecoilValue(partyDerivedState);
+  const setPartyUserKeys = useSetRecoilState(partyUserKeyState);
+  useDebugValue(partyUserKeyGroup);
+  useDebugValue(partyGroup);
 
   const hookMember: PartyHookMember = {
-    party: partyUsers,
-    addUser(user) {
-      setParty([...partyUserKeys, user.id]);
+    party: partyGroup,
+    addUser(group, user) {
+      const clone = { ...partyUserKeyGroup };
+      clone[group].push(user.id);
+
+      setPartyUserKeys(clone);
     },
-    removeUser(user) {
-      setParty(partyUserKeys.filter((p) => p !== user.id));
+    removeUser(group, user) {
+      const clone = { ...partyUserKeyGroup };
+      clone[group] = clone[group].filter((k) => k === user.id);
+
+      setPartyUserKeys(clone);
+    },
+    setUsersGroup(groupNames: string[], user: User): void {
+      throw new Error('Function not implemented.');
+    },
+    addGroup(groupName) {
+      if (Object.prototype.hasOwnProperty.call(partyUserKeyGroup, groupName)) {
+        return;
+      }
+      const clone = { ...partyUserKeyGroup };
+      clone[groupName] = [];
+    },
+    removeGroup(groupName) {
+      if (Object.prototype.hasOwnProperty.call(partyUserKeyGroup, groupName)) {
+        const clone = { ...partyUserKeyGroup };
+        delete clone[groupName];
+        setPartyUserKeys(clone);
+      }
+    },
+    checkUserGroups(userKey) {
+      return Object.keys(partyUserKeyGroup).filter((g) => {
+        return partyUserKeyGroup[g].includes(userKey);
+      });
     },
   };
 

@@ -3,10 +3,12 @@ import {
   EllipsisOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
+import { usePartyData } from '@src/renderer/data/party';
 import { spacing } from '@src/renderer/utils/styling';
-import { Avatar, Card, Tooltip, Typography } from 'antd';
-import { useMemo } from 'react';
+import { Avatar, Button, Card, Tooltip, Typography } from 'antd';
+import { useMemo, useRef, useState } from 'react';
 import { User } from 'vrchat';
+import PartySelectModal from '../PartySelectModal';
 import { Flex, FlexRow } from '../styledComponents';
 
 const SIZE = 16;
@@ -16,59 +18,84 @@ const { Meta } = Card;
 interface Props {
   className?: string;
   user: User;
+  usersGroupNames: string[];
+  allGroupNames: string[];
+
+  onSetUsersGroup(groupNames: string[]): void;
+  onCreateGroup(groupName: string): void;
 }
 function UserCard(props: Props) {
+  // const { checkUserGroups } = usePartyData();
+  const [isOpenGroupModal, setIsOpenGroupModal] = useState(false);
+
   const renderedStatusIcon = useMemo(
     () => convertToStatusCurcle(props.user),
     [props.user],
   );
+
+  const userGroups = props.usersGroupNames;
+
   return (
-    <Card
-      className={props.className}
-      actions={[
-        <SettingOutlined key="setting" />,
-        <EditOutlined key="edit" />,
-        <EllipsisOutlined key="ellipsis" />,
-      ]}
-    >
-      <Meta
-        avatar={<Avatar src={props.user.currentAvatarThumbnailImageUrl} />}
-        title={
-          <Tooltip title={props.user.displayName}>
-            {props.user.displayName}
-          </Tooltip>
-        }
-        description={
-          <Flex>
-            <FlexRow css={{ alignItems: 'center' }}>
-              <div css={{ flex: `0 1 ${SIZE}px` }}>{renderedStatusIcon}</div>
-              <Tooltip
-                title={props.user.statusDescription}
-                css={{
-                  marginLeft: spacing(1),
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  visibility:
-                    props.user.statusDescription.trim() === ''
-                      ? 'hidden'
-                      : 'visible',
-                }}
-              >
-                {props.user.statusDescription.trim() === ''
-                  ? 'No status'
-                  : props.user.statusDescription}
-              </Tooltip>
-            </FlexRow>
-            {/* 
+    <>
+      <PartySelectModal
+        open={isOpenGroupModal}
+        allGroups={props.allGroupNames}
+        userGroups={userGroups}
+        onOk={props.onSetUsersGroup}
+        onCancel={() => setIsOpenGroupModal(false)}
+        onCreateGroup={props.onCreateGroup}
+      />
+
+      <Card
+        className={props.className}
+        actions={[
+          // <SettingOutlined key="setting" />,
+          // <EditOutlined key="edit" />,
+          // <EllipsisOutlined key="ellipsis" />,
+          <Typography.Text>참가 그룹: {userGroups.length}</Typography.Text>,
+          <EditOutlined key="edit" />,
+        ]}
+      >
+        <Meta
+          avatar={<Avatar src={props.user.currentAvatarThumbnailImageUrl} />}
+          title={
+            <Tooltip title={props.user.displayName} open={false}>
+              {props.user.displayName}
+            </Tooltip>
+          }
+          description={
+            <Flex>
+              <FlexRow css={{ alignItems: 'center' }}>
+                <div css={{ flex: `0 1 ${SIZE}px` }}>{renderedStatusIcon}</div>
+                <Tooltip
+                  open={false}
+                  title={props.user.statusDescription}
+                  css={{
+                    marginLeft: spacing(1),
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    visibility:
+                      props.user.statusDescription.trim() === ''
+                        ? 'hidden'
+                        : 'visible',
+                  }}
+                >
+                  {props.user.statusDescription.trim() === ''
+                    ? 'No status'
+                    : props.user.statusDescription}
+                </Tooltip>
+              </FlexRow>
+              {/* 
             <FlexRow>
               <Typography.Text ellipsis>
                 in {props.user.location}
               </Typography.Text>
             </FlexRow> */}
-          </Flex>
-        }
-      />
-    </Card>
+            </Flex>
+          }
+        />
+      </Card>
+    </>
   );
 }
 export default UserCard;
@@ -213,4 +240,11 @@ function convertToStatusCurcle(user: User) {
         />
       );
   }
+}
+
+function isOverflown(element: HTMLElement) {
+  return (
+    element.scrollHeight > element.clientHeight ||
+    element.scrollWidth > element.clientWidth
+  );
 }
