@@ -10,7 +10,6 @@ import {
 } from 'antd';
 import { RefSelectProps } from 'antd/lib/select';
 import { useEffect, useRef, useState } from 'react';
-import { usePartyData } from '../data/party';
 import { Flex } from './styledComponents';
 
 const { Option } = Select;
@@ -47,7 +46,7 @@ export default function PartySelectModal(props: Props) {
 
   const isDisabledAddItem =
     insertedItemName.trim() === '' ||
-    props.allGroups?.some((e) => e === insertedItemName.trim());
+    props.allGroups?.find((e) => e === insertedItemName.trim()) !== undefined;
 
   return (
     <Modal
@@ -63,7 +62,6 @@ export default function PartySelectModal(props: Props) {
       onCancel={() => {
         props.onCancel();
       }}
-      zIndex={3}
     >
       <Flex>
         <Select

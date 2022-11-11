@@ -1,4 +1,5 @@
 import {
+  ApartmentOutlined,
   AuditOutlined,
   ExperimentOutlined,
   EyeOutlined,
@@ -28,9 +29,10 @@ import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 import { Flex, FlexCenter } from './components/styledComponents';
 import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
-import FriendsPage from './features/friends/FriendsPage';
+import FriendsPage from './features/friend/FriendsPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
+import PartyPage from './features/party/PartyPage';
 import WorldExplorePage from './features/world-explore/WorldExplorePage';
 import WorldFavoritePage from './features/world-favorite/WorldFavoritePage';
 import WorldSheetPage from './features/world-sheet/WorldSheetPage';
@@ -53,20 +55,8 @@ export default function App() {
           <Route path="bookmark" element={<BookmarkPage />} />
           <Route path="explore" element={<WorldExplorePage />} />
           <Route path="favorite" element={<WorldFavoritePage />} />
-          <Route
-            path="friends"
-            element={
-              <Suspense
-                fallback={
-                  <FlexCenter>
-                    <Spin />
-                  </FlexCenter>
-                }
-              >
-                <FriendsPage />
-              </Suspense>
-            }
-          />
+          <Route path="party" element={<PartyPage />} />
+          <Route path="friends" element={<FriendsPage />} />
         </Route>
         <Route path="login" element={<LoginPage />} />
       </Routes>
@@ -141,6 +131,14 @@ function MenuLayout() {
                 icon: <StarOutlined />,
                 onClick(ev) {
                   navigate('/favorite');
+                },
+              },
+              {
+                label: 'Party',
+                key: 'party',
+                icon: <ApartmentOutlined />,
+                onClick(ev) {
+                  navigate('/party');
                 },
               },
               {

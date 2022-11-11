@@ -1,6 +1,14 @@
-import { useDebugValue } from 'react';
-import { atom, selector, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useDebugValue, useMemo } from 'react';
+import {
+  atom,
+  selector,
+  useRecoilState,
+  useRecoilValue,
+  useRecoilValueLoadable,
+  useSetRecoilState,
+} from 'recoil';
 import { User } from 'vrchat';
+import copyDeep from '../utils/copyDeep';
 import { sortedFriendsState } from './friends';
 
 // const friendsQuery = selector({
@@ -77,37 +85,57 @@ const partyDerivedState = selector({
 });
 
 interface PartyHookMember {
-  party: PartyGroup;
+  party: PartyGroup | undefined;
   addUser(groupName: string, user: User): void;
   removeUser(groupName: string, user: User): void;
   setUsersGroup(groupNames: string[], user: User): void;
   addGroup(groupName: string): void;
   removeGroup(groupName: string): void;
+  updateGroup(targetGroupName: string, newGroupName: string): void;
   checkUserGroups(userKey: string): string[];
 }
 export const usePartyData = (): PartyHookMember => {
-  const partyUserKeyGroup = useRecoilValue(partyUserKeyState);
-  const partyGroup = useRecoilValue(partyDerivedState);
-  const setPartyUserKeys = useSetRecoilState(partyUserKeyState);
-  useDebugValue(partyUserKeyGroup);
-  useDebugValue(partyGroup);
+  const partyGroupLoadable = useRecoilValueLoadable(partyDerivedState);
+  const [partyUserKeyGroup, setPartyUserKeyGroup] =
+    useRecoilState(partyUserKeyState);
+  // useDebugValue(partyUserKeyGroup);
+  // useDebugValue(partyGroup);
 
   const hookMember: PartyHookMember = {
-    party: partyGroup,
+    party: partyGroupLoadable.valueMaybe(),
     addUser(group, user) {
       const clone = { ...partyUserKeyGroup };
-      clone[group].push(user.id);
+      clone[group] = [user.id, ...clone[group]];
 
-      setPartyUserKeys(clone);
+      setPartyUserKeyGroup(clone);
     },
     removeUser(group, user) {
       const clone = { ...partyUserKeyGroup };
       clone[group] = clone[group].filter((k) => k === user.id);
 
-      setPartyUserKeys(clone);
+      setPartyUserKeyGroup(clone);
     },
     setUsersGroup(groupNames: string[], user: User): void {
-      throw new Error('Function not implemented.');
+      const oldGroupNames = hookMember.checkUserGroups(user.id);
+
+      const targetRemove = oldGroupNames.filter(
+        (og) => !groupNames.includes(og),
+      );
+      const targetAdd = groupNames.filter((ng) => !oldGroupNames.includes(ng));
+
+      const clonePartyUserKeyGroup = { ...partyUserKeyGroup };
+      for (const group of targetRemove) {
+        clonePartyUserKeyGroup[group] = clonePartyUserKeyGroup[group].filter(
+          (e) => e !== user.id,
+        );
+      }
+      for (const group of targetAdd) {
+        clonePartyUserKeyGroup[group] = [
+          user.id,
+          ...clonePartyUserKeyGroup[group],
+        ];
+      }
+      setPartyUserKeyGroup(clonePartyUserKeyGroup);
     },
     addGroup(groupName) {
       if (Object.prototype.hasOwnProperty.call(partyUserKeyGroup, groupName)) {
@@ -115,14 +143,33 @@ export const usePartyData = (): PartyHookMember => {
       }
       const clone = { ...partyUserKeyGroup };
       clone[groupName] = [];
+      setPartyUserKeyGroup(clone);
     },
     removeGroup(groupName) {
       if (Object.prototype.hasOwnProperty.call(partyUserKeyGroup, groupName)) {
         const clone = { ...partyUserKeyGroup };
         delete clone[groupName];
-        setPartyUserKeys(clone);
+        setPartyUserKeyGroup(clone);
       }
     },
+    updateGroup(targetGroupName, newGroupName) {
+      const oldGroupKeys = Object.keys(partyUserKeyGroup);
+
+      if (!oldGroupKeys.includes(targetGroupName)) {
+        // 없는 북마크 변경 시
+        return;
+      }
+      if (oldGroupKeys.includes(newGroupName)) {
+        // 중복된 북마크 이름으로 변경 시
+        return;
+      }
+      const clone = copyDeep(partyUserKeyGroup);
+      const temp = clone[targetGroupName].concat();
+      delete clone[targetGroupName];
+      clone[newGroupName] = temp;
+      setPartyUserKeyGroup(clone);
+    },
+
     checkUserGroups(userKey) {
       return Object.keys(partyUserKeyGroup).filter((g) => {
         return partyUserKeyGroup[g].includes(userKey);

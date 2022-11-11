@@ -1,10 +1,11 @@
-import { useDebugValue } from 'react';
+import { useDebugValue, useEffect } from 'react';
 import {
   atom,
   AtomEffect,
   selector,
   useRecoilRefresher_UNSTABLE,
   useRecoilValue,
+  useRecoilValueLoadable,
 } from 'recoil';
 import { User } from 'vrchat';
 import { VRCHAT_STATUS } from '../utils/constants';
@@ -12,7 +13,7 @@ import { loadBookmarks, saveBookmarks } from '../utils/ipc/bookmarksUtils';
 import { getFriednListToMain } from '../utils/ipc/vrchatAPIToMain';
 
 const friendsQuery = selector({
-  key: 'VRCFriendsQuery',
+  key: 'friendsQuery',
   get: async ({ get }) => {
     const response = await getFriednListToMain(true);
     return response;
@@ -20,7 +21,7 @@ const friendsQuery = selector({
 });
 
 export const sortedFriendsState = selector({
-  key: 'VRCSortedFriendsState',
+  key: 'sortedFriendsState',
   get: ({ get }) => {
     const friends = get(friendsQuery);
     const sortedFriends = [...friends].sort((a, b) => {
@@ -43,16 +44,16 @@ export const sortedFriendsState = selector({
 });
 
 interface FriendsHookMember {
-  friends: User[];
+  friends: User[] | undefined;
   refresh(): void;
 }
 export const useFriendsData = (): FriendsHookMember => {
-  const friends = useRecoilValue(sortedFriendsState);
+  const friendsLoadable = useRecoilValueLoadable(sortedFriendsState);
   const refreshFriends = useRecoilRefresher_UNSTABLE(friendsQuery);
-  useDebugValue(friends);
+  // useDebugValue(friends);
 
   const hookMember: FriendsHookMember = {
-    friends,
+    friends: friendsLoadable.valueMaybe(),
     refresh(): void {
       refreshFriends();
     },
