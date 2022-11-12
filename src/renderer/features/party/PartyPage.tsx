@@ -1,16 +1,28 @@
+import {
+  DownloadOutlined,
+  ReloadOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 import UserCard from '@src/renderer/components/card/UserCard';
 import PartySelectModal from '@src/renderer/components/PartySelectModal';
-import { FlexCenter, Grid } from '@src/renderer/components/styledComponents';
+import {
+  Flex,
+  FlexCenter,
+  FlexRow,
+  Grid,
+} from '@src/renderer/components/styledComponents';
 import { useFriendsData } from '@src/renderer/data/friends';
 import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
-import { Collapse, Spin } from 'antd';
+import { Button, Collapse, Dropdown, Menu, Spin } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { User } from 'vrchat';
 import usePartyPage from './hooks/usePartyPage';
+import PartyGroupModal from './PartyGroupModal';
 
 function PartyPage() {
   const hookMember = usePartyPage();
   const [groupModalData, setGroupModalData] = useState<User>();
+  const [isOpenPartyModal, setIsOpenPartyModal] = useState(false);
 
   // const renderedFriends = hookMember.friends?.map((friend) => (
   //   <UserCard
@@ -59,9 +71,14 @@ function PartyPage() {
         </Collapse.Panel>
       );
     });
+  const defaultOpenGroups = hookMember.partyGroup
+    ? Object.keys(hookMember.partyGroup).filter(
+        (groupName) => (hookMember.partyGroup?.[groupName].length || 0) > 0,
+      )
+    : [];
 
   return (
-    <>
+    <Flex css={{ margin: spacing(2) }}>
       <PartySelectModal
         open={groupModalData ? true : false}
         allGroups={
@@ -79,14 +96,73 @@ function PartyPage() {
         onCancel={() => setGroupModalData(undefined)}
         onCreateGroup={(groupName) => hookMember.onCreateGroup(groupName)}
       />
+      <PartyGroupModal
+        onAddItem={(type: string): void => {
+          hookMember.onCreateGroup(type);
+        }}
+        onEditItem={(type: string, newType: string): void => {
+          hookMember.onRenameGroup(type, newType);
+        }}
+        onRemoveItem={(type: string): void => {
+          hookMember.onRemoveGroup(type);
+        }}
+        onCancel={(): void => {
+          setIsOpenPartyModal(false);
+        }}
+        partyGroup={hookMember.partyGroup}
+        open={isOpenPartyModal}
+      />
+
+      <FlexRow
+        css={{
+          marginLeft: 'auto',
+          marginBottom: spacing(1),
+          alignItems: 'flex-end',
+        }}
+      >
+        <Button
+          size="middle"
+          icon={<ReloadOutlined />}
+          onClick={() => hookMember.onClickRefresh()}
+          loading={!renderedGroupPanels}
+        />
+
+        <Dropdown.Button
+          onClick={() => setIsOpenPartyModal(true)}
+          overlay={
+            <Menu
+              items={[
+                {
+                  label: '파티 내보내기',
+                  key: '1',
+                  icon: <UploadOutlined />,
+                  onClick: () => hookMember.onClickOpenSaveDialog(),
+                },
+                {
+                  label: '파티 가져오기',
+                  key: '2',
+                  icon: <DownloadOutlined />,
+                  danger: true,
+                  onClick: () => hookMember.onClickOpenLoadDialog(),
+                },
+              ]}
+            />
+          }
+        >
+          파티 관리
+        </Dropdown.Button>
+      </FlexRow>
+
       {renderedGroupPanels ? (
-        <Collapse css={{ margin: spacing(2) }}>{renderedGroupPanels}</Collapse>
+        <Collapse defaultActiveKey={defaultOpenGroups}>
+          {renderedGroupPanels}
+        </Collapse>
       ) : (
         <FlexCenter css={{ width: '100%', height: '100%' }}>
           <Spin />
         </FlexCenter>
       )}
-    </>
+    </Flex>
   );
 }
 export default PartyPage;

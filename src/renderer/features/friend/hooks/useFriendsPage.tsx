@@ -21,6 +21,7 @@ interface HookMember {
   checkUserGroups(userKey: string): string[];
   onSetUsersGroup(groupNames: string[], user: User): void;
   onCreateGroup(groupName: string): void;
+  onClickRefresh(): void;
 }
 const useFriendsPage = () => {
   const friendsHookMember = useFriendsData();
@@ -36,6 +37,9 @@ const useFriendsPage = () => {
     },
     onCreateGroup(groupName) {
       partyHookMember.addGroup(groupName);
+    },
+    onClickRefresh() {
+      friendsHookMember.refresh();
     },
   };
   return hookMember;

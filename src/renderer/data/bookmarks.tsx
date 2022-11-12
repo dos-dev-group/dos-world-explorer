@@ -1,6 +1,6 @@
 import { Bookmarks } from '@src/types';
 import { atom, AtomEffect } from 'recoil';
-import { loadBookmarks, saveBookmarks } from '../utils/ipc/bookmarksUtils';
+import { loadBookmarks, saveBookmarks } from '../utils/ipc/fileUtils';
 
 const bookmarkEffect =
   (): AtomEffect<Bookmarks | undefined> =>

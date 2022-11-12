@@ -9,7 +9,7 @@ import {
 } from 'recoil';
 import { User } from 'vrchat';
 import { VRCHAT_STATUS } from '../utils/constants';
-import { loadBookmarks, saveBookmarks } from '../utils/ipc/bookmarksUtils';
+import { loadBookmarks, saveBookmarks } from '../utils/ipc/fileUtils';
 import { getFriednListToMain } from '../utils/ipc/vrchatAPIToMain';
 
 const friendsQuery = selector({

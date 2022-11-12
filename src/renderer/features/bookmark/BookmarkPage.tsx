@@ -169,25 +169,6 @@ export default function BookmarkPage() {
           >
             북마크 관리
           </Dropdown.Button>
-          {/* <Button
-          onClick={() => hookMember.onClickOpenTypeModal()}
-          css={{ marginLeft: spacing(1) }}
-        >
-          북마크 관리
-        </Button>
-        <Button
-          onClick={() => hookMember.onClickOpenSaveBookmarkDialog()}
-          type="link"
-        >
-          북마크 내보내기
-        </Button>
-        <Button
-          onClick={() => hookMember.onClickOpenLoadBookmarkDialog()}
-          danger
-          type="text"
-        >
-          북마크 가져오기
-        </Button> */}
         </FlexRow>
       </Flex>
 

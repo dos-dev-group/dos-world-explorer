@@ -9,6 +9,7 @@ import {
 } from 'recoil';
 import { User } from 'vrchat';
 import copyDeep from '../utils/copyDeep';
+import { showLoadFileDialog, showSaveFileDialog } from '../utils/ipc/fileUtils';
 import { sortedFriendsState } from './friends';
 
 // const friendsQuery = selector({
@@ -91,15 +92,17 @@ interface PartyHookMember {
   setUsersGroup(groupNames: string[], user: User): void;
   addGroup(groupName: string): void;
   removeGroup(groupName: string): void;
-  updateGroup(targetGroupName: string, newGroupName: string): void;
+  renameGroup(targetGroupName: string, newGroupName: string): void;
   checkUserGroups(userKey: string): string[];
+  showSaveDialog(): Promise<void>;
+  showLoadDialog(): Promise<void>;
 }
 export const usePartyData = (): PartyHookMember => {
   const partyGroupLoadable = useRecoilValueLoadable(partyDerivedState);
   const [partyUserKeyGroup, setPartyUserKeyGroup] =
     useRecoilState(partyUserKeyState);
-  // useDebugValue(partyUserKeyGroup);
-  // useDebugValue(partyGroup);
+  useDebugValue(partyUserKeyGroup);
+  useDebugValue(partyGroupLoadable.valueMaybe());
 
   const hookMember: PartyHookMember = {
     party: partyGroupLoadable.valueMaybe(),
@@ -152,7 +155,7 @@ export const usePartyData = (): PartyHookMember => {
         setPartyUserKeyGroup(clone);
       }
     },
-    updateGroup(targetGroupName, newGroupName) {
+    renameGroup(targetGroupName, newGroupName) {
       const oldGroupKeys = Object.keys(partyUserKeyGroup);
 
       if (!oldGroupKeys.includes(targetGroupName)) {
@@ -174,6 +177,13 @@ export const usePartyData = (): PartyHookMember => {
       return Object.keys(partyUserKeyGroup).filter((g) => {
         return partyUserKeyGroup[g].includes(userKey);
       });
+    },
+    async showSaveDialog(): Promise<void> {
+      showSaveFileDialog(partyUserKeyGroup);
+    },
+    async showLoadDialog(): Promise<void> {
+      const data = await showLoadFileDialog<UserKeyPartyGroup>();
+      setPartyUserKeyGroup(data);
     },
   };
 
