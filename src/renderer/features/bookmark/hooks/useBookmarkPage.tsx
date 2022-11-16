@@ -3,9 +3,9 @@ import { worldDataState } from '@src/renderer/data/world';
 import copyDeep from '@src/renderer/utils/copyDeep';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
-  loadBookmarkFromFileDialog,
-  saveBookmarkToFileDialog,
-} from '@src/renderer/utils/ipc/bookmarksUtils';
+  showLoadFileDialog,
+  showSaveFileDialog,
+} from '@src/renderer/utils/ipc/fileUtils';
 import {
   getWorldDataToMain,
   modifyEditSheetToMain,
@@ -155,9 +155,9 @@ const useBookmarkPage = (): HookMember => {
     },
 
     onClickOpenLoadBookmarkDialog() {
-      loadBookmarkFromFileDialog()
-        .then((b: Bookmarks) => {
-          setBookmarks(b);
+      showLoadFileDialog()
+        .then((b) => {
+          setBookmarks(b as Bookmarks);
         })
         .then(() => {
           message.info('북마크 가져오기 성공.');
@@ -166,7 +166,7 @@ const useBookmarkPage = (): HookMember => {
     },
     onClickOpenSaveBookmarkDialog() {
       if (bookmarks) {
-        saveBookmarkToFileDialog(bookmarks)
+        showSaveFileDialog(bookmarks)
           .then(() => {
             message.info('북마크 내보내기 성공.');
           })

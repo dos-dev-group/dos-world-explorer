@@ -78,12 +78,12 @@ export function generatedWorldInstanceInfoToMain(
 }
 
 export function sendInvitesToMain(
-  userList: User[],
+  userKeyList: string[],
   worldId: string,
   instanceId: string,
 ) {
   window.electron.ipcRenderer.sendMessage('sendInvitesToMain', [
-    userList,
+    userKeyList,
     worldId,
     instanceId,
   ]);

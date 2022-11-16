@@ -1,7 +1,7 @@
 /* eslint-disable promise/no-nesting */
 import { UserLogin } from '@src/types';
 import { message } from 'antd';
-import { useEffect, useMemo } from 'react';
+import { useDebugValue, useEffect, useMemo } from 'react';
 import { atom, AtomEffect, useRecoilState, useResetRecoilState } from 'recoil';
 import { CurrentUser } from 'vrchat';
 import {
@@ -43,6 +43,7 @@ export interface VrcCurrentUserHookMember {
 export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const resetUser = useResetRecoilState(currentUserState);
+  useDebugValue(currentUser);
 
   const hookMember: VrcCurrentUserHookMember = {
     currentUser,

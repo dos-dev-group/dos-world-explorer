@@ -131,18 +131,18 @@ const useBookmark = (): HookMember => {
       return isMarked;
     },
     onChangeBookmarkWorld(types: string[]): void {
-      if (this.targetWorldTypes === undefined) return;
+      if (hookMember.targetWorldTypes === undefined) return;
 
       // 북마크 삭제
-      const deleteTarget = this.targetWorldTypes.filter(
+      const deleteTarget = hookMember.targetWorldTypes.filter(
         (be) => !types.find((te) => te === be),
       );
-      deleteTarget.forEach((t) => this.onRemoveBookmarkWorld(t));
+      deleteTarget.forEach((t) => hookMember.onRemoveBookmarkWorld(t));
       // 북마크 추가
       const addTarget = types.filter(
-        (be) => !this.targetWorldTypes!.find((te) => te === be),
+        (be) => !hookMember.targetWorldTypes!.find((te) => te === be),
       );
-      addTarget.forEach((t) => this.onAddBookmarkWorld(t));
+      addTarget.forEach((t) => hookMember.onAddBookmarkWorld(t));
     },
 
     isOpenBookmarkModal: bookmarkTargetWorld ? true : false,

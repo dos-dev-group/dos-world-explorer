@@ -96,7 +96,7 @@ function EditWorldModal(props: Props) {
       }}
       destroyOnClose
       onCancel={props.onCancel}
-      visible={props.world ? true : false}
+      open={props.world ? true : false}
       width="80%"
       okButtonProps={{
         disabled:

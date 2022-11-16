@@ -34,7 +34,6 @@ import { LimitedWorld } from 'vrchat';
 import convertWorldKeyToUrl from '@src/renderer/utils/vrc/convertWorldKeyToUrl';
 import useWorldExplorePage, { TabKey } from './hooks/useWorldExplorePage';
 
-const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
@@ -42,16 +41,16 @@ const { Search } = Input;
 export default function WorldExplorePage() {
   const hookMember = useWorldExplorePage();
 
-  const renderedTabs = ['recent', 'new', 'lab'].map((e) => {
+  const tabItems = ['recent', 'new', 'lab'].map((e) => {
     switch (e) {
       case 'recent':
-        return <TabPane tab={'최근 갔던 월드'} key={e} />;
+        return { label: '최근 갔던 월드', key: e };
       case 'new':
-        return <TabPane tab={'New 월드'} key={e} />;
+        return { label: 'New 월드', key: e };
       case 'lab':
-        return <TabPane tab={'Lab 월드'} key={e} />;
+        return { label: 'Lab 월드', key: e };
       default:
-        return <TabPane tab={'에러 key Name: ' + e} key={e} />;
+        return { label: '에러 key Name: ' + e, key: e };
     }
   });
 
@@ -85,9 +84,8 @@ export default function WorldExplorePage() {
       <Tabs
         activeKey={hookMember.currentTab}
         onChange={(e) => hookMember.onClickChangeTab(e as TabKey)}
-      >
-        {renderedTabs}
-      </Tabs>
+        items={tabItems}
+      />
 
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
         <Button
@@ -189,7 +187,13 @@ export default function WorldExplorePage() {
               </Typography.Text>
             )}
           />
-          <Column width={6} title="즐찾수" dataIndex="favorites" sorter />
+          <Column
+            width={8}
+            title="즐찾수"
+            dataIndex="favorites"
+            sorter
+            ellipsis
+          />
           {/* <Column
             width={20}
             title="Link"
@@ -260,7 +264,7 @@ export default function WorldExplorePage() {
               min={0}
               max={100}
               value={hookMember.queryLimit}
-              onChange={(e) => hookMember.onChangeQueryLimit(e)}
+              onChange={(e) => hookMember.onChangeQueryLimit(e || 0)}
             />
             개
             <Button

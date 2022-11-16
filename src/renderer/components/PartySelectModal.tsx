@@ -15,44 +15,43 @@ import { Flex } from './styledComponents';
 const { Option } = Select;
 
 interface Props {
-  bookmarkTypes: string[];
-  preSelectType?: string[];
-  visible: boolean;
+  allGroups: string[] | undefined;
+  userGroups: string[] | undefined;
+  open: boolean;
 
-  onOk: (types: string[]) => void;
+  onOk: (partyGroups: string[]) => void;
   onCancel: () => void;
-  onAddBookmarkItem: (type: string) => void;
+  onCreateGroup: (groupName: string) => void;
 }
-export default function BookmarkSelectModal(props: Props) {
+export default function PartySelectModal(props: Props) {
+  // const { checkUserGroups, party, addGroup } = usePartyData();
   const selectRef = useRef<RefSelectProps>(null);
 
   const [insertedItemName, setInsertedItemName] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<string[]>();
 
   useEffect(() => {
-    setSelectedTypes(props.preSelectType);
-  }, [props.preSelectType]);
+    setSelectedTypes(props.userGroups);
+  }, [props.userGroups]);
 
   useEffect(() => {
-    if (!props.visible) {
+    if (!props.open) {
       setInsertedItemName('');
       setSelectedTypes(undefined);
     }
-  }, [props.visible]);
+  }, [props.open]);
 
-  const renderedOptions = props.bookmarkTypes.map((e) => (
-    <Option key={e}>{e}</Option>
-  ));
+  const renderedOptions =
+    props.allGroups?.map((e) => <Option key={e}>{e}</Option>) || [];
 
   const isDisabledAddItem =
     insertedItemName.trim() === '' ||
-    props.bookmarkTypes.find((e) => e === insertedItemName.trim()) !==
-      undefined;
+    props.allGroups?.find((e) => e === insertedItemName.trim()) !== undefined;
 
   return (
     <Modal
-      title="북마크를 선택해주세요"
-      open={props.visible}
+      title="그룹을 선택해주세요"
+      open={props.open}
       onOk={() => {
         if (!selectedTypes) {
           message.error('타입을 골라주세요.');
@@ -63,12 +62,11 @@ export default function BookmarkSelectModal(props: Props) {
       onCancel={() => {
         props.onCancel();
       }}
-      zIndex={3}
     >
       <Flex>
         <Select
           ref={selectRef}
-          placeholder="북마크를 선택해주세요"
+          placeholder="그룹"
           mode="multiple"
           value={selectedTypes}
           onChange={(value) => {
@@ -81,14 +79,15 @@ export default function BookmarkSelectModal(props: Props) {
               <Divider style={{ margin: '8px 0' }} />
               <Space align="center" style={{ padding: '0 8px 4px' }}>
                 <Input
-                  placeholder="추가할 북마크 이름"
+                  placeholder="만들 그룹 이름"
                   value={insertedItemName}
                   onChange={(e) => setInsertedItemName(e.target.value)}
                 />
                 <Typography.Link
                   onClick={(e) => {
                     e.preventDefault();
-                    props.onAddBookmarkItem(insertedItemName);
+                    // props.onAddBookmarkItem(insertedItemName);
+                    props.onCreateGroup(insertedItemName);
                   }}
                   style={{ whiteSpace: 'nowrap' }}
                   disabled={isDisabledAddItem}

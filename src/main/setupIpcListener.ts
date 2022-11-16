@@ -29,10 +29,10 @@ import {
   getWorldAllInfo,
 } from './utils/vrchatAPI';
 import {
-  loadBookmarkFromFileDialog,
+  showLoadFileDialog,
   loadBookmarks,
   saveBookmarks,
-  saveBookmarkToFileDialog,
+  showSaveFileDialog,
 } from './utils/fileSystem';
 
 export default function setupIpcListener() {
@@ -199,24 +199,18 @@ export default function setupIpcListener() {
       event.reply('loadBookmarks', null);
     }
   });
-  ipcMain.on('saveBookmarkToFileDialog', async (event, arg) => {
+  ipcMain.on('showSaveFileDialog', async (event, arg) => {
     try {
-      event.reply(
-        'saveBookmarkToFileDialog',
-        await saveBookmarkToFileDialog(arg[0]),
-      );
+      event.reply('showSaveFileDialog', await showSaveFileDialog(arg[0]));
     } catch {
-      event.reply('saveBookmarkToFileDialog', null);
+      event.reply('showSaveFileDialog', null);
     }
   });
-  ipcMain.on('loadBookmarkFromFileDialog', async (event, arg) => {
+  ipcMain.on('showLoadFileDialog', async (event, arg) => {
     try {
-      event.reply(
-        'loadBookmarkFromFileDialog',
-        await loadBookmarkFromFileDialog(),
-      );
+      event.reply('showLoadFileDialog', await showLoadFileDialog());
     } catch {
-      event.reply('loadBookmarkFromFileDialog', null);
+      event.reply('showLoadFileDialog', null);
     }
   });
 }

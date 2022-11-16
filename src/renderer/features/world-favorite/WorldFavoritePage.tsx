@@ -34,7 +34,6 @@ import { LimitedWorld } from 'vrchat';
 import convertWorldKeyToUrl from '@src/renderer/utils/vrc/convertWorldKeyToUrl';
 import useWorldFavoritePage from './hooks/useWorldFavoritePage';
 
-const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
@@ -42,8 +41,8 @@ const { Search } = Input;
 export default function WorldFavoritePage() {
   const hookMember = useWorldFavoritePage();
 
-  const renderedTabs = hookMember.favoriteTabs.map((e) => {
-    return <TabPane tab={e.displayName} key={e.name} />;
+  const tabItems = hookMember.favoriteTabs.map((e) => {
+    return { label: e.displayName, key: e.name };
   });
 
   return (
@@ -76,9 +75,8 @@ export default function WorldFavoritePage() {
       <Tabs
         activeKey={hookMember.currentTab}
         onChange={(e) => hookMember.onClickChangeTab(e)}
-      >
-        {renderedTabs}
-      </Tabs>
+        items={tabItems}
+      ></Tabs>
 
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
         <Button

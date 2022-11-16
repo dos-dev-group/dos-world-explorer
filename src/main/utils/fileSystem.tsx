@@ -22,13 +22,13 @@ export function loadBookmarks(): Promise<Bookmarks> {
   return fs.readFile(FAV_PATH).then((v: Buffer) => JSON.parse(v.toString()));
 }
 
-export async function saveBookmarkToFileDialog(bookmarks: Bookmarks) {
+export async function showSaveFileDialog(file: unknown) {
   const dialogResult = await dialog.showSaveDialog({
-    title: '북마크의 저장 경로를 선택해주세요.',
+    title: '파일의 저장 경로를 선택해주세요.',
     defaultPath: app.getPath('documents'),
     filters: [
       {
-        name: 'bookmarks',
+        name: 'files',
         extensions: ['json'],
       },
     ],
@@ -41,20 +41,18 @@ export async function saveBookmarkToFileDialog(bookmarks: Bookmarks) {
   return fs
     .access(targetDirectory, constants.R_OK)
     .catch(() => fs.mkdir(path.dirname(targetDirectory), { recursive: true }))
-    .then(() =>
-      fs.writeFile(targetDirectory, JSON.stringify(bookmarks, null, 2)),
-    )
-    .then(() => bookmarks);
+    .then(() => fs.writeFile(targetDirectory, JSON.stringify(file, null, 2)))
+    .then(() => file);
 }
 
-export async function loadBookmarkFromFileDialog(): Promise<Bookmarks> {
+export async function showLoadFileDialog(): Promise<unknown> {
   const dialogResult = await dialog.showOpenDialog({
-    title: '불러올 북마크를 선택해주세요.',
+    title: '불러올 파일을 선택해주세요.',
     defaultPath: app.getPath('documents'),
     properties: ['openFile'],
     filters: [
       {
-        name: 'bookmarks',
+        name: 'files',
         extensions: ['json'],
       },
     ],

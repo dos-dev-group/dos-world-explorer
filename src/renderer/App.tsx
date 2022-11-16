@@ -1,4 +1,5 @@
 import {
+  ApartmentOutlined,
   AuditOutlined,
   ExperimentOutlined,
   EyeOutlined,
@@ -8,11 +9,12 @@ import {
   LoginOutlined,
   LogoutOutlined,
   StarOutlined,
+  TeamOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Typography } from 'antd';
+import { Layout, Menu, Spin, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
-import { ReactElement, ReactNode, useEffect } from 'react';
+import { ReactElement, ReactNode, Suspense, useEffect } from 'react';
 import {
   MemoryRouter as Router,
   Routes,
@@ -24,11 +26,13 @@ import {
 } from 'react-router-dom';
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 // import './App.css';
-import { Flex } from './components/styledComponents';
+import { Flex, FlexCenter } from './components/styledComponents';
 import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
+import FriendsPage from './features/friend/FriendsPage';
 import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
+import PartyPage from './features/party/PartyPage';
 import WorldExplorePage from './features/world-explore/WorldExplorePage';
 import WorldFavoritePage from './features/world-favorite/WorldFavoritePage';
 import WorldSheetPage from './features/world-sheet/WorldSheetPage';
@@ -51,6 +55,8 @@ export default function App() {
           <Route path="bookmark" element={<BookmarkPage />} />
           <Route path="explore" element={<WorldExplorePage />} />
           <Route path="favorite" element={<WorldFavoritePage />} />
+          <Route path="party" element={<PartyPage />} />
+          <Route path="friends" element={<FriendsPage />} />
         </Route>
         <Route path="login" element={<LoginPage />} />
       </Routes>
@@ -125,6 +131,22 @@ function MenuLayout() {
                 icon: <StarOutlined />,
                 onClick(ev) {
                   navigate('/favorite');
+                },
+              },
+              {
+                label: 'Party',
+                key: 'party',
+                icon: <ApartmentOutlined />,
+                onClick(ev) {
+                  navigate('/party');
+                },
+              },
+              {
+                label: 'Friends',
+                key: 'friends',
+                icon: <TeamOutlined />,
+                onClick(ev) {
+                  navigate('/friends');
                 },
               },
               {

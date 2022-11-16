@@ -23,31 +23,29 @@ export function loadBookmarks() {
   });
 }
 
-export function saveBookmarkToFileDialog(bookmarks: Bookmarks) {
-  window.electron.ipcRenderer.sendMessage('saveBookmarkToFileDialog', [
-    bookmarks,
-  ]);
-  return new Promise<Bookmarks>((resolve, reject) => {
+export function showSaveFileDialog<T = unknown>(target: T) {
+  window.electron.ipcRenderer.sendMessage('showSaveFileDialog', [target]);
+  return new Promise<T>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'saveBookmarkToFileDialog',
       (result: unknown) => {
         if (result === null) reject(new Error('Canceled'));
-        resolve(result as Bookmarks);
+        resolve(result as T);
       },
     );
   });
 }
 
-export function loadBookmarkFromFileDialog() {
-  window.electron.ipcRenderer.sendMessage('loadBookmarkFromFileDialog', []);
-  return new Promise<Bookmarks>((resolve, reject) => {
+export function showLoadFileDialog<T = unknown>() {
+  window.electron.ipcRenderer.sendMessage('showLoadFileDialog', []);
+  return new Promise<T>((resolve, reject) => {
     window.electron.ipcRenderer.once(
-      'loadBookmarkFromFileDialog',
+      'showLoadFileDialog',
       (result: unknown) => {
         if (result === null) {
           reject(new Error('Canceled'));
         }
-        resolve(result as Bookmarks);
+        resolve(result as T);
       },
     );
   });

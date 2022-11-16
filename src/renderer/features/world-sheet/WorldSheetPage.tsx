@@ -34,7 +34,6 @@ import WorldInfoModal from '../../components/WorldInfoModal';
 import EditWorldModal from '../../components/EditWorldModal';
 import useBookmark from '../../utils/hooks/useBookmark';
 
-const { TabPane } = Tabs;
 const { Column } = Table;
 const { Option } = Select;
 const { Search } = Input;
@@ -45,9 +44,7 @@ export default function WorldSheetPage() {
 
   const isAllType = hookMember.currentType === '전체';
 
-  const renderedTabs = hookMember.typeList.map((e) => (
-    <TabPane tab={e} key={e} />
-  ));
+  const tabItems = hookMember.typeList.map((e) => ({ label: e, key: e }));
 
   const renderedOptions = hookMember.searchOptions.map((e) => {
     let name;
@@ -166,9 +163,8 @@ export default function WorldSheetPage() {
         <Tabs
           activeKey={hookMember.currentType}
           onChange={hookMember.onChangeSheetTab}
-        >
-          {renderedTabs}
-        </Tabs>
+          items={tabItems}
+        ></Tabs>
       </Flex>
 
       <FlexRow css={{ marginLeft: 'auto', alignItems: 'center' }}>
