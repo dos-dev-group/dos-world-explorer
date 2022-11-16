@@ -103,7 +103,7 @@ function WorldInfoModal(props: Props) {
       {props.world && (
         <>
           <FlexCenter>
-            <Image src={props.world.imageUrl} css={{ maxHeight: 576 }}></Image>
+            <Image src={props.world.imageUrl} height={576}></Image>
           </FlexCenter>
           <br />
           <FlexRow>

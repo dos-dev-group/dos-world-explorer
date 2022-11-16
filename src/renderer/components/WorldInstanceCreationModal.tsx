@@ -1,11 +1,23 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { FlexCenter } from '@src/renderer/components/styledComponents';
+import { Flex, FlexCenter } from '@src/renderer/components/styledComponents';
 import { WorldPartial } from '@src/types';
-import { Button, Image, message, Modal, Select, Typography } from 'antd';
-import { useEffect, useState } from 'react';
+import {
+  Button,
+  Image,
+  message,
+  Modal,
+  Popover,
+  Select,
+  Typography,
+} from 'antd';
+import { useEffect, useMemo, useState } from 'react';
 import { spacing } from '@src/renderer/utils/styling';
 import { useVrcCurrentUser } from '../data/user';
-import { sendSelfInviteToMain } from '../utils/ipc/vrchatAPIToMain';
+import {
+  sendInvitesToMain,
+  sendSelfInviteToMain,
+} from '../utils/ipc/vrchatAPIToMain';
+import { usePartyData } from '../data/party';
 
 interface Props {
   onCancel?: () => void;
@@ -36,6 +48,17 @@ function WorldInstanceCreationModal(props: Props) {
   const [region, setRegion] = useState<string>(InstanceDefaultRegion);
   const [instanceId, setInstanceId] = useState<string>();
   const { currentUser } = useVrcCurrentUser();
+  const partyHookMember = usePartyData();
+  const [isInviteLoading, setIsInviteLoading] = useState(false);
+  const [selectedParty, setSelectedParty] = useState<string>();
+
+  const selectedPartyMembers = useMemo(
+    () =>
+      selectedParty && partyHookMember.party
+        ? partyHookMember.party[selectedParty].map((e) => e.id)
+        : [],
+    [partyHookMember.party, selectedParty],
+  );
 
   const renderedTypes = InstanceTypes.map((e) => (
     <Select.Option key={e}>{e}</Select.Option>
@@ -44,6 +67,45 @@ function WorldInstanceCreationModal(props: Props) {
   const renderedRegions = InstanceRegions.map((e) => (
     <Select.Option key={e}>{e}</Select.Option>
   ));
+
+  const renderedPartyGroups = Object.keys(partyHookMember.party || []).map(
+    (e) => <Select.Option key={e}>{e}</Select.Option>,
+  );
+
+  const renderedPopoverContent = (
+    <Flex css={{ padding: spacing(2) }}>
+      <Select
+        css={{ width: 200 }}
+        value={selectedParty}
+        placeholder="파티를 선택해주세요"
+        onSelect={(selected: string) => setSelectedParty(selected)}
+      >
+        {renderedPartyGroups}
+      </Select>
+      <Button
+        css={{ marginLeft: 'auto', marginTop: spacing(1) }}
+        size="small"
+        type="primary"
+        disabled={!(selectedParty && props.world && instanceId)}
+        onClick={async () => {
+          if (selectedParty && props.world && instanceId) {
+            setIsInviteLoading(true);
+            await sendInvitesToMain(
+              selectedPartyMembers,
+              props.world.key,
+              instanceId,
+            );
+            message.success('보내기 성공');
+          } else {
+            message.error('파티초대 에러');
+          }
+          setIsInviteLoading(false);
+        }}
+      >
+        초대
+      </Button>
+    </Flex>
+  );
 
   useEffect(() => {
     if (instanceId === undefined && currentUser !== undefined) {
@@ -63,25 +125,55 @@ function WorldInstanceCreationModal(props: Props) {
       title={title}
       open={props.visible}
       width="50%"
+      footer={[
+        <Button key="back" onClick={props.onCancel}>
+          취소
+        </Button>,
+        <Button
+          key="selfinvite"
+          type="primary"
+          onClick={async () => {
+            if (props.world?.key && instanceId) {
+              setIsInviteLoading(true);
+              try {
+                await sendSelfInviteToMain(props.world.key, instanceId);
+                message.success('셀프초대를 보냈습니다!');
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } catch (e: any) {
+                message.error('셀프초대를 실패했습니다.');
+              }
+              setIsInviteLoading(false);
+            }
+            props.onCancel?.();
+          }}
+        >
+          셀프초대
+        </Button>,
+        <Popover trigger="click" content={renderedPopoverContent}>
+          <Button key="partyinvite" type="primary" loading={isInviteLoading}>
+            파티초대
+          </Button>
+        </Popover>,
+      ]}
       onCancel={props.onCancel}
-      onOk={async () => {
-        if (props.world?.key && instanceId) {
-          try {
-            await sendSelfInviteToMain(props.world.key, instanceId);
-            message.success('셀프초대를 보냈습니다!');
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } catch (e: any) {
-            message.error('셀프초대를 실패했습니다.');
-          }
-        }
+      // onOk={async () => {
+      //   if (props.world?.key && instanceId) {
+      //     try {
+      //       await sendSelfInviteToMain(props.world.key, instanceId);
+      //       message.success('셀프초대를 보냈습니다!');
+      //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //     } catch (e: any) {
+      //       message.error('셀프초대를 실패했습니다.');
+      //     }
+      //   }
 
-        props.onCancel?.();
-      }}
-      okButtonProps={{
-        // disabled: !URL_REGEX.test(props.world?.key || '') ? true : false,
-        disabled: props.world && instanceId ? false : true,
-      }}
-      okText="셀프초대"
+      //   props.onCancel?.();
+      // }}
+      // okButtonProps={{
+      //   // disabled: !URL_REGEX.test(props.world?.key || '') ? true : false,
+      //   disabled: props.world && instanceId ? false : true,
+      // }}
+      // okText="셀프초대"
     >
       {props.world && (
         <>
