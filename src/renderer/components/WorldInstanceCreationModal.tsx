@@ -73,9 +73,8 @@ function WorldInstanceCreationModal(props: Props) {
   );
 
   const renderedPopoverContent = (
-    <Flex css={{ padding: spacing(2) }}>
+    <Flex css={{ padding: spacing(2), minWidth: '40vw' }}>
       <Select
-        css={{ width: 200 }}
         value={selectedParty}
         placeholder="파티를 선택해주세요"
         onSelect={(selected: string) => setSelectedParty(selected)}
@@ -88,7 +87,12 @@ function WorldInstanceCreationModal(props: Props) {
         type="primary"
         disabled={!(selectedParty && props.world && instanceId)}
         onClick={async () => {
-          if (selectedParty && props.world && instanceId) {
+          if (
+            selectedParty &&
+            selectedPartyMembers.length > 0 &&
+            props.world &&
+            instanceId
+          ) {
             setIsInviteLoading(true);
             await sendInvitesToMain(
               selectedPartyMembers,
@@ -96,6 +100,8 @@ function WorldInstanceCreationModal(props: Props) {
               instanceId,
             );
             message.success('보내기 성공');
+          } else if (selectedPartyMembers.length <= 0) {
+            message.error('파티에 사람이 없습니다');
           } else {
             message.error('파티초대 에러');
           }
@@ -132,6 +138,7 @@ function WorldInstanceCreationModal(props: Props) {
         <Button
           key="selfinvite"
           type="primary"
+          loading={isInviteLoading}
           onClick={async () => {
             if (props.world?.key && instanceId) {
               setIsInviteLoading(true);
@@ -149,7 +156,11 @@ function WorldInstanceCreationModal(props: Props) {
         >
           셀프초대
         </Button>,
-        <Popover trigger="click" content={renderedPopoverContent}>
+        <Popover
+          trigger="click"
+          content={renderedPopoverContent}
+          placement="topRight"
+        >
           <Button key="partyinvite" type="primary" loading={isInviteLoading}>
             파티초대
           </Button>
