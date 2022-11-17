@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import { useDebugValue, useMemo } from 'react';
 import {
   atom,
@@ -8,6 +9,7 @@ import {
   useSetRecoilState,
 } from 'recoil';
 import { User } from 'vrchat';
+import checkHasSpecialChar from '../utils/checkHasSpecialChar';
 import copyDeep from '../utils/copyDeep';
 import { showLoadFileDialog, showSaveFileDialog } from '../utils/ipc/fileUtils';
 import { sortedFriendsState } from './friends';
@@ -141,7 +143,15 @@ export const usePartyData = (): PartyHookMember => {
       setPartyUserKeyGroup(clonePartyUserKeyGroup);
     },
     addGroup(groupName) {
+      if (groupName.length <= 0) {
+        message.error('빈 문자열입니다');
+        return;
+      }
       if (Object.prototype.hasOwnProperty.call(partyUserKeyGroup, groupName)) {
+        return;
+      }
+      if (checkHasSpecialChar(groupName)) {
+        message.error('특수문자는 불가능합니다');
         return;
       }
       const clone = { ...partyUserKeyGroup };
@@ -149,6 +159,10 @@ export const usePartyData = (): PartyHookMember => {
       setPartyUserKeyGroup(clone);
     },
     removeGroup(groupName) {
+      if (groupName.length <= 0) {
+        message.error('빈 문자열입니다');
+        return;
+      }
       if (Object.prototype.hasOwnProperty.call(partyUserKeyGroup, groupName)) {
         const clone = { ...partyUserKeyGroup };
         delete clone[groupName];
@@ -166,6 +180,15 @@ export const usePartyData = (): PartyHookMember => {
         // 중복된 북마크 이름으로 변경 시
         return;
       }
+      if (newGroupName.length <= 0) {
+        message.error('빈 문자열입니다');
+        return;
+      }
+      if (checkHasSpecialChar(newGroupName)) {
+        message.error('특수문자는 불가능합니다');
+        return;
+      }
+
       const clone = copyDeep(partyUserKeyGroup);
       const temp = clone[targetGroupName].concat();
       delete clone[targetGroupName];

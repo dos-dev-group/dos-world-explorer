@@ -8,6 +8,8 @@ import {
   Modal,
   Popover,
   Select,
+  TreeSelect,
+  TreeSelectProps,
   Typography,
 } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,6 +20,11 @@ import {
   sendSelfInviteToMain,
 } from '../utils/ipc/vrchatAPIToMain';
 import { usePartyData } from '../data/party';
+import { useFriendsData } from '../data/friends';
+
+const TOKEN = '@';
+const PARTY_IDENTIFIER = 'party' + TOKEN;
+const USER_IDENTIFIER = 'user' + TOKEN;
 
 interface Props {
   onCancel?: () => void;
@@ -49,16 +56,46 @@ function WorldInstanceCreationModal(props: Props) {
   const [instanceId, setInstanceId] = useState<string>();
   const { currentUser } = useVrcCurrentUser();
   const partyHookMember = usePartyData();
+  const friendHookMember = useFriendsData();
   const [isInviteLoading, setIsInviteLoading] = useState(false);
-  const [selectedParty, setSelectedParty] = useState<string>();
+  const [inviteTargets, setInviteTargets] = useState<string[]>([]);
 
-  const selectedPartyMembers = useMemo(
-    () =>
-      selectedParty && partyHookMember.party
-        ? partyHookMember.party[selectedParty].map((e) => e.id)
-        : [],
-    [partyHookMember.party, selectedParty],
-  );
+  const userDataset = useMemo(() => {
+    if (!partyHookMember.party || !friendHookMember.friends) return;
+
+    const hasPartyData = Object.entries(partyHookMember.party).map(
+      ([key, value]) => {
+        return {
+          value: PARTY_IDENTIFIER + key,
+          title: '👥' + key + ` (${value.length})`,
+          checkable: value.length > 0 ? true : false,
+          children: value.map((e) => ({
+            value: key + USER_IDENTIFIER + e.id,
+            title:
+              e.location !== 'offline'
+                ? '🟢' + e.displayName
+                : '⚫' + e.displayName,
+          })),
+        };
+      },
+    );
+    const nonPartyData = [
+      {
+        value: PARTY_IDENTIFIER + 'ALL FRIENDS',
+        title: `👥ALL FRIENDS (${friendHookMember.friends.length})`,
+        checkable: false,
+        children: friendHookMember.friends.map((e) => ({
+          value: 'ALL FRIENDS' + USER_IDENTIFIER + e.id,
+          title:
+            e.location !== 'offline'
+              ? '🟢' + e.displayName
+              : '⚫' + e.displayName,
+        })),
+      },
+    ];
+    // eslint-disable-next-line consistent-return
+    return [...hasPartyData, ...nonPartyData];
+  }, [friendHookMember.friends, partyHookMember.party]);
 
   const renderedTypes = InstanceTypes.map((e) => (
     <Select.Option key={e}>{e}</Select.Option>
@@ -68,42 +105,54 @@ function WorldInstanceCreationModal(props: Props) {
     <Select.Option key={e}>{e}</Select.Option>
   ));
 
-  const renderedPartyGroups = Object.keys(partyHookMember.party || []).map(
-    (e) => <Select.Option key={e}>{e}</Select.Option>,
-  );
-
   const renderedPopoverContent = (
-    <Flex css={{ padding: spacing(2), minWidth: '40vw' }}>
-      <Select
-        value={selectedParty}
-        placeholder="파티를 선택해주세요"
-        onSelect={(selected: string) => setSelectedParty(selected)}
-      >
-        {renderedPartyGroups}
-      </Select>
+    <Flex css={{ padding: spacing(2), width: '40vw' }}>
+      <TreeSelect
+        treeData={userDataset}
+        showCheckedStrategy={TreeSelect.SHOW_PARENT}
+        treeCheckable
+        placeholder="유저나 파티를 선택해주세요"
+        onChange={(selected: string[]) => setInviteTargets(selected)}
+        placement="topLeft"
+      />
       <Button
         css={{ marginLeft: 'auto', marginTop: spacing(1) }}
         size="small"
         type="primary"
-        disabled={!(selectedParty && props.world && instanceId)}
+        disabled={!(inviteTargets.length > 0 && props.world && instanceId)}
         onClick={async () => {
-          if (
-            selectedParty &&
-            selectedPartyMembers.length > 0 &&
-            props.world &&
-            instanceId
-          ) {
+          if (inviteTargets.length > 0 && props.world && instanceId) {
             setIsInviteLoading(true);
-            await sendInvitesToMain(
-              selectedPartyMembers,
-              props.world.key,
-              instanceId,
-            );
+
+            const partyRegex = new RegExp(`^${PARTY_IDENTIFIER}`);
+            const userRegex = new RegExp(`^.+${USER_IDENTIFIER}`);
+            const partys = inviteTargets
+              .filter((e) => partyRegex.test(e))
+              .map((e) => e.replace(partyRegex, ''));
+            const users = inviteTargets
+              .filter((e) => userRegex.test(e))
+              .concat(
+                partys.flatMap((p) =>
+                  partyHookMember.party
+                    ? partyHookMember.party[p].map((u) => u.id)
+                    : [],
+                ),
+              )
+              .map((e) => e.replace(userRegex, ''))
+              .reduce((acc, cur) => {
+                if (acc.includes(cur)) {
+                  return acc;
+                }
+                acc.push(cur);
+                return acc;
+              }, [] as string[]);
+
+            await sendInvitesToMain(users, props.world.key, instanceId);
             message.success('보내기 성공');
-          } else if (selectedPartyMembers.length <= 0) {
-            message.error('파티에 사람이 없습니다');
+          } else if (inviteTargets.length <= 0) {
+            message.error('초대할 사람이 없습니다');
           } else {
-            message.error('파티초대 에러');
+            message.error('초대 에러');
           }
           setIsInviteLoading(false);
         }}
@@ -157,34 +206,17 @@ function WorldInstanceCreationModal(props: Props) {
           셀프초대
         </Button>,
         <Popover
+          key="partyinvite"
           trigger="click"
           content={renderedPopoverContent}
           placement="topRight"
         >
-          <Button key="partyinvite" type="primary" loading={isInviteLoading}>
-            파티초대
+          <Button type="primary" loading={isInviteLoading}>
+            초대
           </Button>
         </Popover>,
       ]}
       onCancel={props.onCancel}
-      // onOk={async () => {
-      //   if (props.world?.key && instanceId) {
-      //     try {
-      //       await sendSelfInviteToMain(props.world.key, instanceId);
-      //       message.success('셀프초대를 보냈습니다!');
-      //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //     } catch (e: any) {
-      //       message.error('셀프초대를 실패했습니다.');
-      //     }
-      //   }
-
-      //   props.onCancel?.();
-      // }}
-      // okButtonProps={{
-      //   // disabled: !URL_REGEX.test(props.world?.key || '') ? true : false,
-      //   disabled: props.world && instanceId ? false : true,
-      // }}
-      // okText="셀프초대"
     >
       {props.world && (
         <>
