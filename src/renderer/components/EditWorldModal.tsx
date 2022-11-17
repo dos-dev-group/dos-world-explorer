@@ -149,7 +149,7 @@ function EditWorldModal(props: Props) {
       <Input.Group css={{ marginTop: spacing(1) }}>
         <Space size="small" direction="vertical">
           <Row gutter={8}>
-            <Image src={worldCheckInfo?.imageUrl} />
+            <Image src={worldCheckInfo?.imageUrl} height={360} />
           </Row>
           <Row gutter={8}>
             <Col span={12}>
