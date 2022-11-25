@@ -14,7 +14,7 @@ import {
 import { useFriendsData } from '@src/renderer/data/friends';
 import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { Button, Collapse, Dropdown, Menu, Spin } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { User } from 'vrchat';
 import usePartyPage from './hooks/usePartyPage';
 import PartyGroupModal from './PartyGroupModal';
@@ -41,7 +41,7 @@ function PartyPage() {
         <UserCard
           key={memberUser.id}
           user={memberUser}
-          usersGroupNames={hookMember.checkUserGroups(memberUser.id)}
+          usersGroupNames={hookMember.findUserGroups(memberUser.id)}
           onClickGroupEdit={() => setGroupModalData(memberUser)}
         />
       ));
@@ -71,6 +71,7 @@ function PartyPage() {
         </Collapse.Panel>
       );
     });
+
   const defaultOpenGroups = hookMember.partyGroup
     ? Object.keys(hookMember.partyGroup).filter(
         (groupName) => (hookMember.partyGroup?.[groupName].length || 0) > 0,
@@ -85,7 +86,7 @@ function PartyPage() {
           hookMember.partyGroup ? Object.keys(hookMember.partyGroup) : []
         }
         userGroups={
-          groupModalData ? hookMember.checkUserGroups(groupModalData.id) : []
+          groupModalData ? hookMember.findUserGroups(groupModalData.id) : []
         }
         onOk={(groupNames) => {
           if (!groupModalData) return;
@@ -124,7 +125,7 @@ function PartyPage() {
           size="middle"
           icon={<ReloadOutlined />}
           onClick={() => hookMember.onClickRefresh()}
-          loading={!renderedGroupPanels}
+          loading={!hookMember.partyGroup}
         />
 
         <Dropdown.Button

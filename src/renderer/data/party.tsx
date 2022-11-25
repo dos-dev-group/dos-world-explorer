@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import { useDebugValue, useMemo } from 'react';
+import { useDebugValue, useEffect, useMemo, useState } from 'react';
 import {
   atom,
   selector,
@@ -95,7 +95,7 @@ interface PartyHookMember {
   addGroup(groupName: string): void;
   removeGroup(groupName: string): void;
   renameGroup(targetGroupName: string, newGroupName: string): void;
-  checkUserGroups(userKey: string): string[];
+  findUserGroups(userKey: string): string[];
   showSaveDialog(): Promise<void>;
   showLoadDialog(): Promise<void>;
 }
@@ -103,11 +103,19 @@ export const usePartyData = (): PartyHookMember => {
   const partyGroupLoadable = useRecoilValueLoadable(partyDerivedState);
   const [partyUserKeyGroup, setPartyUserKeyGroup] =
     useRecoilState(partyUserKeyState);
+  const [memoizedParty, setMemoizedParty] = useState<PartyGroup>();
   useDebugValue(partyUserKeyGroup);
   useDebugValue(partyGroupLoadable.valueMaybe());
 
+  useEffect(() => {
+    const maybeValue = partyGroupLoadable.valueMaybe();
+    if (maybeValue) {
+      setMemoizedParty(maybeValue);
+    }
+  }, [partyGroupLoadable]);
+
   const hookMember: PartyHookMember = {
-    party: partyGroupLoadable.valueMaybe(),
+    party: memoizedParty,
     addUser(group, user) {
       const clone = { ...partyUserKeyGroup };
       clone[group] = [user.id, ...clone[group]];
@@ -121,7 +129,7 @@ export const usePartyData = (): PartyHookMember => {
       setPartyUserKeyGroup(clone);
     },
     setUsersGroup(groupNames: string[], user: User): void {
-      const oldGroupNames = hookMember.checkUserGroups(user.id);
+      const oldGroupNames = hookMember.findUserGroups(user.id);
 
       const targetRemove = oldGroupNames.filter(
         (og) => !groupNames.includes(og),
@@ -196,7 +204,7 @@ export const usePartyData = (): PartyHookMember => {
       setPartyUserKeyGroup(clone);
     },
 
-    checkUserGroups(userKey) {
+    findUserGroups(userKey) {
       return Object.keys(partyUserKeyGroup).filter((g) => {
         return partyUserKeyGroup[g].includes(userKey);
       });

@@ -1,7 +1,7 @@
 /* eslint-disable promise/no-nesting */
 import { UserLogin } from '@src/types';
 import { message } from 'antd';
-import { useDebugValue, useEffect, useMemo } from 'react';
+import { useDebugValue, useEffect } from 'react';
 import { atom, AtomEffect, useRecoilState, useResetRecoilState } from 'recoil';
 import { CurrentUser } from 'vrchat';
 import {
@@ -45,8 +45,16 @@ export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
   const resetUser = useResetRecoilState(currentUserState);
   useDebugValue(currentUser);
 
+  useEffect(() => {
+    const id = setInterval(
+      () => getCurrentUserToMain().then((user) => setCurrentUser(user)),
+      5000,
+    );
+    return clearInterval(id);
+  }, [setCurrentUser]);
+
   const hookMember: VrcCurrentUserHookMember = {
-    currentUser,
+    currentUser: currentUser,
     async login(userLogin: UserLogin): Promise<CurrentUser> {
       const user = await login(userLogin);
       setCurrentUser(user);

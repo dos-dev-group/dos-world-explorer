@@ -1,4 +1,4 @@
-import { useDebugValue, useEffect } from 'react';
+import { useDebugValue, useEffect, useState } from 'react';
 import {
   atom,
   AtomEffect,
@@ -37,6 +37,10 @@ export const sortedFriendsState = selector({
         return VRCHAT_STATUS[a.status] - VRCHAT_STATUS[b.status];
       }
 
+      if (a.status !== 'offline' && b.status !== 'offline') {
+        return a.displayName.localeCompare(b.displayName);
+      }
+
       return b.last_login.localeCompare(a.last_login);
     });
     return sortedFriends;
@@ -50,10 +54,24 @@ interface FriendsHookMember {
 export const useFriendsData = (): FriendsHookMember => {
   const friendsLoadable = useRecoilValueLoadable(sortedFriendsState);
   const refreshFriends = useRecoilRefresher_UNSTABLE(friendsQuery);
-  // useDebugValue(friends);
+
+  const [memoizedFriends, setMemoizedFriends] = useState<User[]>();
+  useDebugValue(memoizedFriends);
+
+  useEffect(() => {
+    const id = setInterval(() => refreshFriends(), 5000);
+    return () => clearInterval(id);
+  }, [refreshFriends]);
+
+  useEffect(() => {
+    const maybeValue = friendsLoadable.valueMaybe();
+    if (maybeValue) {
+      setMemoizedFriends(maybeValue);
+    }
+  }, [friendsLoadable]);
 
   const hookMember: FriendsHookMember = {
-    friends: friendsLoadable.valueMaybe(),
+    friends: memoizedFriends,
     refresh(): void {
       refreshFriends();
     },

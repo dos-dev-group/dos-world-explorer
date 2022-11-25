@@ -16,9 +16,10 @@ onCreateGroup={function (groupName: string): void {
 
 interface HookMember {
   friends: User[] | undefined;
+  // partialFriends: User[] | undefined;
   partyGroup: PartyGroup | undefined;
 
-  checkUserGroups(userKey: string): string[];
+  findUserGroups(userKey: string): string[];
   onSetUsersGroup(groupNames: string[], user: User): void;
   onCreateGroup(groupName: string): void;
   onClickRefresh(): void;
@@ -31,7 +32,7 @@ const useFriendsPage = () => {
     friends: friendsHookMember.friends,
     partyGroup: partyHookMember.party,
 
-    checkUserGroups: partyHookMember.checkUserGroups,
+    findUserGroups: partyHookMember.findUserGroups,
     onSetUsersGroup(groupNames, user) {
       partyHookMember.setUsersGroup(groupNames, user);
     },

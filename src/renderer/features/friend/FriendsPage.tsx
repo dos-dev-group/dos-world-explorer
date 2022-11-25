@@ -9,7 +9,7 @@ import {
 } from '@src/renderer/components/styledComponents';
 import { useFriendsData } from '@src/renderer/data/friends';
 import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
-import { Button, Collapse, Spin } from 'antd';
+import { Button, Collapse, Pagination, Spin } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { User } from 'vrchat';
 import useFriendsPage from './hooks/useFriendsPage';
@@ -23,7 +23,7 @@ function FriendsPage() {
       key={friend.id}
       user={friend}
       css={{ overflowX: 'hidden' }}
-      usersGroupNames={hookMember.checkUserGroups(friend.id)}
+      usersGroupNames={hookMember.findUserGroups(friend.id)}
       onClickGroupEdit={() => setGroupModalData(friend)}
     />
   ));
@@ -37,7 +37,7 @@ function FriendsPage() {
           hookMember.partyGroup ? Object.keys(hookMember.partyGroup) : []
         }
         userGroups={
-          groupModalData ? hookMember.checkUserGroups(groupModalData.id) : []
+          groupModalData ? hookMember.findUserGroups(groupModalData.id) : []
         }
         onOk={(groupNames) => {
           if (!groupModalData) return;
@@ -64,9 +64,10 @@ function FriendsPage() {
             loading={!renderedFriends}
           />
         </FlexRow>
-        {renderedFriends ? (
-          <Collapse activeKey={['all']}>
-            <Collapse.Panel key="all" header={`Friends (${numFriends})`}>
+
+        <Collapse activeKey={['all']}>
+          <Collapse.Panel key="all" header={`Friends (${numFriends})`}>
+            {renderedFriends ? (
               <Grid
                 css={{
                   gridTemplateColumns: 'repeat(3, 1fr)',
@@ -80,13 +81,22 @@ function FriendsPage() {
               >
                 {renderedFriends}
               </Grid>
-            </Collapse.Panel>
-          </Collapse>
-        ) : (
-          <FlexCenter css={{ width: '100%', height: '100%' }}>
-            <Spin />
-          </FlexCenter>
-        )}
+            ) : (
+              <FlexCenter css={{ width: '100%', height: '100%' }}>
+                <Spin />
+              </FlexCenter>
+            )}
+          </Collapse.Panel>
+        </Collapse>
+        <FlexRow css={{ marginTop: spacing(2) }}>
+          <Pagination
+            css={{ marginLeft: 'auto' }}
+            total={85}
+            showTotal={(total, range) => `${range[0]} - ${range[1]} (${total})`}
+            showSizeChanger={false}
+            defaultCurrent={1}
+          />
+        </FlexRow>
       </Flex>
     </Flex>
   );
