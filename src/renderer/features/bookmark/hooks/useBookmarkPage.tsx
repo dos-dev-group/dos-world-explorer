@@ -17,6 +17,7 @@ import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
+import { useVrcCurrentUser } from '@src/renderer/data/user';
 
 const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
 export type SearchOptions = typeof SEARCH_OPTIONS;
@@ -58,8 +59,18 @@ const useBookmarkPage = (): HookMember => {
     useState<boolean>(false);
   const [isManipulatedTable, setIsManipulatedTable] = useState(false);
 
+  const userHookMember = useVrcCurrentUser();
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   // const bookmarks = useMemo(() => favorites, [worldData]);
+
+  const getWorlds = useMemo(
+    () =>
+      userHookMember.currentAuthType === 'USER'
+        ? getSheetWorldData
+        : getWorldDataToMain,
+    [userHookMember.currentAuthType],
+  );
 
   useEffect(() => {
     if (!bookmarks) return;
@@ -79,12 +90,12 @@ const useBookmarkPage = (): HookMember => {
 
   useEffect(() => {
     if (worldData === undefined) {
-      getWorldDataToMain().then((data) => {
+      getWorlds().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
     }
-  }, [setWorldData, worldData]);
+  }, [getWorlds, setWorldData, worldData]);
 
   const favKeys = useMemo(
     () =>
@@ -142,7 +153,7 @@ const useBookmarkPage = (): HookMember => {
     },
     onClickRefresh() {
       setIsLoading(true);
-      getWorldDataToMain().then((data) => {
+      getWorlds().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
@@ -155,7 +166,7 @@ const useBookmarkPage = (): HookMember => {
     },
 
     onClickOpenLoadBookmarkDialog() {
-      showLoadFileDialog()
+      showLoadFileDialog('bookmark')
         .then((b) => {
           setBookmarks(b as Bookmarks);
         })
@@ -166,7 +177,7 @@ const useBookmarkPage = (): HookMember => {
     },
     onClickOpenSaveBookmarkDialog() {
       if (bookmarks) {
-        showSaveFileDialog(bookmarks)
+        showSaveFileDialog('bookmark', bookmarks)
           .then(() => {
             message.info('북마크 내보내기 성공.');
           })
@@ -180,12 +191,17 @@ const useBookmarkPage = (): HookMember => {
       setIsManipulatedTable(isManipulated);
     },
     onEditWorld(key, world) {
+      if (userHookMember.currentAuthType !== 'ADMIN') {
+        message.error('어드민이 아닙니다.');
+        return;
+      }
+
       setIsLoading(true);
       modifyEditSheetToMain(key, world)
         .then(() => {
           message.info('월드가 변경되었습니다');
         })
-        .then(() => getWorldDataToMain())
+        .then(() => getWorlds())
         .then((data) => {
           setWorldData(data);
         })
@@ -193,12 +209,17 @@ const useBookmarkPage = (): HookMember => {
         .finally(() => setIsLoading(false));
     },
     onRemoveWorld(key) {
+      if (userHookMember.currentAuthType !== 'ADMIN') {
+        message.error('어드민이 아닙니다.');
+        return;
+      }
+
       setIsLoading(true);
       reomoveEditSheetToMain(key)
         .then(() => {
           message.info('월드가 삭제되었습니다');
         })
-        .then(() => getWorldDataToMain())
+        .then(() => getWorlds())
         .then((data) => {
           setWorldData(data);
         })

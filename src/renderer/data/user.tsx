@@ -1,5 +1,6 @@
 /* eslint-disable promise/no-nesting */
-import { UserLogin } from '@src/types';
+import authUsers from '@secret/authUsers.json';
+import { AuthType, UserLogin } from '@src/types';
 import { message } from 'antd';
 import { useDebugValue, useEffect } from 'react';
 import { atom, AtomEffect, useRecoilState, useResetRecoilState } from 'recoil';
@@ -37,6 +38,7 @@ const currentUserState = atom<CurrentUser | undefined>({
 
 export interface VrcCurrentUserHookMember {
   currentUser: CurrentUser | undefined;
+  currentAuthType: AuthType;
   login(userLogin: UserLogin): Promise<CurrentUser>;
   logout(): Promise<void>;
 }
@@ -55,6 +57,9 @@ export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
 
   const hookMember: VrcCurrentUserHookMember = {
     currentUser: currentUser,
+    currentAuthType: authUsers.admin.includes(currentUser?.id || '')
+      ? 'ADMIN'
+      : 'USER',
     async login(userLogin: UserLogin): Promise<CurrentUser> {
       const user = await login(userLogin);
       setCurrentUser(user);

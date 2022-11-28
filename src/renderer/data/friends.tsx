@@ -9,7 +9,6 @@ import {
 } from 'recoil';
 import { User } from 'vrchat';
 import { VRCHAT_STATUS } from '../utils/constants';
-import { loadBookmarks, saveBookmarks } from '../utils/ipc/fileUtils';
 import { getFriednListToMain } from '../utils/ipc/vrchatAPIToMain';
 
 const friendsQuery = selector({
@@ -63,12 +62,12 @@ export const useFriendsData = (): FriendsHookMember => {
     return () => clearInterval(id);
   }, [refreshFriends]);
 
+  const maybeValue = friendsLoadable.valueMaybe();
   useEffect(() => {
-    const maybeValue = friendsLoadable.valueMaybe();
     if (maybeValue) {
       setMemoizedFriends(maybeValue);
     }
-  }, [friendsLoadable]);
+  }, [maybeValue]);
 
   const hookMember: FriendsHookMember = {
     friends: memoizedFriends,

@@ -1,30 +1,15 @@
-import { Bookmarks } from '@src/types';
-import { NoDataError } from '../error';
+import packageMetadata from '@src/../package.json';
 
-export function saveBookmarks(bookmarks: Bookmarks) {
-  window.electron.ipcRenderer.sendMessage('saveBookmarks', [bookmarks]);
-  return new Promise<Bookmarks>((resolve, reject) => {
-    window.electron.ipcRenderer.once('saveBookmarks', (result: unknown) => {
-      if (result === null) reject(new Error('Fail to Save Bookmarks'));
-      resolve(result as Bookmarks);
-    });
-  });
-}
+const APP_NAME = packageMetadata.name;
 
-export function loadBookmarks() {
-  window.electron.ipcRenderer.sendMessage('loadBookmarks', []);
-  return new Promise<Bookmarks>((resolve, reject) => {
-    window.electron.ipcRenderer.once('loadBookmarks', (result: unknown) => {
-      if (result === null) {
-        reject(new NoDataError('Fail Load Bookmarks'));
-      }
-      resolve(result as Bookmarks);
-    });
-  });
-}
-
-export function showSaveFileDialog<T = unknown>(target: T) {
-  window.electron.ipcRenderer.sendMessage('showSaveFileDialog', [target]);
+export function showSaveFileDialog<T = unknown>(type: string, target: T) {
+  window.electron.ipcRenderer.sendMessage('showSaveFileDialog', [
+    {
+      app: APP_NAME,
+      type: type,
+      data: target,
+    },
+  ]);
   return new Promise<T>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'saveBookmarkToFileDialog',
@@ -36,17 +21,24 @@ export function showSaveFileDialog<T = unknown>(target: T) {
   });
 }
 
-export function showLoadFileDialog<T = unknown>() {
+export function showLoadFileDialog<T = unknown>(type: string) {
   window.electron.ipcRenderer.sendMessage('showLoadFileDialog', []);
   return new Promise<T>((resolve, reject) => {
-    window.electron.ipcRenderer.once(
-      'showLoadFileDialog',
-      (result: unknown) => {
-        if (result === null) {
-          reject(new Error('Canceled'));
-        }
-        resolve(result as T);
-      },
-    );
+    window.electron.ipcRenderer.once('showLoadFileDialog', (result: any) => {
+      if (result === null) {
+        reject(new Error('Canceled'));
+        return;
+      }
+      if (result?.app !== APP_NAME) {
+        reject(new Error('Not matched this app'));
+        return;
+      }
+      if (result?.type !== type) {
+        reject(new Error('Not matched type'));
+        return;
+      }
+
+      resolve(result as T);
+    });
   });
 }

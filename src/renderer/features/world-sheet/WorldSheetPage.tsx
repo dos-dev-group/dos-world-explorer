@@ -367,39 +367,41 @@ export default function WorldSheetPage() {
               </Typography.Link>
             )}
           /> */}
-          <Column
-            width={7}
-            dataIndex="key"
-            responsive={['xl']}
-            render={(k, record: World) => (
-              <Flex
-                css={{
-                  [mqMinWidth(1200)]: {
-                    width: 50,
-                  },
-                }}
-              >
-                <Button
-                  type="primary"
-                  ghost
-                  size="small"
-                  onClick={() => hookMember.onOpenEditWorldModal(record)}
+          {hookMember.authType === 'ADMIN' && (
+            <Column
+              width={7}
+              dataIndex="key"
+              responsive={['xl']}
+              render={(k, record: World) => (
+                <Flex
+                  css={{
+                    [mqMinWidth(1200)]: {
+                      width: 50,
+                    },
+                  }}
                 >
-                  수정
-                </Button>
-                <div css={{ marginTop: 4 }} />
-                <Popconfirm
-                  title="정말 월드를 삭제하시겠습니까?"
-                  placement="topRight"
-                  onConfirm={() => hookMember.onRemoveWorld(k)}
-                >
-                  <Button danger size="small">
-                    삭제
+                  <Button
+                    type="primary"
+                    ghost
+                    size="small"
+                    onClick={() => hookMember.onOpenEditWorldModal(record)}
+                  >
+                    수정
                   </Button>
-                </Popconfirm>
-              </Flex>
-            )}
-          />
+                  <div css={{ marginTop: 4 }} />
+                  <Popconfirm
+                    title="정말 월드를 삭제하시겠습니까?"
+                    placement="topRight"
+                    onConfirm={() => hookMember.onRemoveWorld(k)}
+                  >
+                    <Button danger size="small">
+                      삭제
+                    </Button>
+                  </Popconfirm>
+                </Flex>
+              )}
+            />
+          )}
         </Table>
       </Spin>
     </Flex>

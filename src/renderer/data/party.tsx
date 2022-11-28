@@ -107,12 +107,12 @@ export const usePartyData = (): PartyHookMember => {
   useDebugValue(partyUserKeyGroup);
   useDebugValue(partyGroupLoadable.valueMaybe());
 
+  const maybeValue = partyGroupLoadable.valueMaybe();
   useEffect(() => {
-    const maybeValue = partyGroupLoadable.valueMaybe();
     if (maybeValue) {
       setMemoizedParty(maybeValue);
     }
-  }, [partyGroupLoadable]);
+  }, [maybeValue]);
 
   const hookMember: PartyHookMember = {
     party: memoizedParty,
@@ -210,10 +210,10 @@ export const usePartyData = (): PartyHookMember => {
       });
     },
     async showSaveDialog(): Promise<void> {
-      showSaveFileDialog(partyUserKeyGroup);
+      showSaveFileDialog('party', partyUserKeyGroup);
     },
     async showLoadDialog(): Promise<void> {
-      const data = await showLoadFileDialog<UserKeyPartyGroup>();
+      const data = await showLoadFileDialog<UserKeyPartyGroup>('party');
       setPartyUserKeyGroup(data);
     },
   };

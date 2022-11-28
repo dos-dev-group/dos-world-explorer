@@ -30,9 +30,11 @@ import WorldInstanceCreationModal from './WorldInstanceCreationModal';
 import { useFavoritedWorld } from '../data/favoritedWorld';
 import FavoriteWorldSelectModal from './FavoriteWorldSelectModal';
 import { getWorldAllInfoToMain } from '../utils/ipc/vrchatAPIToMain';
+import { useVrcCurrentUser } from '../data/user';
 
 interface Props {
   onCancel?: () => void;
+  onAdd?: (world: WorldPartial) => void;
   onEdit?: (world: WorldPartial) => void;
   onRemove?: (world: WorldPartial) => void;
   onClickBookmark?: (world: WorldPartial, isBookmarked: boolean) => void;
@@ -48,6 +50,7 @@ function WorldInfoModal(props: Props) {
   const [vrcWorldInfo, setVRCWorldInfo] = useState<VRCWorld>();
 
   const favoritedWorldHookMember = useFavoritedWorld();
+  const userHookMember = useVrcCurrentUser();
 
   // memoized check is world favorited
   const favoriteGroup = useMemo(
@@ -193,25 +196,41 @@ function WorldInfoModal(props: Props) {
                     />
                   </>
                 )}
-                {props.onEdit && (
-                  <Button
-                    type="primary"
-                    ghost
-                    onClick={() => {
-                      props.onEdit?.(props.world!);
-                    }}
-                  >
-                    수정
-                  </Button>
-                )}
-                {props.onRemove && (
-                  <Popconfirm
-                    title="정말 월드를 삭제하시겠습니까?"
-                    placement="topRight"
-                    onConfirm={() => props.onRemove?.(props.world!)}
-                  >
-                    <Button danger>삭제</Button>
-                  </Popconfirm>
+                <br />
+                {userHookMember.currentAuthType === 'ADMIN' && (
+                  <>
+                    {props.onAdd && (
+                      <Button
+                        type="primary"
+                        ghost
+                        onClick={() => {
+                          props.onAdd?.(props.world!);
+                        }}
+                      >
+                        추가
+                      </Button>
+                    )}
+                    {props.onEdit && (
+                      <Button
+                        type="primary"
+                        ghost
+                        onClick={() => {
+                          props.onEdit?.(props.world!);
+                        }}
+                      >
+                        수정
+                      </Button>
+                    )}
+                    {props.onRemove && (
+                      <Popconfirm
+                        title="정말 월드를 삭제하시겠습니까?"
+                        placement="topRight"
+                        onConfirm={() => props.onRemove?.(props.world!)}
+                      >
+                        <Button danger>삭제</Button>
+                      </Popconfirm>
+                    )}
+                  </>
                 )}
               </div>
 

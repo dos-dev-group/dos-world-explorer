@@ -1,6 +1,8 @@
 import { type } from 'os';
 import { FavoriteGroup, LimitedWorld } from 'vrchat';
 
+export type AuthType = 'ADMIN' | 'MODERATOR' | 'USER';
+
 export interface World {
   key: string; // 월드 고유ID
   name: string;

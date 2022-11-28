@@ -11,7 +11,6 @@ import {
   FlexRow,
   Grid,
 } from '@src/renderer/components/styledComponents';
-import { useFriendsData } from '@src/renderer/data/friends';
 import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
 import { Button, Collapse, Dropdown, Menu, Spin } from 'antd';
 import { ReactNode, useEffect, useMemo, useState } from 'react';

@@ -5,11 +5,13 @@ import {
   addEditSheetToMain,
   getWorldDataToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
-import { World, WorldEditInput, WorldPartial } from '@src/types';
+import { AuthType, World, WorldEditInput, WorldPartial } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { FavoriteGroup, LimitedWorld } from 'vrchat';
+import { useVrcCurrentUser } from '@src/renderer/data/user';
+import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 
 interface HookMember {
   isLoading: boolean;
@@ -23,7 +25,7 @@ interface HookMember {
 
   onClickRefresh(): void;
   onChangePage(page: number): void;
-  onOpenAddWorldModal(world: LimitedWorld): void;
+  onOpenAddWorldModal(world: WorldPartial): void;
   onCloseAddWorldModal(): void;
   onOpenWorldInfoModal(world: LimitedWorld): void;
   onCloseWorldInfoModal(): void;
@@ -39,6 +41,15 @@ const useWorldFavoritePage = (): HookMember => {
   const [infoModalWorld, setInfoModalWorld] = useState<WorldPartial>();
   const [addModalWorld, setAddModalWorld] = useState<WorldPartial>();
   const favoritedWorldHookMember = useFavoritedWorld();
+  const userHookMember = useVrcCurrentUser();
+
+  const getWorlds = useMemo(
+    () =>
+      userHookMember.currentAuthType === 'USER'
+        ? getSheetWorldData
+        : getWorldDataToMain,
+    [userHookMember.currentAuthType],
+  );
 
   const favoriteTabs = useMemo(
     () =>
@@ -67,11 +78,11 @@ const useWorldFavoritePage = (): HookMember => {
 
   useEffect(() => {
     if (worldData === undefined) {
-      getWorldDataToMain().then((data) => {
+      getWorlds().then((data) => {
         return setWorldData(data);
       });
     }
-  }, [setWorldData, worldData]);
+  }, [getWorlds, setWorldData, worldData]);
 
   useEffect(() => {
     if (favoritedWorldHookMember.favoritedWorlds && worldData !== undefined) {
@@ -102,8 +113,8 @@ const useWorldFavoritePage = (): HookMember => {
     onChangePage(page: number): void {
       setCurrentPage(page);
     },
-    onOpenAddWorldModal(world: LimitedWorld): void {
-      setAddModalWorld(convertLimitedWorldToDosWorld(world));
+    onOpenAddWorldModal(world: WorldPartial): void {
+      setAddModalWorld(world);
     },
     onCloseAddWorldModal(): void {
       setAddModalWorld(undefined);
@@ -115,9 +126,14 @@ const useWorldFavoritePage = (): HookMember => {
       setInfoModalWorld(undefined);
     },
     onAddWorld(world: WorldEditInput): void {
+      if (userHookMember.currentAuthType !== 'ADMIN') {
+        message.error('어드민이 아닙니다.');
+        return;
+      }
+
       addEditSheetToMain(world)
         .then(() => message.info('월드가 추가되었습니다'))
-        .then(() => getWorldDataToMain())
+        .then(() => getWorlds())
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()));
     },
