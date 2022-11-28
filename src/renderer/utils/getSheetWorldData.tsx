@@ -70,7 +70,7 @@ export default function getSheetWorldData() {
           description: row[3].textContent || '', // 설명
           tags:
             row[4].textContent!.replaceAll(' ', '').slice(1).split('#') || [], // 태그
-          score: row[5].textContent?.length || 0, // 별점
+          score: Number(row[5].textContent) || 0, // 별점
           url: row[6].textContent || '', // 링크
           imageUrl: row[0].textContent || '',
           // row[0].getElementsByTagName('img')[0]?.getAttribute('src') || '', // 이미지

@@ -1,20 +1,14 @@
 import {
   ApartmentOutlined,
   AuditOutlined,
-  ExperimentOutlined,
-  EyeOutlined,
   GlobalOutlined,
   HeartOutlined,
-  HomeOutlined,
-  LoginOutlined,
   LogoutOutlined,
   StarOutlined,
   TeamOutlined,
-  ThunderboltOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Spin, Typography } from 'antd';
+import { Layout, Menu, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
-import { ReactElement, ReactNode, Suspense, useEffect } from 'react';
 import {
   MemoryRouter as Router,
   Routes,
@@ -24,13 +18,11 @@ import {
   useLocation,
   Navigate,
 } from 'react-router-dom';
-import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 // import './App.css';
 import { Flex } from './components/styledComponents';
 import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import FriendsPage from './features/friend/FriendsPage';
-import Home from './features/home/Home';
 import LoginPage from './features/login/LoginPage';
 import PartyPage from './features/party/PartyPage';
 import WorldExplorePage from './features/world-explore/WorldExplorePage';
@@ -102,7 +94,7 @@ function MenuLayout() {
               //   },
               // },
               {
-                label: 'Sheet',
+                label: 'World List',
                 key: 'sheet',
                 icon: <AuditOutlined />,
                 onClick(ev) {
@@ -110,7 +102,7 @@ function MenuLayout() {
                 },
               },
               {
-                label: 'Bookmarks',
+                label: 'Bookmark',
                 key: 'bookmark',
                 icon: <HeartOutlined />,
                 onClick(ev) {
@@ -120,7 +112,7 @@ function MenuLayout() {
               {
                 label: 'Explore',
                 key: 'explore',
-                icon: <EyeOutlined />,
+                icon: <GlobalOutlined />,
                 onClick(ev) {
                   navigate('/explore');
                 },

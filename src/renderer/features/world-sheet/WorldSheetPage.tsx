@@ -188,19 +188,23 @@ export default function WorldSheetPage() {
             },
             current: hookMember.currentPage,
           }}
-          footer={(data) => (
-            <FlexRow css={{ gap: spacing(2) }}>
-              <Button
-                type="primary"
-                css={{ marginLeft: 'auto' }}
-                onClick={(e) => {
-                  hookMember.onOpenAddWorldModal();
-                }}
-              >
-                월드 추가
-              </Button>
-            </FlexRow>
-          )}
+          footer={
+            hookMember.authType === 'ADMIN'
+              ? (data) => (
+                  <FlexRow css={{ gap: spacing(2) }}>
+                    <Button
+                      type="primary"
+                      css={{ marginLeft: 'auto' }}
+                      onClick={(e) => {
+                        hookMember.onOpenAddWorldModal();
+                      }}
+                    >
+                      월드 추가
+                    </Button>
+                  </FlexRow>
+                )
+              : undefined
+          }
         >
           <Column
             width={5}
