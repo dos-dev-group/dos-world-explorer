@@ -81,16 +81,20 @@ const useWorldSheetPage = (): HookMember => {
 
   const typeList = useMemo(
     () =>
-      worldData?.reduce(
-        (acc, cur) => {
-          if (acc.find((e) => e === cur.type)) {
-            return acc;
-          }
-          return acc.concat(cur.type);
-        },
-        ['전체'],
-      ) || [],
-    [worldData],
+      worldData
+        ?.reduce(
+          (acc, cur) => {
+            if (acc.find((e) => e === cur.type)) {
+              return acc;
+            }
+            return acc.concat(cur.type);
+          },
+          ['전체'],
+        )
+        .filter((e) =>
+          userHookMember.currentAuthType === 'USER' ? e !== '비공개' : true,
+        ) || [],
+    [userHookMember.currentAuthType, worldData],
   );
   const currentTableData = useMemo(() => {
     const searchedWorldData =
