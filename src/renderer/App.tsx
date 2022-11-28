@@ -28,6 +28,7 @@ import PartyPage from './features/party/PartyPage';
 import WorldExplorePage from './features/world-explore/WorldExplorePage';
 import WorldFavoritePage from './features/world-favorite/WorldFavoritePage';
 import WorldSheetPage from './features/world-sheet/WorldSheetPage';
+import { spacing } from './utils/styling';
 
 const { Sider } = Layout;
 const { Title } = Typography;
@@ -77,7 +78,14 @@ function MenuLayout() {
             bottom: 0,
           }}
         >
-          <Title level={4} style={{ color: 'white', textAlign: 'center' }}>
+          <Title
+            level={2}
+            style={{
+              color: 'white',
+              textAlign: 'center',
+              marginTop: spacing(3),
+            }}
+          >
             VRCExplorer
           </Title>
           <Menu
