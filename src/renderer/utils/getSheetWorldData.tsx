@@ -72,8 +72,8 @@ export default function getSheetWorldData() {
             row[4].textContent!.replaceAll(' ', '').slice(1).split('#') || [], // 태그
           score: row[5].textContent?.length || 0, // 별점
           url: row[6].textContent || '', // 링크
-          imageUrl:
-            row[0].getElementsByTagName('img')[0].getAttribute('src') || '', // 이미지
+          imageUrl: row[0].textContent || '',
+          // row[0].getElementsByTagName('img')[0]?.getAttribute('src') || '', // 이미지
           date: new Date(row[8].textContent + 'z' || ''), // 기록 날짜
           type: row[7].textContent || '', // 카테고리
         };
