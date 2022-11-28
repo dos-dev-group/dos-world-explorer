@@ -14,6 +14,8 @@ import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { LimitedWorld } from 'vrchat';
+import { useVrcCurrentUser } from '@src/renderer/data/user';
+import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 
 export type TabKey = 'new' | 'lab' | 'recent';
 
@@ -29,7 +31,7 @@ interface HookMember {
 
   onClickRefresh(): void;
   onChangePage(page: number): void;
-  onOpenAddWorldModal(world: LimitedWorld): void;
+  onOpenAddWorldModal(world: WorldPartial): void;
   onCloseAddWorldModal(): void;
   onOpenWorldInfoModal(world: LimitedWorld): void;
   onCloseWorldInfoModal(): void;
@@ -51,13 +53,23 @@ const useWorldExplorePage = (): HookMember => {
   const [infoModalWorld, setInfoModalWorld] = useState<WorldPartial>();
   const [addModalWorld, setAddModalWorld] = useState<WorldPartial>();
 
+  const userHookMember = useVrcCurrentUser();
+
+  const getWorlds = useMemo(
+    () =>
+      userHookMember.currentAuthType === 'USER'
+        ? getSheetWorldData
+        : getWorldDataToMain,
+    [userHookMember.currentAuthType],
+  );
+
   useEffect(() => {
     if (worldData === undefined) {
-      getWorldDataToMain().then((data) => {
+      getWorlds().then((data) => {
         return setWorldData(data);
       });
     }
-  }, [setWorldData, worldData]);
+  }, [getWorlds, setWorldData, worldData]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -127,8 +139,8 @@ const useWorldExplorePage = (): HookMember => {
     onChangePage(page: number): void {
       setCurrentPage(page);
     },
-    onOpenAddWorldModal(world: LimitedWorld): void {
-      setAddModalWorld(convertLimitedWorldToDosWorld(world));
+    onOpenAddWorldModal(world: WorldPartial): void {
+      setAddModalWorld(world);
     },
     onCloseAddWorldModal(): void {
       setAddModalWorld(undefined);
@@ -140,9 +152,14 @@ const useWorldExplorePage = (): HookMember => {
       setInfoModalWorld(undefined);
     },
     onAddWorld(world: WorldEditInput): void {
+      if (userHookMember.currentAuthType !== 'ADMIN') {
+        message.error('어드민이 아닙니다.');
+        return;
+      }
+
       addEditSheetToMain(world)
         .then(() => message.info('월드가 추가되었습니다'))
-        .then(() => getWorldDataToMain())
+        .then(() => getWorlds())
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()));
     },

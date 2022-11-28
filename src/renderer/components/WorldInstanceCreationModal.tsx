@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Flex, FlexCenter } from '@src/renderer/components/styledComponents';
+import {
+  Flex,
+  FlexCenter,
+  FlexRow,
+} from '@src/renderer/components/styledComponents';
 import { WorldPartial } from '@src/types';
 import {
   Button,
@@ -97,6 +101,47 @@ function WorldInstanceCreationModal(props: Props) {
     return [...hasPartyData, ...nonPartyData];
   }, [friendHookMember.friends, partyHookMember.party]);
 
+  const onClickInvite = async () => {
+    if (inviteTargets.length > 0 && props.world && instanceId) {
+      setIsInviteLoading(true);
+
+      const partyRegex = new RegExp(`^${PARTY_IDENTIFIER}`);
+      const userRegex = new RegExp(`^.+${USER_IDENTIFIER}`);
+      const partys = inviteTargets
+        .filter((e) => partyRegex.test(e))
+        .map((e) => e.replace(partyRegex, ''));
+      const users = inviteTargets
+        .filter((e) => userRegex.test(e))
+        .concat(
+          partys.flatMap((p) =>
+            partyHookMember.party
+              ? partyHookMember.party[p].map((u) => u.id)
+              : [],
+          ),
+        )
+        .map((e) => e.replace(userRegex, ''))
+        .reduce((acc, cur) => {
+          if (acc.includes(cur)) {
+            return acc;
+          }
+          acc.push(cur);
+          return acc;
+        }, [] as string[]);
+
+      await sendInvitesToMain(users, props.world.key, instanceId);
+      message.success('보내기 성공');
+    } else if (inviteTargets.length <= 0) {
+      message.error('초대할 사람이 없습니다');
+    } else {
+      message.error('초대 에러');
+    }
+    setIsInviteLoading(false);
+  };
+
+  // const onAddInvTargetAsFriends = () => {
+  //   setInviteTargets(currentUser.)
+  // };
+
   const renderedTypes = InstanceTypes.map((e) => (
     <Select.Option key={e}>{e}</Select.Option>
   ));
@@ -113,52 +158,28 @@ function WorldInstanceCreationModal(props: Props) {
         treeCheckable
         placeholder="유저나 파티를 선택해주세요"
         onChange={(selected: string[]) => setInviteTargets(selected)}
+        value={inviteTargets}
         placement="topLeft"
       />
-      <Button
-        css={{ marginLeft: 'auto', marginTop: spacing(1) }}
-        size="small"
-        type="primary"
-        disabled={!(inviteTargets.length > 0 && props.world && instanceId)}
-        onClick={async () => {
-          if (inviteTargets.length > 0 && props.world && instanceId) {
-            setIsInviteLoading(true);
-
-            const partyRegex = new RegExp(`^${PARTY_IDENTIFIER}`);
-            const userRegex = new RegExp(`^.+${USER_IDENTIFIER}`);
-            const partys = inviteTargets
-              .filter((e) => partyRegex.test(e))
-              .map((e) => e.replace(partyRegex, ''));
-            const users = inviteTargets
-              .filter((e) => userRegex.test(e))
-              .concat(
-                partys.flatMap((p) =>
-                  partyHookMember.party
-                    ? partyHookMember.party[p].map((u) => u.id)
-                    : [],
-                ),
-              )
-              .map((e) => e.replace(userRegex, ''))
-              .reduce((acc, cur) => {
-                if (acc.includes(cur)) {
-                  return acc;
-                }
-                acc.push(cur);
-                return acc;
-              }, [] as string[]);
-
-            await sendInvitesToMain(users, props.world.key, instanceId);
-            message.success('보내기 성공');
-          } else if (inviteTargets.length <= 0) {
-            message.error('초대할 사람이 없습니다');
-          } else {
-            message.error('초대 에러');
-          }
-          setIsInviteLoading(false);
-        }}
-      >
-        초대
-      </Button>
+      <FlexRow css={{ marginTop: spacing(1) }}>
+        {/* <Button
+          css={{ marginLeft: 'auto' }}
+          size="small"
+          onClick={() => setInviteTargets()}
+        >
+          인스턴스 내 친구 추가
+        </Button> */}
+        <Button
+          // css={{ marginLeft: spacing(1) }}
+          css={{ marginLeft: 'auto' }}
+          size="small"
+          type="primary"
+          disabled={!(inviteTargets.length > 0 && props.world && instanceId)}
+          onClick={onClickInvite}
+        >
+          초대
+        </Button>
+      </FlexRow>
     </Flex>
   );
 

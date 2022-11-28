@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
+import { useVrcCurrentUser } from '@src/renderer/data/user';
 import { worldDataState } from '@src/renderer/data/world';
 import getSheetWorldData from '@src/renderer/utils/getSheetWorldData';
 import {
@@ -9,7 +10,7 @@ import {
   reomoveEditSheetToMain,
 } from '@src/renderer/utils/ipc/editSheetToMain';
 import stringEscape from '@src/renderer/utils/stringEscape';
-import { World, WorldEditInput, WorldPartial } from '@src/types';
+import { AuthType, World, WorldEditInput, WorldPartial } from '@src/types';
 import { message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -18,6 +19,7 @@ const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
 export type SearchOptions = typeof SEARCH_OPTIONS;
 
 interface HookMember {
+  authType: AuthType;
   currentType: string;
   currentPage: number;
   isLoading: boolean;
@@ -44,6 +46,8 @@ interface HookMember {
   onChangeSearchOption: (option: SearchOptions[number]) => void;
 }
 const useWorldSheetPage = (): HookMember => {
+  const userHookMember = useVrcCurrentUser();
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentType, setCurrentType] = useState<string>('전체');
   const [worldData, setWorldData] = useRecoilState(worldDataState);
@@ -59,18 +63,21 @@ const useWorldSheetPage = (): HookMember => {
   const [curSearchOption, setCurSearchOption] =
     useState<SearchOptions[number]>('NAME');
 
+  const getWorlds = useMemo(
+    () =>
+      userHookMember.currentAuthType === 'USER'
+        ? getSheetWorldData
+        : getWorldDataToMain,
+    [userHookMember.currentAuthType],
+  );
   useEffect(() => {
     if (worldData === undefined) {
-      getWorldDataToMain().then((data) => {
+      getWorlds().then((data) => {
         setIsLoading(false);
         return setWorldData(data);
       });
-      // getWorldDataToMain().then((data) => {
-      //   setIsLoading(false);
-      //   return setWorldData(data);
-      // });
     }
-  }, [setWorldData, worldData]);
+  }, [getWorlds, setWorldData, worldData]);
 
   const typeList = useMemo(
     () =>
@@ -127,6 +134,7 @@ const useWorldSheetPage = (): HookMember => {
   }, [curSearchOption, currentType, searchText, worldData]);
 
   return {
+    authType: userHookMember.currentAuthType,
     currentType,
     currentPage,
     isLoading,
@@ -161,35 +169,50 @@ const useWorldSheetPage = (): HookMember => {
       setEditModalWorld(undefined);
     },
     onAddWorld(world) {
+      if (userHookMember.currentAuthType !== 'ADMIN') {
+        message.error('어드민이 아닙니다.');
+        return;
+      }
+
       setIsLoading(true);
       addEditSheetToMain(world)
         .then(() => message.info('월드가 추가되었습니다'))
-        .then(() => getWorldDataToMain())
+        .then(() => getWorlds())
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onEditWorld(key, world) {
+      if (userHookMember.currentAuthType !== 'ADMIN') {
+        message.error('어드민이 아닙니다.');
+        return;
+      }
+
       setIsLoading(true);
       modifyEditSheetToMain(key, world)
         .then(() => message.info('월드가 변경되었습니다'))
-        .then(() => getWorldDataToMain())
+        .then(() => getWorlds())
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onRemoveWorld(key) {
+      if (userHookMember.currentAuthType !== 'ADMIN') {
+        message.error('어드민이 아닙니다.');
+        return;
+      }
+
       setIsLoading(true);
       reomoveEditSheetToMain(key)
         .then(() => message.info('월드가 삭제되었습니다'))
-        .then(() => getWorldDataToMain())
+        .then(() => getWorlds())
         .then((data) => setWorldData(data))
         .catch((e: Error) => message.error(e.toString()))
         .finally(() => setIsLoading(false));
     },
     onClickRefresh() {
       setIsLoading(true);
-      getWorldDataToMain()
+      getWorlds()
         .then((data) => {
           return setWorldData(data);
         })

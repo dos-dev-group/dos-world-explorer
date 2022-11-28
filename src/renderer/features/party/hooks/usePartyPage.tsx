@@ -8,7 +8,7 @@ interface HookMember {
   onClickOpenSaveDialog(): void;
   partyGroup: PartyGroup | undefined;
 
-  checkUserGroups(userKey: string): string[];
+  findUserGroups(userKey: string): string[];
   onSetUsersGroup(groupNames: string[], user: User): void;
   onCreateGroup(groupName: string): void;
   onRemoveGroup(groupName: string): void;
@@ -17,7 +17,7 @@ interface HookMember {
 const usePartyPage = (): HookMember => {
   const {
     party,
-    checkUserGroups,
+    findUserGroups,
     setUsersGroup,
     addGroup,
     removeGroup,
@@ -30,7 +30,7 @@ const usePartyPage = (): HookMember => {
 
   const hookMember: HookMember = {
     partyGroup: party,
-    checkUserGroups,
+    findUserGroups,
     onSetUsersGroup: setUsersGroup,
     onCreateGroup: addGroup,
     onRemoveGroup: removeGroup,

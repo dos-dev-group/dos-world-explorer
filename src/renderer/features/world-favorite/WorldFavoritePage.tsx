@@ -57,6 +57,9 @@ export default function WorldFavoritePage() {
         onCancel={() => {
           hookMember.onCloseWorldInfoModal();
         }}
+        onAdd={(w) => {
+          hookMember.onOpenAddWorldModal(w);
+        }}
         visible={hookMember.infoModalWorld ? true : false}
         world={hookMember.infoModalWorld}
       />
@@ -200,7 +203,7 @@ export default function WorldFavoritePage() {
               </a>
             )}
           /> */}
-          <Column
+          {/* <Column
             width={7}
             key="actions"
             responsive={['xl']}
@@ -220,28 +223,9 @@ export default function WorldFavoritePage() {
                 >
                   추가
                 </Button>
-                {/* TODO 월드 추가 버튼 만들기 */}
-                {/* <Button
-                  type="primary"
-                  ghost
-                  size="small"
-                  onClick={() => hookMember.onOpenEditWorldModal(record)}
-                >
-                  수정
-                </Button>
-                <div css={{ marginTop: 4 }} />
-                <Popconfirm
-                  title="정말 월드를 삭제하시겠습니까?"
-                  placement="topRight"
-                  onConfirm={() => hookMember.onRemoveWorld(k)}
-                >
-                  <Button danger size="small">
-                    삭제
-                  </Button>
-                </Popconfirm> */}
               </Flex>
             )}
-          />
+          /> */}
         </Table>
       </Spin>
     </Flex>

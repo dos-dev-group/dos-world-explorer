@@ -26,7 +26,7 @@ import {
 } from 'react-router-dom';
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 // import './App.css';
-import { Flex, FlexCenter } from './components/styledComponents';
+import { Flex } from './components/styledComponents';
 import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import FriendsPage from './features/friend/FriendsPage';

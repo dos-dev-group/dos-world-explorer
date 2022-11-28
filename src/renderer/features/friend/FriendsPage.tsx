@@ -9,7 +9,7 @@ import {
 } from '@src/renderer/components/styledComponents';
 import { useFriendsData } from '@src/renderer/data/friends';
 import { mqMinHeight, mqMinWidth, spacing } from '@src/renderer/utils/styling';
-import { Button, Collapse, Spin } from 'antd';
+import { Button, Collapse, Input, Pagination, Spin } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { User } from 'vrchat';
 import useFriendsPage from './hooks/useFriendsPage';
@@ -18,16 +18,15 @@ function FriendsPage() {
   const hookMember = useFriendsPage();
   const [groupModalData, setGroupModalData] = useState<User>();
 
-  const renderedFriends = hookMember.friends?.map((friend) => (
+  const renderedFriends = hookMember.partialFriends?.map((friend) => (
     <UserCard
       key={friend.id}
       user={friend}
       css={{ overflowX: 'hidden' }}
-      usersGroupNames={hookMember.checkUserGroups(friend.id)}
+      usersGroupNames={hookMember.findUserGroups(friend.id)}
       onClickGroupEdit={() => setGroupModalData(friend)}
     />
   ));
-  const numFriends = hookMember.friends?.length || 0;
 
   return (
     <Flex>
@@ -37,7 +36,7 @@ function FriendsPage() {
           hookMember.partyGroup ? Object.keys(hookMember.partyGroup) : []
         }
         userGroups={
-          groupModalData ? hookMember.checkUserGroups(groupModalData.id) : []
+          groupModalData ? hookMember.findUserGroups(groupModalData.id) : []
         }
         onOk={(groupNames) => {
           if (!groupModalData) return;
@@ -52,21 +51,34 @@ function FriendsPage() {
       <Flex css={{ margin: spacing(2) }}>
         <FlexRow
           css={{
-            marginLeft: 'auto',
-            alignItems: 'center',
+            alignItems: 'end',
             marginBottom: spacing(1),
           }}
         >
+          <Input.Search
+            placeholder="검색어를 입력하세요"
+            allowClear
+            onSearch={hookMember.onSearchInput}
+            css={{
+              marginRight: spacing(10),
+            }}
+            loading={!renderedFriends}
+          />
           <Button
+            css={{ marginLeft: 'auto' }}
             size="small"
             icon={<ReloadOutlined />}
             onClick={() => hookMember.onClickRefresh()}
             loading={!renderedFriends}
           />
         </FlexRow>
-        {renderedFriends ? (
-          <Collapse activeKey={['all']}>
-            <Collapse.Panel key="all" header={`Friends (${numFriends})`}>
+
+        <Collapse activeKey={['all']}>
+          <Collapse.Panel
+            key="all"
+            header={`Friends (${hookMember.friendsLength})`}
+          >
+            {renderedFriends ? (
               <Grid
                 css={{
                   gridTemplateColumns: 'repeat(3, 1fr)',
@@ -80,13 +92,24 @@ function FriendsPage() {
               >
                 {renderedFriends}
               </Grid>
-            </Collapse.Panel>
-          </Collapse>
-        ) : (
-          <FlexCenter css={{ width: '100%', height: '100%' }}>
-            <Spin />
-          </FlexCenter>
-        )}
+            ) : (
+              <FlexCenter css={{ width: '100%', height: '100%' }}>
+                <Spin />
+              </FlexCenter>
+            )}
+          </Collapse.Panel>
+        </Collapse>
+        <FlexRow css={{ marginTop: spacing(2) }}>
+          <Pagination
+            css={{ marginLeft: 'auto' }}
+            total={hookMember.friendsLength}
+            showTotal={(total, range) => `${range[0]} - ${range[1]} (${total})`}
+            showSizeChanger={false}
+            current={hookMember.currentPage}
+            pageSize={hookMember.pageSize}
+            onChange={hookMember.onChangePage}
+          />
+        </FlexRow>
       </Flex>
     </Flex>
   );
