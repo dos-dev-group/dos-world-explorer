@@ -48,7 +48,7 @@ export default function WorldExplorePage() {
       case 'new':
         return { label: 'New 월드', key: e };
       case 'lab':
-        return { label: 'Lab 월드', key: e };
+        return { label: 'Community Labs 월드', key: e };
       default:
         return { label: '에러 key Name: ' + e, key: e };
     }
@@ -170,7 +170,10 @@ export default function WorldExplorePage() {
                 css={{ wordBreak: 'keep-all' }}
                 ellipsis={{ tooltip: capacity }}
               >
-                {capacity + ' (' + (capacity ?? 0) * 2 + ')'}
+                {capacity +
+                  ' (' +
+                  (capacity === 1 ? 1 : (capacity ?? 0) * 2) +
+                  ')'}
               </Typography.Text>
             )}
           />

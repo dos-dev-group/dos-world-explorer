@@ -292,7 +292,9 @@ function WorldInfoModal(props: Props) {
                   <strong>인원 :</strong>{' '}
                   {vrcWorldInfo?.capacity +
                     ' (' +
-                    (vrcWorldInfo?.capacity ?? 0) * 2 +
+                    (vrcWorldInfo?.capacity === 1
+                      ? 1
+                      : (vrcWorldInfo?.capacity ?? 0) * 2) +
                     ')'}
                 </span>
               </FlexRow>

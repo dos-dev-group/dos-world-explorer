@@ -161,7 +161,10 @@ export default function WorldFavoritePage() {
                 css={{ wordBreak: 'keep-all' }}
                 ellipsis={{ tooltip: capacity }}
               >
-                {capacity + ' (' + (capacity ?? 0) * 2 + ')'}
+                {capacity +
+                  ' (' +
+                  (capacity === 1 ? 1 : (capacity ?? 0) * 2) +
+                  ')'}
               </Typography.Text>
             )}
           />
