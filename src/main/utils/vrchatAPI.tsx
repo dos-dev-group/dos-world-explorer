@@ -12,9 +12,10 @@ import {
   LimitedUser,
   LimitedWorld,
   User,
+  TwoFactorAuthCode,
 } from 'vrchat';
 import { off } from 'process';
-import { DosFavoriteWorldGroup } from '../../types';
+import { DosFavoriteWorldGroup, LoginError } from '../../types';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -23,7 +24,7 @@ let authenticationApi = new vrchat.AuthenticationApi();
 
 let user;
 
-export async function login(id: string, pw: string): Promise<boolean> {
+export async function login(id: string, pw: string): Promise<LoginError> {
   authenticationApi = new vrchat.AuthenticationApi(
     new vrchat.Configuration({
       apiKey: VRCHATAPIKEY,
@@ -31,7 +32,6 @@ export async function login(id: string, pw: string): Promise<boolean> {
       password: pw,
     }),
   );
-
   return authenticationApi
     .getCurrentUser()
     .then(async (res) => {
@@ -39,10 +39,43 @@ export async function login(id: string, pw: string): Promise<boolean> {
       // console.log(user);
       console.log('login success');
       console.log('api displayName :', res.data.displayName);
-      return true;
+      return LoginError.SUCCESS;
     })
     .catch((err) => {
       console.log(err.response.data);
+      if (
+        err.response.data.error.message ===
+        '"Requires Two-Factor Authentication"'
+      ) {
+        console.log('2FA required');
+        return LoginError.TWOFACTOR;
+      }
+      if (
+        err.response.data.error.message ===
+        '"Invalid Username/Email or Password"'
+      ) {
+        console.log('Invalid ID or PW');
+        return LoginError.InvalidIDPW;
+      }
+      console.log('unknown error');
+      return LoginError.UNKNOWN;
+    });
+}
+
+export async function verify2FAcode(code: string): Promise<boolean> {
+  const twoFactorAuthCode: TwoFactorAuthCode = {
+    code,
+  };
+  return authenticationApi
+    .verify2FA(twoFactorAuthCode)
+    .then(async (res) => {
+      user = res.data;
+      // console.log(user);
+      console.log('2FA verify success');
+      return true;
+    })
+    .catch((err) => {
+      console.log(err.response);
       return false;
     });
 }
