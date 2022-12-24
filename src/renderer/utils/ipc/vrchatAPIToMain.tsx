@@ -16,13 +16,14 @@ export function testVrchatAPIToMain() {
 export function loginToMain(id: string, pw: string) {
   window.electron.ipcRenderer.sendMessage('loginToMain', [id, pw]);
   return new Promise<LoginError>((resolve, reject) => {
-    window.electron.ipcRenderer.once(
-      'loginToRenderer',
-      (resultIpc: unknown) => {
-        resolve(resultIpc as LoginError);
-        // console.log('renderer: login result', result);
-      },
-    );
+    window.electron.ipcRenderer.once('loginToRenderer', (result: unknown) => {
+      const res = result as LoginError;
+      if (res === LoginError.SUCCESS) {
+        resolve(res);
+      } else {
+        reject(res);
+      }
+    });
   });
 }
 
@@ -32,7 +33,12 @@ export function verify2FAcodeToMain(code: string) {
     window.electron.ipcRenderer.once(
       'verify2FAcodeToRenderer',
       (result: unknown) => {
-        resolve(result as boolean);
+        const res = result as boolean;
+        if (res === true) {
+          resolve(res);
+        } else {
+          reject(res);
+        }
       },
     );
   });
