@@ -120,6 +120,13 @@ export interface Bookmarks {
   [bookmarkType: string]: string[];
 }
 
+export enum LoginError {
+  SUCCESS = 0,
+  UNKNOWN = 1,
+  TWOFACTOR = 2,
+  InvalidIDPW = 3,
+}
+
 export enum EditResult {
   SUCCESS = 0,
   UNKNOWN = 1,

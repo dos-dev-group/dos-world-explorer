@@ -17,6 +17,7 @@ import {
   sendInvites,
   genWorldInstanceName,
   login,
+  verify2FAcode,
   logout,
   sendSelfInvite,
   getCurrentUser,
@@ -57,6 +58,10 @@ export default function setupIpcListener() {
 
   ipcMain.on('loginToMain', async (event, arg) => {
     event.reply('loginToRenderer', await login(arg[0], arg[1]));
+  });
+
+  ipcMain.on('verify2FAcodeToMain', async (event, arg) => {
+    event.reply('verify2FAcodeToRenderer', await verify2FAcode(arg[0]));
   });
 
   ipcMain.on('logoutToMain', async (event, arg) => {
