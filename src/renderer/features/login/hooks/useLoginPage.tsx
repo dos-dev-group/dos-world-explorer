@@ -1,6 +1,6 @@
 import { useVrcCurrentUser } from '@src/renderer/data/user';
 import { loginToMain } from '@src/renderer/utils/ipc/vrchatAPIToMain';
-import { UserLogin } from '@src/types';
+import { LoginError, UserLogin } from '@src/types';
 import { message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -11,35 +11,27 @@ const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
 interface HookMember {
   username: string;
   password: string;
-  code: string | undefined;
   isLoginProgress: boolean;
-  isTwoFactorAuth: boolean;
   visibleTwoFactorAuthModal: boolean;
-  isAutoLogin: boolean;
 
   onChangeUsername: (u: string) => void;
   onChangePassword: (p: string) => void;
-  onOpenTwoFactorAuthdModal: () => void;
-  onCloseTwoFactorAuthdModal: () => void;
-  onCheckAutoLogin: (isChecked: boolean) => void;
-  onCheckTwoFactorLogin: (isChecked: boolean) => void;
   onSubmitLogin: (user: UserLogin) => void;
+  onSubmit2faCode: (user: UserLogin) => void;
+  onCancel2faCode: () => void;
   checkInputValid: (input: string | null | undefined) => boolean;
 }
 
 const useLoginPage = (): HookMember => {
-  const { currentUser, login } = useVrcCurrentUser();
+  const { currentUser, login, doTwoFactorAuth } = useVrcCurrentUser();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [code, setCode] = useState<string>();
   const [isLoginProgress, setIsLoginProgress] = useState(false);
-  const [isTwoFactorAuth, setIsTwoFactorAuth] = useState(false);
   const [visibleTwoFactorAuthModal, setVisibleTwoFactorAuthModal] =
     useState(false);
-  const [isAutoLogin, setIsAutoLogin] = useState(false);
 
   useEffect(() => {
     // if Login, go Main Page
@@ -51,25 +43,20 @@ const useLoginPage = (): HookMember => {
   const hookMember: HookMember = {
     username,
     password,
-    code,
     isLoginProgress,
-    isTwoFactorAuth,
     visibleTwoFactorAuthModal,
-    isAutoLogin,
 
     checkInputValid,
-
-    onOpenTwoFactorAuthdModal() {
-      setVisibleTwoFactorAuthModal(true);
-    },
-    onCloseTwoFactorAuthdModal() {
+    onSubmit2faCode(userLogin: UserLogin) {
+      if (userLogin.code) {
+        doTwoFactorAuth(userLogin.code);
+      } else {
+        message.error('2차인증코드가 제대로 입력되지 않았습니다.');
+      }
       setVisibleTwoFactorAuthModal(false);
     },
-    onCheckAutoLogin(isChecked: boolean) {
-      setIsAutoLogin(isChecked);
-    },
-    onCheckTwoFactorLogin(isChecked: boolean) {
-      setIsTwoFactorAuth(isChecked);
+    onCancel2faCode() {
+      setVisibleTwoFactorAuthModal(false);
     },
     onSubmitLogin(loginSubmitValue: UserLogin) {
       if (
@@ -87,14 +74,22 @@ const useLoginPage = (): HookMember => {
       // 로그인시도
       setIsLoginProgress(true);
 
-      // 만약 2FA가 필요할 경우
-      if (isTwoFactorAuth) {
-        setVisibleTwoFactorAuthModal(true);
-      }
-      login(loginSubmitValue).catch((err) => {
-        message.error(err.toString());
-        setIsLoginProgress(false);
-      });
+      // // 만약 2FA가 필요할 경우
+      // if (isTwoFactorAuth) {
+      //   setVisibleTwoFactorAuthModal(true);
+      // }
+      login(loginSubmitValue)
+        .catch((err) => {
+          if (err === LoginError.TWOFACTOR) {
+            setVisibleTwoFactorAuthModal(true);
+          } else {
+            throw err;
+          }
+        })
+        .catch((err) => {
+          message.error(err.toString());
+          setIsLoginProgress(false);
+        });
     },
     onChangeUsername(u: string): void {
       setUsername(u);
