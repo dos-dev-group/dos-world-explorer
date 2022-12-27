@@ -49,7 +49,7 @@ const useLoginPage = (): HookMember => {
     checkInputValid,
     onSubmit2faCode(userLogin: UserLogin) {
       if (userLogin.code) {
-        doTwoFactorAuth(userLogin.code);
+        doTwoFactorAuth(userLogin.code).then(() => login(userLogin));
       } else {
         message.error('2차인증코드가 제대로 입력되지 않았습니다.');
       }
