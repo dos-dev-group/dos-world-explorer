@@ -1,9 +1,5 @@
 import { UserLogin } from '@src/types';
-import {
-  Input,
-  Modal,
-  Typography,
-} from 'antd';
+import { Input, Modal, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 
 interface Props {
@@ -31,18 +27,19 @@ function TwoFactorAuthModal(props: Props) {
             password: props.userLogin?.password || '',
             code: code,
           });
-          props.onCancel?.();
         }
       }}
       destroyOnClose
       onCancel={props.onCancel}
-      visible={props.visible}
+      open={props.visible}
       width="300px"
       okButtonProps={{
         disabled: code.trim().length !== 6 ? true : false,
       }}
     >
-      <Typography.Title level={5}>OTP코드를 입력해주세요</Typography.Title>
+      <Typography.Title level={5}>
+        2차 인증코드를 입력해주세요 (이메일확인)
+      </Typography.Title>
       <Input
         value={code}
         onChange={(e) => {

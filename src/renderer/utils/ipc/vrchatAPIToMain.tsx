@@ -1,4 +1,4 @@
-import { DosFavoriteWorldGroup, LoginError } from '@src/types';
+import { DosFavoriteWorldGroup, LoginError as LoginResult } from '@src/types';
 import { CurrentUser, LimitedWorld, User, World } from 'vrchat';
 
 export function testVrchatAPIToMain() {
@@ -15,10 +15,10 @@ export function testVrchatAPIToMain() {
 
 export function loginToMain(id: string, pw: string) {
   window.electron.ipcRenderer.sendMessage('loginToMain', [id, pw]);
-  return new Promise<LoginError>((resolve, reject) => {
+  return new Promise<LoginResult>((resolve, reject) => {
     window.electron.ipcRenderer.once('loginToRenderer', (result: unknown) => {
-      const res = result as LoginError;
-      if (res === LoginError.SUCCESS) {
+      const res = result as LoginResult;
+      if (res === LoginResult.SUCCESS) {
         resolve(res);
       } else {
         reject(res);

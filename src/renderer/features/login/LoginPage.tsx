@@ -10,16 +10,19 @@ export default function LoginPage() {
 
   return (
     <FlexCenter style={{ height: '100vh' }}>
-      {/* <TwoFactorAuthModal
+      <TwoFactorAuthModal
         onLogin={(u) => {
-          hookMember.onClickLogin(u);
+          hookMember.onSubmit2faCode(u);
         }}
         onCancel={() => {
-          hookMember.onCloseTwoFactorAuthdModal();
+          hookMember.onCancel2faCode();
         }}
         visible={hookMember.visibleTwoFactorAuthModal}
-        userLogin={hookMember.userLogin}
-      /> */}
+        userLogin={{
+          name: hookMember.username,
+          password: hookMember.password,
+        }}
+      />
 
       <Typography.Title level={2}>VRCExplorer</Typography.Title>
 
