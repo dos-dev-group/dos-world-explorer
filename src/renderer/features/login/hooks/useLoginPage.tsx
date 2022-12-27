@@ -57,6 +57,7 @@ const useLoginPage = (): HookMember => {
     },
     onCancel2faCode() {
       setVisibleTwoFactorAuthModal(false);
+      message.warn('2차인증을 취소했습니다.');
     },
     onSubmitLogin(loginSubmitValue: UserLogin) {
       if (
