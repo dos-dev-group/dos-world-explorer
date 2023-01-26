@@ -57,8 +57,9 @@ const useWorldExplorePage = (): HookMember => {
 
   const getWorlds = useMemo(
     () =>
-      userHookMember.currentAuthType === 'USER'
-        ? getSheetWorldData
+      userHookMember.currentAuthType === 'USER' ||
+      userHookMember.currentAuthType === 'MODERATOR'
+        ? () => getSheetWorldData(userHookMember.currentAuthType !== 'USER')
         : getWorldDataToMain,
     [userHookMember.currentAuthType],
   );
