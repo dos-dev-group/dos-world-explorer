@@ -13,6 +13,7 @@ import {
   LimitedWorld,
   User,
   TwoFactorAuthCode,
+  TwoFactorEmailCode,
 } from 'vrchat';
 import { off } from 'process';
 import { DosFavoriteWorldGroup, LoginError } from '../../types';
@@ -34,16 +35,26 @@ export async function login(id: string, pw: string): Promise<LoginError> {
   );
   return authenticationApi
     .getCurrentUser()
-    .then(async (res) => {
+    .then((res) => {
       user = res.data;
-      // console.log(user);
+      console.log(user);
       console.log('login success');
       console.log('api displayName :', res.data.displayName);
+      if (user.requiresTwoFactorAuth!) {
+        throw new Error('Requires Two-Factor Authentication');
+      }
       return LoginError.SUCCESS;
     })
     .catch((err) => {
-      console.log(err.response.data);
-      if (err.response.data.error.message.includes('Two-Factor')) {
+      // console.log(err);
+      if (err.message === 'Requires Two-Factor Authentication'){
+        console.log('2FA required');
+        return LoginError.TWOFACTOREMAIL;
+      }
+      if (
+        err.response.data.error.message ===
+        '"Requires Two-Factor Authentication"'
+      ) {
         console.log('2FA required');
         return LoginError.TWOFACTOR;
       }
@@ -59,7 +70,7 @@ export async function login(id: string, pw: string): Promise<LoginError> {
     });
 }
 
-export async function verify2FAcode(code: string): Promise<boolean> {
+export async function verify2FACode(code: string): Promise<boolean> {
   const twoFactorAuthCode: TwoFactorAuthCode = {
     code,
   };
@@ -72,6 +83,27 @@ export async function verify2FAcode(code: string): Promise<boolean> {
       return true;
     })
     .catch((err) => {
+      console.log('verify2FACode error');
+      console.log(err.response);
+      return false;
+    });
+}
+
+export async function verify2FAEmailCode(code: string): Promise<boolean> {
+  console.log(code);
+  const twoFactorAuthCode: TwoFactorEmailCode = {
+    code,
+  };
+  return authenticationApi
+    .verify2FAEmailCode(twoFactorAuthCode)
+    .then(async (res) => {
+      user = res.data;
+      // console.log(user);
+      console.log('2FA Email verify success');
+      return true;
+    })
+    .catch((err) => {
+      console.log('verify2FAEmailCode error');
       console.log(err.response);
       return false;
     });

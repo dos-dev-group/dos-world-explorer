@@ -125,6 +125,7 @@ export enum LoginError {
   UNKNOWN = 1,
   TWOFACTOR = 2,
   InvalidIDPW = 3,
+  TWOFACTOREMAIL = 4,
 }
 
 export enum EditResult {
