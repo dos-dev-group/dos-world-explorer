@@ -33,11 +33,12 @@ const sheetInfos = {
   CheckerWorld: { sheetName: 'checker_sheet1', sheetId: 765529254 },
 };
 
+// console.log('path', path.join(path.dirname(app.getPath('exe'))));
 // sheet API 초기화
 let client: any;
 let keys: any = {};
 fs.readFile(
-  path.join(app.getAppPath(), 'sheetAuth.json'),
+  path.join(path.dirname(app.getPath('exe')), 'sheetAuth.json'),
   'utf8',
   (err, data) => {
     if (err) {
