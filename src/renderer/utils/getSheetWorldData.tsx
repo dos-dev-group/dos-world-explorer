@@ -49,7 +49,7 @@ export async function test() {
   }
 }
 
-export default function getSheetWorldData() {
+export default function getSheetWorldData(privateVisible = false) {
   const worldData: WorldData = [];
   return getHtml(sheetUrl)
     .then((html) => {
@@ -62,7 +62,9 @@ export default function getSheetWorldData() {
         .getElementsByTagName('tr');
       for (let i = 1; i < raws.length; i++) {
         const row = raws[i].getElementsByTagName('td');
-        // console.log(rows);
+        // 비공개 숨김처리
+        if (!privateVisible && row[7].textContent === '비공개') continue;
+
         const world: World = {
           key: row[9].textContent || '', // 키 값
           name: row[1].textContent || '', // 월드 이름
