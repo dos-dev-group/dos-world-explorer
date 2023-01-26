@@ -17,7 +17,7 @@ import {
   sendInvites,
   genWorldInstanceName,
   login,
-  verify2FAcode,
+  verify2FACode,
   logout,
   sendSelfInvite,
   getCurrentUser,
@@ -28,6 +28,7 @@ import {
   getVrchatlabWorlds,
   getVrchatNewWorlds,
   getWorldAllInfo,
+  verify2FAEmailCode,
 } from './utils/vrchatAPI';
 import {
   showLoadFileDialog,
@@ -61,7 +62,14 @@ export default function setupIpcListener() {
   });
 
   ipcMain.on('verify2FAcodeToMain', async (event, arg) => {
-    event.reply('verify2FAcodeToRenderer', await verify2FAcode(arg[0]));
+    event.reply('verify2FAcodeToRenderer', await verify2FACode(arg[0]));
+  });
+
+  ipcMain.on('verify2FAEmailcodeToMain', async (event, arg) => {
+    event.reply(
+      'verify2FAEmailcodeToRenderer',
+      await verify2FAEmailCode(arg[0]),
+    );
   });
 
   ipcMain.on('logoutToMain', async (event, arg) => {
