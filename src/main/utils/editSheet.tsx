@@ -1,6 +1,9 @@
 import { google, sheets_v4 } from 'googleapis';
 import axios from 'axios';
 import { v4 } from 'uuid';
+import { app } from 'electron';
+import * as fs from 'node:fs';
+import path from 'node:path';
 import {
   World,
   WorldData,
@@ -17,7 +20,6 @@ import {
   TagStyle,
   TagStyleData,
 } from '../../types';
-import keys from '../../../secret/sheetAuth.json';
 import sheetData from '../../../secret/sheetData.json';
 import { getWorldInfo } from './vrchatAPI';
 
@@ -31,11 +33,25 @@ const sheetInfos = {
   CheckerWorld: { sheetName: 'checker_sheet1', sheetId: 765529254 },
 };
 
-const client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
-  'https://www.googleapis.com/auth/drive',
-  'https://www.googleapis.com/auth/drive.file',
-  'https://www.googleapis.com/auth/spreadsheets',
-]);
+// sheet API 초기화
+let client: any;
+let keys: any = {};
+fs.readFile(
+  path.join(app.getAppPath(), 'sheetAuth.json'),
+  'utf8',
+  (err, data) => {
+    if (err) {
+      return;
+    }
+    keys = JSON.parse(data);
+
+    client = new google.auth.JWT(keys.client_email, '', keys.private_key, [
+      'https://www.googleapis.com/auth/drive',
+      'https://www.googleapis.com/auth/drive.file',
+      'https://www.googleapis.com/auth/spreadsheets',
+    ]);
+  },
+);
 
 async function transeImageUrl(imageUrl: string): Promise<string> {
   try {
