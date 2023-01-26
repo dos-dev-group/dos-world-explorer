@@ -23,7 +23,7 @@ interface HookMember {
 }
 
 const useLoginPage = (): HookMember => {
-  const { currentUser, login, doTwoFactorAuth } = useVrcCurrentUser();
+  const { currentUser, login, doTwoFactorAuth, logout } = useVrcCurrentUser();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -81,6 +81,7 @@ const useLoginPage = (): HookMember => {
       // }
       login(loginSubmitValue)
         .catch((err) => {
+          logout();
           if (err === LoginError.TWOFACTOR) {
             setVisibleTwoFactorAuthModal(true);
           } else {
