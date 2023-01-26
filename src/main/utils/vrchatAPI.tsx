@@ -43,10 +43,7 @@ export async function login(id: string, pw: string): Promise<LoginError> {
     })
     .catch((err) => {
       console.log(err.response.data);
-      if (
-        err.response.data.error.message ===
-        '"Requires Two-Factor Authentication"'
-      ) {
+      if (err.response.data.error.message.includes('Two-Factor')) {
         console.log('2FA required');
         return LoginError.TWOFACTOR;
       }
