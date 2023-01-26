@@ -41,6 +41,7 @@ fs.readFile(
   'utf8',
   (err, data) => {
     if (err) {
+      console.warn('[WARN]', err.name, err.message);
       return;
     }
     keys = JSON.parse(data);
