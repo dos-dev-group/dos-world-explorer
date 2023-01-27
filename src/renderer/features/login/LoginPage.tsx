@@ -17,7 +17,7 @@ export default function LoginPage() {
         onCancel={() => {
           hookMember.onCancel2faCode();
         }}
-        visible={hookMember.visibleTwoFactorAuthModal}
+        tfaState={hookMember.twoFactorAuthState}
         userLogin={{
           name: hookMember.username,
           password: hookMember.password,

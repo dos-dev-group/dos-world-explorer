@@ -10,6 +10,7 @@ import {
   loginToMain,
   logoutToMain,
   verify2FAcodeToMain,
+  verify2FAEmailCodeToMain,
 } from '../utils/ipc/vrchatAPIToMain';
 
 const USER_LOGIN_LOCALSTORAGE_KEY = 'USER_LOGIN';
@@ -43,6 +44,7 @@ export interface VrcCurrentUserHookMember {
   login(userLogin: UserLogin): Promise<CurrentUser>;
   logout(): Promise<void>;
   doTwoFactorAuth(twoFactorCode: string): Promise<void>;
+  doTFAEmail(code: string): Promise<void>;
 }
 export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
@@ -73,6 +75,9 @@ export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
     },
     async doTwoFactorAuth(twoFactorCode: string): Promise<void> {
       await verify2FAcodeToMain(twoFactorCode);
+    },
+    async doTFAEmail(code: string): Promise<void> {
+      await verify2FAEmailCodeToMain(code);
     },
   };
 
