@@ -8,11 +8,13 @@ import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil';
 
 const SEARCH_OPTIONS = ['NAME', 'AUTHOR', 'DESCRIPTION', 'TAG'] as const;
 
+export type TfaType = 'NONE' | 'TFA' | 'EMAIL';
+
 interface HookMember {
   username: string;
   password: string;
   isLoginProgress: boolean;
-  visibleTwoFactorAuthModal: boolean;
+  twoFactorAuthState: TfaType;
 
   onChangeUsername: (u: string) => void;
   onChangePassword: (p: string) => void;
@@ -23,15 +25,15 @@ interface HookMember {
 }
 
 const useLoginPage = (): HookMember => {
-  const { currentUser, login, doTwoFactorAuth, logout } = useVrcCurrentUser();
+  const { currentUser, login, doTwoFactorAuth, doTFAEmail, logout } =
+    useVrcCurrentUser();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLoginProgress, setIsLoginProgress] = useState(false);
-  const [visibleTwoFactorAuthModal, setVisibleTwoFactorAuthModal] =
-    useState(false);
+  const [twoFactorAuthState, setTwoFactorAuthState] = useState<TfaType>('NONE');
 
   useEffect(() => {
     // if Login, go Main Page
@@ -44,20 +46,24 @@ const useLoginPage = (): HookMember => {
     username,
     password,
     isLoginProgress,
-    visibleTwoFactorAuthModal,
+    twoFactorAuthState: twoFactorAuthState,
 
     checkInputValid,
     onSubmit2faCode(userLogin: UserLogin) {
-      if (userLogin.code) {
+      if (userLogin.code && twoFactorAuthState === 'TFA') {
         doTwoFactorAuth(userLogin.code).then(() => login(userLogin));
+      } else if (userLogin.code && twoFactorAuthState === 'EMAIL') {
+        doTFAEmail(userLogin.code).then(() => login(userLogin));
       } else {
         message.error('2차인증코드가 제대로 입력되지 않았습니다.');
+        setIsLoginProgress(false);
       }
-      setVisibleTwoFactorAuthModal(false);
+      setTwoFactorAuthState('NONE');
     },
     onCancel2faCode() {
-      setVisibleTwoFactorAuthModal(false);
       message.warn('2차인증을 취소했습니다.');
+      setIsLoginProgress(false);
+      setTwoFactorAuthState('NONE');
     },
     onSubmitLogin(loginSubmitValue: UserLogin) {
       if (
@@ -83,7 +89,9 @@ const useLoginPage = (): HookMember => {
         .catch((err) => {
           logout();
           if (err === LoginError.TWOFACTOR) {
-            setVisibleTwoFactorAuthModal(true);
+            setTwoFactorAuthState('TFA');
+          } else if (err === LoginError.TWOFACTOREMAIL) {
+            setTwoFactorAuthState('EMAIL');
           } else {
             throw err;
           }

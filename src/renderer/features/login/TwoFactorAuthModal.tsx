@@ -1,21 +1,29 @@
 import { UserLogin } from '@src/types';
 import { Input, Modal, Typography } from 'antd';
 import { useEffect, useState } from 'react';
+import { TfaType } from './hooks/useLoginPage';
 
 interface Props {
   onLogin?: (u: UserLogin) => void;
   onCancel?: () => void;
-  visible: boolean;
+  tfaState: TfaType;
   userLogin?: UserLogin;
 }
 function TwoFactorAuthModal(props: Props) {
   const [code, setCode] = useState<string>('');
 
   useEffect(() => {
-    if (props.visible === false) {
+    if (props.tfaState === 'NONE') {
       setCode('');
     }
-  }, [props.visible]);
+  }, [props.tfaState]);
+
+  let renderedTfaInfo;
+  if (props.tfaState === 'EMAIL') {
+    renderedTfaInfo = '(이메일확인)';
+  } else if (props.tfaState === 'TFA') {
+    renderedTfaInfo = '(2차인증확인)';
+  }
 
   return (
     <Modal
@@ -31,14 +39,14 @@ function TwoFactorAuthModal(props: Props) {
       }}
       destroyOnClose
       onCancel={props.onCancel}
-      open={props.visible}
+      open={props.tfaState !== 'NONE'}
       width="300px"
       okButtonProps={{
         disabled: code.trim().length !== 6 ? true : false,
       }}
     >
       <Typography.Title level={5}>
-        2차 인증코드를 입력해주세요 (이메일확인)
+        2차 인증코드를 입력해주세요 {renderedTfaInfo}
       </Typography.Title>
       <Input
         value={code}

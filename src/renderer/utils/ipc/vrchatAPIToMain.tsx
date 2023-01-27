@@ -1,4 +1,5 @@
 import { DosFavoriteWorldGroup, LoginError as LoginResult } from '@src/types';
+import { rejects } from 'assert';
 import { CurrentUser, LimitedWorld, User, World } from 'vrchat';
 
 export function testVrchatAPIToMain() {
@@ -32,6 +33,23 @@ export function verify2FAcodeToMain(code: string) {
   return new Promise<boolean>((resolve, reject) => {
     window.electron.ipcRenderer.once(
       'verify2FAcodeToRenderer',
+      (result: unknown) => {
+        const res = result as boolean;
+        if (res === true) {
+          resolve(res);
+        } else {
+          reject(res);
+        }
+      },
+    );
+  });
+}
+
+export function verify2FAEmailCodeToMain(code: string) {
+  window.electron.ipcRenderer.sendMessage('verify2FAEmailcodeToMain', [code]);
+  return new Promise<boolean>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'verify2FAEmailcodeToRenderer',
       (result: unknown) => {
         const res = result as boolean;
         if (res === true) {
