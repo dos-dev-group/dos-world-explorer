@@ -40,7 +40,6 @@ function TwoFactorAuthModal(props: Props) {
       destroyOnClose
       onCancel={props.onCancel}
       open={props.tfaState !== 'NONE'}
-      width="300px"
       okButtonProps={{
         disabled: code.trim().length !== 6 ? true : false,
       }}

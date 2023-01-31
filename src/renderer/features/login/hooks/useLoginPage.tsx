@@ -87,7 +87,6 @@ const useLoginPage = (): HookMember => {
       // }
       login(loginSubmitValue)
         .catch((err) => {
-          logout();
           if (err === LoginError.TWOFACTOR) {
             setTwoFactorAuthState('TFA');
           } else if (err === LoginError.TWOFACTOREMAIL) {
