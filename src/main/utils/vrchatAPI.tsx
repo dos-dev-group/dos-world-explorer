@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 // /* eslint-disable promise/no-nesting */
 import * as vrchat from 'vrchat';
 import { v4 } from 'uuid';
@@ -16,6 +17,7 @@ import {
   TwoFactorEmailCode,
 } from 'vrchat';
 import { off } from 'process';
+import axios, { AxiosResponse } from 'axios';
 import { DosFavoriteWorldGroup, LoginError } from '../../types';
 
 const NONCE = v4();
@@ -23,7 +25,8 @@ const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
 
 let authenticationApi = new vrchat.AuthenticationApi();
 
-let user;
+let user: CurrentUser;
+let authCookie: string;
 
 export async function login(id: string, pw: string): Promise<LoginError> {
   authenticationApi = new vrchat.AuthenticationApi(
@@ -47,7 +50,7 @@ export async function login(id: string, pw: string): Promise<LoginError> {
     })
     .catch((err) => {
       // console.log(err);
-      if (err.message === 'Requires Two-Factor Authentication'){
+      if (err.message === 'Requires Two-Factor Authentication') {
         console.log('2FA required');
         return LoginError.TWOFACTOREMAIL;
       }
@@ -77,10 +80,9 @@ export async function verify2FACode(code: string): Promise<boolean> {
   return authenticationApi
     .verify2FA(twoFactorAuthCode)
     .then(async (res) => {
-      user = res.data;
       // console.log(user);
       console.log('2FA verify success');
-      return true;
+      return res.data.verified;
     })
     .catch((err) => {
       console.log('verify2FACode error');
@@ -97,23 +99,33 @@ export async function verify2FAEmailCode(code: string): Promise<boolean> {
   return authenticationApi
     .verify2FAEmailCode(twoFactorAuthCode)
     .then(async (res) => {
-      user = res.data;
       // console.log(user);
       console.log('2FA Email verify success');
-      return true;
+      return res.data.verified;
     })
     .catch((err) => {
       console.log('verify2FAEmailCode error');
       console.log(err.response);
       return false;
     });
+
+  // return DosVerify2faEmailCode(code)
+  //   .then(() => {
+  //     console.log('2FA verify success');
+  //     return true;
+  //   })
+  //   .catch((err) => {
+  //     console.log('verify2FACode error');
+  //     console.log(err.response);
+  //     return false;
+  //   });
 }
 
 export async function logout(): Promise<boolean> {
   return authenticationApi
     .logout()
     .then(async (res) => {
-      user = res.data;
+      user = undefined;
       // console.log(user);
       console.log('logout success');
       return true;
@@ -130,15 +142,16 @@ function authCheck() {
     .verifyAuthToken()
     .then(async (res) => {
       console.log(res.data);
+      authCookie = res.data.token;
       if (!res.data.ok) {
         authenticationApi = new vrchat.AuthenticationApi();
-        user = await authenticationApi.getCurrentUser();
+        user = (await authenticationApi.getCurrentUser()).data;
       }
     })
     .catch(async (err) => {
       console.log(err.response.data);
       authenticationApi = new vrchat.AuthenticationApi();
-      user = await authenticationApi.getCurrentUser();
+      user = (await authenticationApi.getCurrentUser()).data;
     });
 }
 
@@ -208,32 +221,20 @@ export async function getFriednList(offline?: boolean): Promise<LimitedUser[]> {
   const friends: LimitedUser[] = [];
   let cnt = 0;
   while (true) {
-    if (
-      // eslint-disable-next-line no-await-in-loop, @typescript-eslint/no-loop-func
-      await friendsApi.getFriends(cnt).then((res) => {
-        friends.push(...res.data);
-        cnt += 100;
-        if (res.data.length < 100) {
-          return true;
-        }
-      })
-    ) {
+    const res = await friendsApi.getFriends(cnt);
+    friends.push(...res.data);
+    cnt += 100;
+    if (res.data.length < 100) {
       break;
     }
   }
   cnt = 0;
   if (offline === true) {
     while (true) {
-      if (
-        // eslint-disable-next-line no-await-in-loop, @typescript-eslint/no-loop-func
-        await friendsApi.getFriends(cnt, 100, true).then((res) => {
-          friends.push(...res.data);
-          cnt += 100;
-          if (res.data.length < 100) {
-            return true;
-          }
-        })
-      ) {
+      const res = await friendsApi.getFriends(cnt, 100, true);
+      friends.push(...res.data);
+      cnt += 100;
+      if (res.data.length < 100) {
         break;
       }
     }
@@ -477,37 +478,25 @@ export async function getFavoritedWorlds(): Promise<DosFavoriteWorldGroup[]> {
   const dosWorldFavorite: DosFavoriteWorldGroup[] = [];
   let cnt = 0;
   while (true) {
-    if (
-      // eslint-disable-next-line no-await-in-loop
-      await favoritesApi
-        .getFavoriteGroups(100, cnt)
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        .then((res) => {
-          favoriteGroup.push(...res.data);
-          cnt += 100;
-          if (res.data.length < 100) {
-            return true;
-          }
-        })
-    ) {
+    const res = await favoritesApi.getFavoriteGroups(100, cnt);
+    favoriteGroup.push(...res.data);
+    cnt += 100;
+    if (res.data.length < 100) {
       break;
     }
   }
   cnt = 0;
   while (true) {
-    if (
-      // eslint-disable-next-line no-await-in-loop
-      await worldsApi
-        .getFavoritedWorlds(true, undefined, 100, 'descending', cnt)
-        // eslint-disable-next-line @typescript-eslint/no-loop-func
-        .then((res) => {
-          worlds.push(...res.data);
-          cnt += 100;
-          if (res.data.length < 100) {
-            return true;
-          }
-        })
-    ) {
+    const res = await worldsApi.getFavoritedWorlds(
+      true,
+      undefined,
+      100,
+      'descending',
+      cnt,
+    );
+    worlds.push(...res.data);
+    cnt += 100;
+    if (res.data.length < 100) {
       break;
     }
   }
