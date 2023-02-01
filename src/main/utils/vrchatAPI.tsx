@@ -34,12 +34,20 @@ export async function login(
   pw: string,
   authCookie?: string,
 ): Promise<LoginResult> {
-  const configuration = new vrchat.Configuration({
-    apiKey: VRCHATAPIKEY,
-    username: id,
-    password: pw,
-    accessToken: authCookie ? authCookie : undefined,
-  });
+  let configuration: vrchat.Configuration;
+  if (authCookie) {
+    configuration = new vrchat.Configuration({
+      apiKey: VRCHATAPIKEY,
+      accessToken: authCookie,
+    });
+  } else {
+    configuration = new vrchat.Configuration({
+      apiKey: VRCHATAPIKEY,
+      username: id,
+      password: pw,
+    });
+  }
+
   authenticationApi = new vrchat.AuthenticationApi(configuration);
 
   return authenticationApi
@@ -57,7 +65,7 @@ export async function login(
     })
     .then((tokenInfo) => {
       store.set('id', safeStorage.encryptString(id));
-      store.set('password', safeStorage.encryptString(id));
+      store.set('password', safeStorage.encryptString(pw));
       store.set('authCookie', safeStorage.encryptString(tokenInfo.data.token));
       return LoginResult.SUCCESS;
     })
@@ -101,6 +109,8 @@ export async function autoLogin(): Promise<LoginResult> {
   const authCookie = safeStorage.decryptString(
     Buffer.from(store.get('authCookie') as string),
   );
+  console.log('autoLogin', id, password, authCookie);
+
   return login(id, password, authCookie);
 }
 

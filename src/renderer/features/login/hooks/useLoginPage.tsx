@@ -51,9 +51,13 @@ const useLoginPage = (): HookMember => {
     checkInputValid,
     onSubmit2faCode(userLogin: UserLogin) {
       if (userLogin.code && twoFactorAuthState === 'TFA') {
-        doTwoFactorAuth(userLogin.code).then(() => login(userLogin));
+        doTwoFactorAuth(userLogin.code)
+          .then(() => login(userLogin))
+          .catch((err) => message.error('인증번호가 틀렸습니다.'));
       } else if (userLogin.code && twoFactorAuthState === 'EMAIL') {
-        doTFAEmail(userLogin.code).then(() => login(userLogin));
+        doTFAEmail(userLogin.code)
+          .then(() => login(userLogin))
+          .catch((err) => message.error('인증번호가 틀렸습니다.'));
       } else {
         message.error('2차인증코드가 제대로 입력되지 않았습니다.');
         setIsLoginProgress(false);
