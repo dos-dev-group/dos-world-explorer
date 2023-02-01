@@ -110,6 +110,7 @@ export interface UserLogin {
   name: string; // 유저이름
   password: string; // 비밀번호
   code?: string; // Two Factors Authentication OTP 코드
+  isAutoLogin?: boolean;
 }
 
 export type WorldData = World[];
@@ -120,12 +121,14 @@ export interface Bookmarks {
   [bookmarkType: string]: string[];
 }
 
-export enum LoginError {
+export enum LoginResult {
   SUCCESS = 0,
   UNKNOWN = 1,
   TWOFACTOR = 2,
   InvalidIDPW = 3,
   TWOFACTOREMAIL = 4,
+  NO_AUTO_LOGIN_INFO = 10,
+  NOT_ABLE_ENCRYPTION = 11,
 }
 
 export enum EditResult {

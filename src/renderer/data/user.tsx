@@ -6,6 +6,7 @@ import { useDebugValue, useEffect } from 'react';
 import { atom, AtomEffect, useRecoilState, useResetRecoilState } from 'recoil';
 import { CurrentUser } from 'vrchat';
 import {
+  autoLoginToMain,
   getCurrentUserToMain,
   loginToMain,
   logoutToMain,
@@ -13,23 +14,20 @@ import {
   verify2FAEmailCodeToMain,
 } from '../utils/ipc/vrchatAPIToMain';
 
-const USER_LOGIN_LOCALSTORAGE_KEY = 'USER_LOGIN';
+// const USER_LOGIN_LOCALSTORAGE_KEY = 'USER_LOGIN';
 
 const vrcCurrentUserEffect =
   (): AtomEffect<CurrentUser | undefined> =>
   ({ trigger, onSet, setSelf, resetSelf }) => {
-    getCurrentUserToMain()
-      .catch(() => {
-        const savedUl = localStorage.getItem(USER_LOGIN_LOCALSTORAGE_KEY);
-        if (savedUl) {
-          return login(JSON.parse(savedUl));
-        }
-        throw new Error('LOGIN_ERROR');
+    // TODO: 자동로그인 함수사용하여 고칠것
+    autoLoginToMain()
+      .then((result) => {
+        return getCurrentUserToMain();
       })
       .then((currentUser) => {
         setSelf(currentUser);
       })
-      .catch((reason) => console.error(reason.toString()));
+      .catch((reason) => console.error('Login Error: ', reason.toString()));
   };
 
 const currentUserState = atom<CurrentUser | undefined>({
@@ -85,22 +83,12 @@ export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
 };
 
 async function login(userLogin: UserLogin): Promise<CurrentUser> {
-  try {
-    await loginToMain(userLogin.name, userLogin.password);
-    const user = await getCurrentUserToMain();
-    localStorage.setItem(
-      USER_LOGIN_LOCALSTORAGE_KEY,
-      JSON.stringify(userLogin),
-    );
+  await loginToMain(userLogin.name, userLogin.password);
+  const user = await getCurrentUserToMain();
 
-    return user;
-  } catch (e) {
-    localStorage.removeItem(USER_LOGIN_LOCALSTORAGE_KEY);
-    throw e;
-  }
+  return user;
 }
 
 async function logout(): Promise<void> {
   await logoutToMain();
-  localStorage.removeItem(USER_LOGIN_LOCALSTORAGE_KEY);
 }

@@ -1,6 +1,6 @@
 import { useVrcCurrentUser } from '@src/renderer/data/user';
 import { loginToMain } from '@src/renderer/utils/ipc/vrchatAPIToMain';
-import { LoginError, UserLogin } from '@src/types';
+import { LoginResult, UserLogin } from '@src/types';
 import { message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -87,9 +87,9 @@ const useLoginPage = (): HookMember => {
       // }
       login(loginSubmitValue)
         .catch((err) => {
-          if (err === LoginError.TWOFACTOR) {
+          if (err === LoginResult.TWOFACTOR) {
             setTwoFactorAuthState('TFA');
-          } else if (err === LoginError.TWOFACTOREMAIL) {
+          } else if (err === LoginResult.TWOFACTOREMAIL) {
             setTwoFactorAuthState('EMAIL');
           } else {
             throw err;
