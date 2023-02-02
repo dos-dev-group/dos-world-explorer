@@ -1,6 +1,6 @@
 import { useVrcCurrentUser } from '@src/renderer/data/user';
 import { loginToMain } from '@src/renderer/utils/ipc/vrchatAPIToMain';
-import { LoginError, UserLogin } from '@src/types';
+import { LoginResult, UserLogin } from '@src/types';
 import { message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -51,9 +51,13 @@ const useLoginPage = (): HookMember => {
     checkInputValid,
     onSubmit2faCode(userLogin: UserLogin) {
       if (userLogin.code && twoFactorAuthState === 'TFA') {
-        doTwoFactorAuth(userLogin.code).then(() => login(userLogin));
+        doTwoFactorAuth(userLogin.code)
+          .then(() => login(userLogin))
+          .catch((err) => message.error('인증번호가 틀렸습니다.'));
       } else if (userLogin.code && twoFactorAuthState === 'EMAIL') {
-        doTFAEmail(userLogin.code).then(() => login(userLogin));
+        doTFAEmail(userLogin.code)
+          .then(() => login(userLogin))
+          .catch((err) => message.error('인증번호가 틀렸습니다.'));
       } else {
         message.error('2차인증코드가 제대로 입력되지 않았습니다.');
         setIsLoginProgress(false);
@@ -87,9 +91,9 @@ const useLoginPage = (): HookMember => {
       // }
       login(loginSubmitValue)
         .catch((err) => {
-          if (err === LoginError.TWOFACTOR) {
+          if (err === LoginResult.TWOFACTOR) {
             setTwoFactorAuthState('TFA');
-          } else if (err === LoginError.TWOFACTOREMAIL) {
+          } else if (err === LoginResult.TWOFACTOREMAIL) {
             setTwoFactorAuthState('EMAIL');
           } else {
             throw err;

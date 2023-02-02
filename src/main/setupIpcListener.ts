@@ -29,6 +29,7 @@ import {
   getVrchatNewWorlds,
   getWorldAllInfo,
   verify2FAEmailCode,
+  autoLogin,
 } from './utils/vrchatAPI';
 import {
   showLoadFileDialog,
@@ -59,6 +60,10 @@ export default function setupIpcListener() {
 
   ipcMain.on('loginToMain', async (event, arg) => {
     event.reply('loginToRenderer', await login(arg[0], arg[1]));
+  });
+
+  ipcMain.on('autoLoginToMain', async (event, arg) => {
+    event.reply('autoLoginToRenderer', await autoLogin());
   });
 
   ipcMain.on('verify2FAcodeToMain', async (event, arg) => {
