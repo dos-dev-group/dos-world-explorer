@@ -17,10 +17,3 @@ if (process.env.NODE_ENV === 'development') {
     return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
   };
 }
-
-export const waitAppReady = () =>
-  new Promise<void>((resolve, reject) => {
-    app.on('ready', () => {
-      resolve();
-    });
-  });

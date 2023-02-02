@@ -17,10 +17,10 @@ import {
   TwoFactorEmailCode,
 } from 'vrchat';
 import { off } from 'process';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
+import { Cookie, CookieJar } from 'tough-cookie';
 import { DosFavoriteWorldGroup, LoginResult } from '../../types';
 import store from '../store';
-import { waitAppReady } from '../util';
 
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
@@ -29,32 +29,47 @@ let authenticationApi = new vrchat.AuthenticationApi();
 
 let user: CurrentUser;
 
+function setAuthCookie(authCookie: string) {
+  const axiosDefaults = axios.defaults as any;
+
+  const jar = axiosDefaults.jar as CookieJar;
+
+  jar.setCookie(
+    new Cookie({ key: 'auth', value: authCookie }),
+    'https://api.vrchat.cloud/',
+  );
+  jar.setCookie(
+    new Cookie({ key: 'apiKey', value: VRCHATAPIKEY }),
+    'https://api.vrchat.cloud/',
+  );
+}
+
 export async function login(
   id: string,
   pw: string,
   authCookie?: string,
 ): Promise<LoginResult> {
-  let configuration: vrchat.Configuration;
+  let configuration;
+
   if (authCookie) {
     configuration = new vrchat.Configuration({
       apiKey: VRCHATAPIKEY,
-      accessToken: authCookie,
     });
+    setAuthCookie(authCookie);
   } else {
     configuration = new vrchat.Configuration({
       apiKey: VRCHATAPIKEY,
       username: id,
       password: pw,
+      accessToken: authCookie,
     });
   }
-
   authenticationApi = new vrchat.AuthenticationApi(configuration);
 
   return authenticationApi
     .getCurrentUser()
     .then((res) => {
       user = res.data;
-      console.log(user);
       console.log('login success');
       console.log('api displayName :', res.data.displayName);
 
@@ -70,7 +85,6 @@ export async function login(
       return LoginResult.SUCCESS;
     })
     .catch((err) => {
-      // console.log(err);
       if (err.message === 'Requires Two-Factor Email Authentication') {
         console.log('2FA required');
         return LoginResult.TWOFACTOREMAIL;
@@ -90,6 +104,7 @@ export async function login(
         return LoginResult.InvalidIDPW;
       }
       console.log('unknown error');
+      console.error('login', err);
       return LoginResult.UNKNOWN;
     });
 }
@@ -109,7 +124,6 @@ export async function autoLogin(): Promise<LoginResult> {
   const authCookie = safeStorage.decryptString(
     Buffer.from(store.get('authCookie') as string),
   );
-  console.log('autoLogin', id, password, authCookie);
 
   return login(id, password, authCookie);
 }
@@ -121,7 +135,6 @@ export async function verify2FACode(code: string): Promise<boolean> {
   return authenticationApi
     .verify2FA(twoFactorAuthCode)
     .then(async (res) => {
-      // console.log(user);
       console.log('2FA verify success');
       return res.data.verified;
     })
@@ -140,7 +153,6 @@ export async function verify2FAEmailCode(code: string): Promise<boolean> {
   return authenticationApi
     .verify2FAEmailCode(twoFactorAuthCode)
     .then(async (res) => {
-      // console.log(user);
       console.log('2FA Email verify success');
       return res.data.verified;
     })
@@ -156,7 +168,6 @@ export async function logout(): Promise<boolean> {
     .logout()
     .then(async (res) => {
       user = undefined;
-      // console.log(user);
       store.reset('id', 'password', 'authCookie');
       console.log('logout success');
       return true;
