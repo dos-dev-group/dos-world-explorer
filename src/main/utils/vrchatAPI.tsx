@@ -44,6 +44,14 @@ function setAuthCookie(authCookie: string) {
   );
 }
 
+function resetAuthCookie() {
+  const axiosDefaults = axios.defaults as any;
+
+  const jar = axiosDefaults.jar as CookieJar;
+
+  jar.removeAllCookiesSync();
+}
+
 export async function login(
   id: string,
   pw: string,
@@ -168,6 +176,7 @@ export async function logout(): Promise<boolean> {
     .logout()
     .then(async (res) => {
       user = undefined;
+      resetAuthCookie();
       store.reset('id', 'password', 'authCookie');
       console.log('logout success');
       return true;

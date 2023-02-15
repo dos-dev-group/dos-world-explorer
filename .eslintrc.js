@@ -35,6 +35,7 @@ module.exports = {
     'react/destructuring-assignment': 'off',
     'react/no-array-index-key': 'off',
     'react/jsx-boolean-value': 'off',
+    'react/jsx-props-no-spreading': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
