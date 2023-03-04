@@ -32,7 +32,7 @@ import useWorldSheetPage, { SearchOptions } from './hooks/useWorldSheetPage';
 import AddWorldModal from '../../components/AddWorldModal';
 import WorldInfoModal from '../../components/WorldInfoModal';
 import EditWorldModal from '../../components/EditWorldModal';
-import useBookmark from '../../utils/hooks/useBookmark';
+import useBookmarkLogic from '../../utils/hooks/useBookmarkLogic';
 
 const { Column } = Table;
 const { Option } = Select;
@@ -40,7 +40,7 @@ const { Search } = Input;
 
 export default function WorldSheetPage() {
   const hookMember = useWorldSheetPage();
-  const bookmarkHookMember = useBookmark();
+  const bookmarkHookMember = useBookmarkLogic();
 
   const isAllType = hookMember.currentType === '전체';
 

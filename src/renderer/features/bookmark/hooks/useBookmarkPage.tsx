@@ -25,7 +25,7 @@ export type SearchOptions = typeof SEARCH_OPTIONS;
 interface HookMember {
   currentType: string;
   typeList: string[];
-  worldData: WorldData;
+  tableData: WorldData;
   searchOptions: SearchOptions;
   infoModalWorld: World | undefined;
   bookmarkModalData: Bookmarks | undefined;
@@ -46,6 +46,7 @@ interface HookMember {
   onEditWorld: (key: string, world: WorldEditInput) => void;
   onRemoveWorld: (key: string) => void;
 }
+
 const useBookmarkPage = (): HookMember => {
   const [bookmarks, setBookmarks] = useRecoilState(worldBookmarksState);
   const [worldData, setWorldData] = useRecoilState(worldDataState);
@@ -124,7 +125,7 @@ const useBookmarkPage = (): HookMember => {
   return {
     currentType: currentType || '',
     typeList: bookmarks ? Object.keys(bookmarks) : [],
-    worldData: worldTableData,
+    tableData: worldTableData,
     searchOptions: SEARCH_OPTIONS,
     infoModalWorld: modalWorldInfo,
     bookmarkModalData: visibleModalBookmark ? bookmarks : undefined,

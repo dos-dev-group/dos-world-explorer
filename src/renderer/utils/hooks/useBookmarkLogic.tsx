@@ -16,6 +16,7 @@ interface HookMember {
   onChangeBookmarkWorld(bookmarkTypes: string[]): void;
   onFrontSwapWorld(bookmarkType: string, world: World): void;
   onRearSwapWorld(bookmarkType: string, world: World): void;
+  onMoveWorld(bookmarkType: string, world1Key: string, world2Key: string): void;
 
   checkIsSomewhereBookmarkedWorld(world: World): boolean;
 
@@ -24,7 +25,7 @@ interface HookMember {
   targetWorldTypes: string[] | undefined;
 }
 
-const useBookmark = (): HookMember => {
+const useBookmarkLogic = (): HookMember => {
   const [bookmarkTargetWorld, setBookmarkTargetWorld] =
     useState<WorldPartial>();
   const [recoilBookmarks, setRecoilBookmarks] =
@@ -207,7 +208,34 @@ const useBookmark = (): HookMember => {
         return val;
       });
     },
+    onMoveWorld(
+      bookmarkType: string,
+      world1Key: string,
+      world2Key: string,
+    ): void {
+      if (!recoilBookmarks) return;
+
+      const curTypeWorlds = recoilBookmarks[bookmarkType].concat();
+      const world1Index = curTypeWorlds.findIndex((e) => e === world1Key);
+      const world2Index = curTypeWorlds.findIndex((e) => e === world2Key);
+
+      if (world1Index === -1 || world2Index === -1) {
+        message.error('해당 월드가 북마크에 없습니다.');
+      }
+      const tempWorld = curTypeWorlds[world1Index];
+      curTypeWorlds.splice(world1Index, 1);
+      curTypeWorlds.splice(world2Index, 0, tempWorld);
+
+      setRecoilBookmarks((val) => {
+        if (val) {
+          const clone = { ...val };
+          clone[bookmarkType] = curTypeWorlds;
+          return clone;
+        }
+        return val;
+      });
+    },
   };
   return hookMember;
 };
-export default useBookmark;
+export default useBookmarkLogic;

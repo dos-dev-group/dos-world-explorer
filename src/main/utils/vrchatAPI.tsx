@@ -44,6 +44,14 @@ function setAuthCookie(authCookie: string) {
   );
 }
 
+function resetAuthCookie() {
+  const axiosDefaults = axios.defaults as any;
+
+  const jar = axiosDefaults.jar as CookieJar;
+
+  jar.removeAllCookiesSync();
+}
+
 export async function login(
   id: string,
   pw: string,
@@ -64,7 +72,16 @@ export async function login(
       accessToken: authCookie,
     });
   }
-  authenticationApi = new vrchat.AuthenticationApi(configuration);
+  const axiosConfiguration = axios.create({
+    headers: {
+      'User-Agent': 'vrce/v0.18.12 cdwdong1@gmail.com',
+    },
+  });
+  authenticationApi = new vrchat.AuthenticationApi(
+    configuration,
+    undefined,
+    axiosConfiguration,
+  );
 
   return authenticationApi
     .getCurrentUser()
@@ -104,7 +121,7 @@ export async function login(
         return LoginResult.InvalidIDPW;
       }
       console.log('unknown error');
-      console.error('login', err);
+      console.error('login', err.response.data.error);
       return LoginResult.UNKNOWN;
     });
 }
@@ -168,6 +185,7 @@ export async function logout(): Promise<boolean> {
     .logout()
     .then(async (res) => {
       user = undefined;
+      resetAuthCookie();
       store.reset('id', 'password', 'authCookie');
       console.log('logout success');
       return true;
@@ -179,19 +197,19 @@ export async function logout(): Promise<boolean> {
 }
 
 function authCheck() {
-  authenticationApi = new vrchat.AuthenticationApi();
+  if (!authenticationApi) {
+    console.error('\nError Log: authenticationApi is undefinded');
+  }
   authenticationApi
     .verifyAuthToken()
     .then(async (res) => {
       console.log(res.data);
       if (!res.data.ok) {
-        authenticationApi = new vrchat.AuthenticationApi();
         user = (await authenticationApi.getCurrentUser()).data;
       }
     })
     .catch(async (err) => {
       console.log(err.response.data);
-      authenticationApi = new vrchat.AuthenticationApi();
       user = (await authenticationApi.getCurrentUser()).data;
     });
 }

@@ -37,7 +37,13 @@ import { World } from '@src/types';
 import WorldInfoModal from '@src/renderer/components/WorldInfoModal';
 import StarSelect from '@src/renderer/components/StarSelect';
 import BookmarkSelectModal from '@src/renderer/components/BookmarkSelectModal';
-import useBookmark from '@src/renderer/utils/hooks/useBookmark';
+import useBookmarkLogic from '@src/renderer/utils/hooks/useBookmarkLogic';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { DndContext } from '@dnd-kit/core';
+import DraggableBodyRow from '@src/renderer/components/table/DraggableBodyRow';
 import useBookmarkPage from './hooks/useBookmarkPage';
 import BookmarkTypeModal from './BookmarkTypeModal';
 
@@ -47,7 +53,7 @@ const { Search } = Input;
 
 export default function BookmarkPage() {
   const hookMember = useBookmarkPage();
-  const bookmarkHookMember = useBookmark();
+  const bookmarkHookMember = useBookmarkLogic();
 
   const tabItems = hookMember.typeList.map((e) => ({
     label: e,
@@ -182,195 +188,227 @@ export default function BookmarkPage() {
       </FlexRow>
 
       <Spin spinning={hookMember.isLoading}>
-        <Table
-          dataSource={hookMember.worldData}
-          pagination={{
-            pageSize: 100,
-          }}
-          onChange={(pagination, filters, sorter) => {
-            const isFiltered =
-              Object.values(filters).filter((e) => !!e).length > 0;
-            // eslint-disable-next-line no-nested-ternary
-            const isSorted = Array.isArray(sorter)
-              ? true
-              : sorter.order
-              ? true
-              : false;
-            hookMember.onChangeIsManipulatedTable(isFiltered || isSorted);
+        <DndContext
+          onDragEnd={({ active, over }) => {
+            if (over && active.id !== over.id) {
+              bookmarkHookMember.onMoveWorld(
+                hookMember.currentType,
+                active.id as string,
+                over.id as string,
+              );
+            }
           }}
         >
-          <Column
-            width={5}
-            title=""
-            key="bookmark"
-            render={(_, record: World) => {
-              if (bookmarkHookMember.checkIsSomewhereBookmarkedWorld(record)) {
-                return (
-                  <HeartFilled
-                    css={{ color: red.primary, fontSize: 20 }}
-                    onClick={() =>
-                      bookmarkHookMember.onClickOpenBookmarkModal(record)
-                    }
-                  />
-                );
-              }
-              return (
-                <HeartOutlined
-                  css={{ color: red.primary, fontSize: 20 }}
-                  onClick={() =>
-                    bookmarkHookMember.onClickOpenBookmarkModal(record)
+          <SortableContext
+            items={hookMember.tableData.map((e) => e.key)}
+            strategy={verticalListSortingStrategy}
+          >
+            <Table
+              components={{
+                body: {
+                  row: DraggableBodyRow,
+                },
+              }}
+              dataSource={hookMember.tableData}
+              pagination={{
+                pageSize: 100,
+              }}
+              onChange={(pagination, filters, sorter) => {
+                const isFiltered =
+                  Object.values(filters).filter((e) => !!e).length > 0;
+                // eslint-disable-next-line no-nested-ternary
+                const isSorted = Array.isArray(sorter)
+                  ? true
+                  : sorter.order
+                  ? true
+                  : false;
+                hookMember.onChangeIsManipulatedTable(isFiltered || isSorted);
+              }}
+            >
+              <Column
+                width={5}
+                title=""
+                key={hookMember.isManipulatedTable ? 'none' : 'sort'}
+              />
+              <Column
+                width={5}
+                title=""
+                key="bookmark"
+                render={(_, record: World) => {
+                  if (
+                    bookmarkHookMember.checkIsSomewhereBookmarkedWorld(record)
+                  ) {
+                    return (
+                      <HeartFilled
+                        css={{ color: red.primary, fontSize: 20 }}
+                        onClick={() =>
+                          bookmarkHookMember.onClickOpenBookmarkModal(record)
+                        }
+                      />
+                    );
                   }
-                />
-              );
-            }}
-          />
-          <Column
-            width={10}
-            title="이미지"
-            dataIndex="imageUrl"
-            render={(imageUrl, record: World) => (
-              <ClickableOpacity>
-                <Image
-                  src={imageUrl}
-                  preview={false}
-                  onClick={(e) => {
-                    hookMember.onClickToggleInfoModal(record);
-                  }}
-                />
-              </ClickableOpacity>
-            )}
-          />
-          <Column
-            width={20}
-            title="제목"
-            dataIndex="name"
-            sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
-            // onCell={(w) => ({
-            //   style: {
-            //     width: 200,
-            //     wordBreak: 'keep-all',
-            //   },
-            // })}
-            // ellipsis
-            render={(_, world) => (
-              <Typography.Text
-                css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ tooltip: world.name }}
-              >
-                <Typography.Link
-                  onClick={(e) => {
-                    hookMember.onClickToggleInfoModal(world);
-                  }}
-                >
-                  {world.name}
-                </Typography.Link>
-              </Typography.Text>
-            )}
-          />
-          <Column
-            width={10}
-            title="제작자"
-            dataIndex="author"
-            sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
-            ellipsis
-          />
-          <Column
-            responsive={['xl']}
-            width={6}
-            dataIndex="type"
-            ellipsis
-            onCell={(world) => ({
-              style: {
-                fontSize: 12,
-              },
-            })}
-          />
-          <Column
-            width={15}
-            title="설명"
-            dataIndex="description"
-            render={(value) => (
-              <Typography.Paragraph
-                css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ rows: 3, expandable: true }}
-              >
-                {value}
-              </Typography.Paragraph>
-            )}
-          />
-          <Column
-            width={15}
-            title="태그"
-            dataIndex="tags"
-            render={(tags: any[]) => (
-              <div css={{ wordBreak: 'break-all', whiteSpace: 'break-spaces' }}>
-                {tags.map((tag, index) => {
-                  const colorIndex =
-                    simpleStringHash(tag) % PresetColorTypes.length;
-                  const color = PresetColorTypes[colorIndex];
                   return (
-                    <span key={tag}>
-                      <Tag color={color}>{tag.toUpperCase()}</Tag>
-                    </span>
+                    <HeartOutlined
+                      css={{ color: red.primary, fontSize: 20 }}
+                      onClick={() =>
+                        bookmarkHookMember.onClickOpenBookmarkModal(record)
+                      }
+                    />
                   );
+                }}
+              />
+              <Column
+                width={10}
+                title="이미지"
+                dataIndex="imageUrl"
+                render={(imageUrl, record: World) => (
+                  <ClickableOpacity>
+                    <Image
+                      src={imageUrl}
+                      preview={false}
+                      onClick={(e) => {
+                        hookMember.onClickToggleInfoModal(record);
+                      }}
+                    />
+                  </ClickableOpacity>
+                )}
+              />
+              <Column
+                width={20}
+                title="제목"
+                dataIndex="name"
+                sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
+                // onCell={(w) => ({
+                //   style: {
+                //     width: 200,
+                //     wordBreak: 'keep-all',
+                //   },
+                // })}
+                // ellipsis
+                render={(_, world) => (
+                  <Typography.Text
+                    css={{ wordBreak: 'keep-all' }}
+                    ellipsis={{ tooltip: world.name }}
+                  >
+                    <Typography.Link
+                      onClick={(e) => {
+                        hookMember.onClickToggleInfoModal(world);
+                      }}
+                    >
+                      {world.name}
+                    </Typography.Link>
+                  </Typography.Text>
+                )}
+              />
+              <Column
+                width={10}
+                title="제작자"
+                dataIndex="author"
+                sorter={(a: World, b: World) =>
+                  a.author.localeCompare(b.author)
+                }
+                ellipsis
+              />
+              <Column
+                responsive={['xl']}
+                width={6}
+                dataIndex="type"
+                ellipsis
+                onCell={(world) => ({
+                  style: {
+                    fontSize: 12,
+                  },
                 })}
-              </div>
-            )}
-            ellipsis
-          />
-          <Column
-            width={9}
-            title="별점"
-            dataIndex="score"
-            render={(score: number) => (
-              <FlexRow>
-                {new Array(score).fill(null).map((_, index) => (
-                  <StarFilled key={index} css={{ color: gold.primary }} />
-                ))}
-              </FlexRow>
-            )}
-            sorter={(a: World, b: World) => a.score - b.score}
-            filters={scoreFilters}
-            onFilter={(value, record) => value === record.score}
-          />
-          {!hookMember.isManipulatedTable && (
-            <Column
-              width={5}
-              responsive={['xl']}
-              title=""
-              key="swap"
-              render={(_, record, index) => (
-                <Flex>
-                  {index === 0 ? undefined : (
-                    <Button
-                      type="text"
-                      icon={<UpOutlined />}
-                      onClick={() =>
-                        bookmarkHookMember.onFrontSwapWorld(
-                          hookMember.currentType,
-                          record as World,
-                        )
-                      }
-                    />
-                  )}
-                  {index + 1 === hookMember.worldData.length ? undefined : (
-                    <Button
-                      type="text"
-                      icon={<DownOutlined />}
-                      onClick={() =>
-                        bookmarkHookMember.onRearSwapWorld(
-                          hookMember.currentType,
-                          record as World,
-                        )
-                      }
-                    />
-                  )}
-                </Flex>
-              )}
-            />
-          )}
+              />
+              <Column
+                width={15}
+                title="설명"
+                dataIndex="description"
+                render={(value) => (
+                  <Typography.Paragraph
+                    css={{ wordBreak: 'keep-all' }}
+                    ellipsis={{ rows: 3, expandable: true }}
+                  >
+                    {value}
+                  </Typography.Paragraph>
+                )}
+              />
+              <Column
+                width={15}
+                title="태그"
+                dataIndex="tags"
+                render={(tags: any[]) => (
+                  <div
+                    css={{ wordBreak: 'break-all', whiteSpace: 'break-spaces' }}
+                  >
+                    {tags.map((tag, index) => {
+                      const colorIndex =
+                        simpleStringHash(tag) % PresetColorTypes.length;
+                      const color = PresetColorTypes[colorIndex];
+                      return (
+                        <span key={tag}>
+                          <Tag color={color}>{tag.toUpperCase()}</Tag>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                ellipsis
+              />
+              <Column
+                width={9}
+                title="별점"
+                dataIndex="score"
+                render={(score: number) => (
+                  <FlexRow>
+                    {new Array(score).fill(null).map((_, index) => (
+                      <StarFilled key={index} css={{ color: gold.primary }} />
+                    ))}
+                  </FlexRow>
+                )}
+                sorter={(a: World, b: World) => a.score - b.score}
+                filters={scoreFilters}
+                onFilter={(value, record) => value === record.score}
+              />
 
-          {/* <Column
+              {/* {!hookMember.isManipulatedTable && (
+                <Column
+                  width={5}
+                  responsive={['xl']}
+                  title=""
+                  key="swap"
+                  render={(_, record, index) => (
+                    <Flex>
+                      {index === 0 ? undefined : (
+                        <Button
+                          type="text"
+                          icon={<UpOutlined />}
+                          onClick={() =>
+                            bookmarkHookMember.onFrontSwapWorld(
+                              hookMember.currentType,
+                              record as World,
+                            )
+                          }
+                        />
+                      )}
+                      {index + 1 === hookMember.tableData.length ? undefined : (
+                        <Button
+                          type="text"
+                          icon={<DownOutlined />}
+                          onClick={() =>
+                            bookmarkHookMember.onRearSwapWorld(
+                              hookMember.currentType,
+                              record as World,
+                            )
+                          }
+                        />
+                      )}
+                    </Flex>
+                  )}
+                />
+              )} */}
+
+              {/* <Column
             width="5%"
             dataIndex="key"
             render={(k, record) => (
@@ -387,7 +425,9 @@ export default function BookmarkPage() {
               </Flex>
             )}
           /> */}
-        </Table>
+            </Table>
+          </SortableContext>
+        </DndContext>
       </Spin>
     </Flex>
   );

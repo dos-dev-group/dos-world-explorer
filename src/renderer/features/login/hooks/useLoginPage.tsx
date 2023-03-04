@@ -59,6 +59,7 @@ const useLoginPage = (): HookMember => {
           .then(() => login(userLogin))
           .catch((err) => message.error('인증번호가 틀렸습니다.'));
       } else {
+        console.error('\ntwoFactorAuthState: ' + twoFactorAuthState);
         message.error('2차인증코드가 제대로 입력되지 않았습니다.');
         setIsLoginProgress(false);
       }

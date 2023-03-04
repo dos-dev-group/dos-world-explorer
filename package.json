@@ -227,6 +227,9 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
+    "@dnd-kit/core": "^6.0.7",
+    "@dnd-kit/sortable": "^7.0.2",
+    "@dnd-kit/utilities": "^3.2.1",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@googleapis/docs": "^0.4.1",
@@ -248,7 +251,7 @@
     "react-router-dom": "^6.3.0",
     "recoil": "^0.7.3-alpha.2",
     "uuid": "^8.3.2",
-    "vrchat": "^1.11.0",
+    "vrchat": "^1.11.1",
     "ws": "^8.7.0"
   },
   "devEngines": {
