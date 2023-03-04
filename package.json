@@ -251,7 +251,7 @@
     "react-router-dom": "^6.3.0",
     "recoil": "^0.7.3-alpha.2",
     "uuid": "^8.3.2",
-    "vrchat": "^1.11.0",
+    "vrchat": "^1.11.1",
     "ws": "^8.7.0"
   },
   "devEngines": {
