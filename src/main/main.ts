@@ -70,7 +70,7 @@ const createWindow = async () => {
     show: false,
     width: 1680,
     height: 1050,
-    icon: getAssetPath('icon.png'),
+    icon: getAssetPath('VRCE_logo512.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
