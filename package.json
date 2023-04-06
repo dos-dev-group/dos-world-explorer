@@ -262,6 +262,6 @@
     "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
   "browserslist": [],
-  "version": "0.18.15",
+  "version": "1.0.0",
   "main": ".eslintrc.js"
 }
