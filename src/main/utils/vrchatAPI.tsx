@@ -25,7 +25,38 @@ import store from '../store';
 const NONCE = v4();
 const VRCHATAPIKEY = 'JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26';
 
-let authenticationApi = new vrchat.AuthenticationApi();
+const axiosConfiguration = axios.create({
+  headers: {
+    'User-Agent': 'vrce/v0.18.12 cdwdong1@gmail.com',
+  },
+});
+let configuration: vrchat.Configuration;
+let authenticationApi = new vrchat.AuthenticationApi(
+  undefined,
+  undefined,
+  axiosConfiguration,
+);
+const friendsApi = new vrchat.FriendsApi(
+  undefined,
+  undefined,
+  axiosConfiguration,
+);
+const inviteApi = new vrchat.InviteApi(
+  undefined,
+  undefined,
+  axiosConfiguration,
+);
+const worldsApi = new vrchat.WorldsApi(
+  undefined,
+  undefined,
+  axiosConfiguration,
+);
+const usersApi = new vrchat.UsersApi(undefined, undefined, axiosConfiguration);
+const favoritesApi = new vrchat.FavoritesApi(
+  undefined,
+  undefined,
+  axiosConfiguration,
+);
 
 let user: CurrentUser;
 
@@ -57,8 +88,6 @@ export async function login(
   pw: string,
   authCookie?: string,
 ): Promise<LoginResult> {
-  let configuration;
-
   if (authCookie) {
     configuration = new vrchat.Configuration({
       apiKey: VRCHATAPIKEY,
@@ -72,11 +101,7 @@ export async function login(
       accessToken: authCookie,
     });
   }
-  const axiosConfiguration = axios.create({
-    headers: {
-      'User-Agent': 'vrce/v0.18.12 cdwdong1@gmail.com',
-    },
-  });
+
   authenticationApi = new vrchat.AuthenticationApi(
     configuration,
     undefined,
@@ -199,6 +224,7 @@ export async function logout(): Promise<boolean> {
 function authCheck() {
   if (!authenticationApi) {
     console.error('\nError Log: authenticationApi is undefinded');
+    return;
   }
   authenticationApi
     .verifyAuthToken()
@@ -276,7 +302,7 @@ export async function testVrchatAPI(): Promise<any> {
 
 export async function getFriednList(offline?: boolean): Promise<LimitedUser[]> {
   await authCheck();
-  const friendsApi = new vrchat.FriendsApi();
+
   const friends: LimitedUser[] = [];
   let cnt = 0;
   while (true) {
@@ -340,7 +366,7 @@ export async function sendInvites(
   instanceId: string,
 ): Promise<string> {
   await authCheck();
-  const inviteApi = new vrchat.InviteApi();
+
   for (let i = 0; i < userIds.length; i++) {
     inviteApi
       .inviteUser(userIds[i], {
@@ -357,7 +383,6 @@ export async function sendSelfInvite(
   instanceId: string,
 ): Promise<string> {
   await authCheck();
-  const inviteApi = new vrchat.InviteApi();
 
   return inviteApi
     .inviteMyselfTo(worldId, instanceId)
@@ -385,8 +410,8 @@ export async function genWorldInstanceName(worldId: string): Promise<string> {
 
 export async function getWorldAllInfo(worldId: string) {
   await authCheck();
-  const WorldsApi = new vrchat.WorldsApi();
-  const worldData = await WorldsApi.getWorld(worldId);
+
+  const worldData = await worldsApi.getWorld(worldId);
   // console.log(await worldData);
   return worldData.data;
 }
@@ -395,8 +420,8 @@ export async function getWorldInfo(
   worldId: string,
 ): Promise<{ name: string; authorName: string; imageUrl: string }> {
   await authCheck();
-  const WorldsApi = new vrchat.WorldsApi();
-  const worldData = (await WorldsApi.getWorld(worldId)).data;
+
+  const worldData = (await worldsApi.getWorld(worldId)).data;
 
   return {
     name: worldData.name,
@@ -407,7 +432,7 @@ export async function getWorldInfo(
 
 async function getWorldInstanceInfo(worldId: string): Promise<string[]> {
   await authCheck();
-  const worldsApi = new vrchat.WorldsApi();
+
   const worldInstanceInfo = [];
   const worldInstance =
     (await worldsApi.getWorld(worldId)).data.instances || [];
@@ -426,29 +451,25 @@ export async function getVrchatRecentWorlds(
   limit?: number,
 ): Promise<LimitedWorld[]> {
   await authCheck();
-  const WorldsApi = new vrchat.WorldsApi();
+
   await authenticationApi.getCurrentUser();
-  return WorldsApi.getRecentWorlds(
-    false,
-    'order',
-    limit,
-    'descending',
-    offset,
-  ).then((res) => {
-    // const worlds: WorldVrcRaw[] = [];
-    // const worldRowdata = res.data;
-    // for (let i = 0; i < worldRowdata.length; i++) {
-    //   worlds.push({
-    //     key: worldRowdata[i].id, // key
-    //     name: worldRowdata[i].name, // name
-    //     author: worldRowdata[i].authorName, // author
-    //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
-    //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
-    //   });
-    // }
-    // console.log(worlds);
-    return res.data;
-  });
+  return worldsApi
+    .getRecentWorlds(false, 'order', limit, 'descending', offset)
+    .then((res) => {
+      // const worlds: WorldVrcRaw[] = [];
+      // const worldRowdata = res.data;
+      // for (let i = 0; i < worldRowdata.length; i++) {
+      //   worlds.push({
+      //     key: worldRowdata[i].id, // key
+      //     name: worldRowdata[i].name, // name
+      //     author: worldRowdata[i].authorName, // author
+      //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
+      //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
+      //   });
+      // }
+      // console.log(worlds);
+      return res.data;
+    });
 }
 
 export async function getVrchatlabWorlds(
@@ -456,30 +477,32 @@ export async function getVrchatlabWorlds(
   limit?: number,
 ): Promise<LimitedWorld[]> {
   await authCheck();
-  const WorldsApi = new vrchat.WorldsApi();
+
   await authenticationApi.getCurrentUser();
-  return WorldsApi.searchWorlds(
-    false,
-    'labsPublicationDate',
-    undefined,
-    undefined,
-    limit,
-    'descending',
-    offset,
-  ).then((res) => {
-    // const worlds: WorldVrcRaw[] = [];
-    // const worldRowdata = res.data;
-    // for (let i = 0; i < worldRowdata.length; i++) {
-    //   worlds.push({
-    //     key: worldRowdata[i].id, // key
-    //     name: worldRowdata[i].name, // name
-    //     author: worldRowdata[i].authorName, // author
-    //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
-    //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
-    //   });
-    // }
-    return res.data;
-  });
+  return worldsApi
+    .searchWorlds(
+      false,
+      'labsPublicationDate',
+      undefined,
+      undefined,
+      limit,
+      'descending',
+      offset,
+    )
+    .then((res) => {
+      // const worlds: WorldVrcRaw[] = [];
+      // const worldRowdata = res.data;
+      // for (let i = 0; i < worldRowdata.length; i++) {
+      //   worlds.push({
+      //     key: worldRowdata[i].id, // key
+      //     name: worldRowdata[i].name, // name
+      //     author: worldRowdata[i].authorName, // author
+      //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
+      //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
+      //   });
+      // }
+      return res.data;
+    });
 }
 
 export async function getVrchatNewWorlds(
@@ -487,30 +510,32 @@ export async function getVrchatNewWorlds(
   limit?: number,
 ): Promise<LimitedWorld[]> {
   await authCheck();
-  const WorldsApi = new vrchat.WorldsApi();
+
   await authenticationApi.getCurrentUser();
-  return WorldsApi.searchWorlds(
-    false,
-    'publicationDate',
-    undefined,
-    undefined,
-    limit,
-    'descending',
-    offset,
-  ).then((res) => {
-    // const worlds: LimitedWorld[] = [];
-    // const worldRowdata = res.data;
-    // for (let i = 0; i < worldRowdata.length; i++) {
-    //   worlds.push({
-    //     key: worldRowdata[i].id, // key
-    //     name: worldRowdata[i].name, // name
-    //     author: worldRowdata[i].authorName, // author
-    //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
-    //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
-    //   });
-    // }
-    return res.data;
-  });
+  return worldsApi
+    .searchWorlds(
+      false,
+      'publicationDate',
+      undefined,
+      undefined,
+      limit,
+      'descending',
+      offset,
+    )
+    .then((res) => {
+      // const worlds: LimitedWorld[] = [];
+      // const worldRowdata = res.data;
+      // for (let i = 0; i < worldRowdata.length; i++) {
+      //   worlds.push({
+      //     key: worldRowdata[i].id, // key
+      //     name: worldRowdata[i].name, // name
+      //     author: worldRowdata[i].authorName, // author
+      //     url: 'https://vrchat.com/home/world/' + worldRowdata[i].id, // url
+      //     imageUrl: worldRowdata[i].imageUrl, // imageUrl
+      //   });
+      // }
+      return res.data;
+    });
 }
 
 export async function getCurrentUser(): Promise<CurrentUser> {
@@ -522,7 +547,7 @@ export async function getCurrentUser(): Promise<CurrentUser> {
 
 export async function getUser(userId: string): Promise<User> {
   await authCheck();
-  const usersApi = new vrchat.UsersApi();
+
   return usersApi.getUser(userId).then((res) => {
     return res.data;
   });
@@ -530,9 +555,9 @@ export async function getUser(userId: string): Promise<User> {
 
 export async function getFavoritedWorlds(): Promise<DosFavoriteWorldGroup[]> {
   await authCheck();
-  const favoritesApi = new vrchat.FavoritesApi();
+
   const favoriteGroup: FavoriteGroup[] = [];
-  const worldsApi = new vrchat.WorldsApi();
+
   const worlds: LimitedWorld[] = [];
   const dosWorldFavorite: DosFavoriteWorldGroup[] = [];
   let cnt = 0;
@@ -585,7 +610,7 @@ export async function addFavoriteWorld(
   worldId: string,
 ): Promise<boolean> {
   await authCheck();
-  const favoritesApi = new vrchat.FavoritesApi();
+
   return favoritesApi
     .addFavorite({
       type: FavoriteType.World,
@@ -604,8 +629,7 @@ export async function addFavoriteWorld(
 
 export async function removeFavoriteWorld(worldId: string): Promise<boolean> {
   await authCheck();
-  const favoritesApi = new vrchat.FavoritesApi();
-  const worldsApi = new vrchat.WorldsApi();
+
   let favoriteId = '';
   let cnt = 0;
   while (true) {

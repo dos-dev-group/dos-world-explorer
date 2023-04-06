@@ -7,7 +7,9 @@ import {
   StarOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Typography } from 'antd';
+import logoImage from '@assets/VRCE_logo256.png';
+// import logoImage from '@assets/VRCE_logo.svg';
+import { Image, Layout, Menu, Typography } from 'antd';
 import { Footer } from 'antd/lib/layout/layout';
 import {
   MemoryRouter as Router,
@@ -19,7 +21,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 // import './App.css';
-import { Flex } from './components/styledComponents';
+import { Flex, FlexCenter } from './components/styledComponents';
 import { useVrcCurrentUser } from './data/user';
 import BookmarkPage from './features/bookmark/BookmarkPage';
 import FriendsPage from './features/friend/FriendsPage';
@@ -78,16 +80,26 @@ function MenuLayout() {
             bottom: 0,
           }}
         >
-          <Title
-            level={2}
-            style={{
-              color: 'white',
-              textAlign: 'center',
+          <FlexCenter
+            css={{
+              width: '100%',
               marginTop: spacing(3),
+              padding: `0px ${spacing(2)}px 0px ${spacing(2)}px`,
             }}
           >
-            VRCExplorer
-          </Title>
+            <Image src={logoImage} preview={false} />
+            {/* <Image src={mainImage} width={80} height={80} preview={false} /> */}
+            <Title
+              level={2}
+              style={{
+                color: 'white',
+                textAlign: 'center',
+              }}
+            >
+              VRCExplorer
+            </Title>
+          </FlexCenter>
+
           <Menu
             theme="dark"
             defaultSelectedKeys={['sheet']}
