@@ -168,9 +168,9 @@ const useBookmarkPage = (): HookMember => {
     },
 
     onClickOpenLoadBookmarkDialog() {
-      showLoadFileDialog('bookmark')
+      showLoadFileDialog<Bookmarks>('bookmark')
         .then((b) => {
-          setBookmarks(b as Bookmarks);
+          setBookmarks(b);
         })
         .then(() => {
           message.info('북마크 가져오기 성공.');
