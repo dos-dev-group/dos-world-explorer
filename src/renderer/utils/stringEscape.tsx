@@ -8,6 +8,9 @@ export default function stringEscape(s: string) {
         .replace(/\v/g, '\\v')
         .replace(/'/g, "\\'")
         .replace(/"/g, '\\"')
+        .replace(/\?/g, '\\?')
+        .replace(/\*/g, '\\*')
+        .replace(/\+/g, '\\+')
         .replace(/[\x00-\x1F\x80-\x9F]/g, hex)
     : s;
   function hex(c: string) {
