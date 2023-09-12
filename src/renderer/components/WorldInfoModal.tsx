@@ -294,7 +294,7 @@ function WorldInfoModal(props: Props) {
                     ' (' +
                     (vrcWorldInfo?.capacity === 1
                       ? 1
-                      : (vrcWorldInfo?.capacity ?? 0) * 2) +
+                      : (vrcWorldInfo?.capacity ?? 0) / 2) +
                     ')'}
                 </span>
               </FlexRow>
