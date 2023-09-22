@@ -9,6 +9,7 @@
 `dos-world-explorer\node_modules\electron\dist\` 경로에 키파일 (`sheetAuth.json`)을 넣고 사용할 것
 
 ## GITHUB FLOW
+* `{fork-repo}`의 브랜치 --> `{upstream-repo}`의 `dev`브랜치 --> `{upstream-repo}`의 `master`브랜치
 
 1. 현 프로젝트를 [깃허브(링크)](https://github.com/dos-dev-group/dos-world-explorer)에서 자기 개인 계정으로 fork 한다.
 2. fork 프로젝트를 로컬에 clone 한다.
