@@ -21,7 +21,7 @@ import {
   TagStyleData,
 } from '../../types';
 import { getWorldInfo } from './vrchatAPI';
-import { sheetInfos, spreadsheetId, adminEmail } from './accountStrings';
+import { sheetInfos, spreadsheetId, adminEmailList } from './accountStrings';
 
 // console.log('path', path.join(path.dirname(app.getPath('exe'))));
 // sheet API 초기화
@@ -181,6 +181,8 @@ export async function getCheckerWorldData(): Promise<CheckerWorldData> {
 }
 
 async function protectSheet(sheetID: number): Promise<number> {
+  // TODO: Sheet 잠금기능 현재 사용불가
+  return 0;
   console.log(sheetID, 'protectSheet!!');
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();
@@ -195,7 +197,7 @@ async function protectSheet(sheetID: number): Promise<number> {
                 sheetId: sheetID,
               },
               editors: {
-                users: [[adminEmail]],
+                users: [adminEmailList],
               },
             },
           },
@@ -221,6 +223,8 @@ async function protectSheet(sheetID: number): Promise<number> {
 }
 
 async function unprotectSheet(protectedRangeId: number) {
+  // TODO: Sheet 잠금기능 현재 사용불가
+  return 0;
   console.log('unprotectSheet!!');
   const sheets = google.sheets({ version: 'v4', auth: client });
   const authClient = client.authorize();

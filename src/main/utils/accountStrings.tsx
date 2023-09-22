@@ -1,5 +1,7 @@
-export const adminEmail =
-  'sheetcheckbot@wise-perception-349404.iam.gserviceaccount.com';
+export const adminEmailList = [
+  // 'sheetcheckbot@wise-perception-349404.iam.gserviceaccount.com',
+  'dosvrce@gmail.com',
+];
 export const spreadsheetId = '1CBTRCUiC6x5RpwJyvZ9hU7bZ6GyKMFcZ8NR2B-g9S6Y';
 
 export const sheetInfos = {
