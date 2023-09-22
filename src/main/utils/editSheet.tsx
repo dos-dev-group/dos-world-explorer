@@ -20,18 +20,8 @@ import {
   TagStyle,
   TagStyleData,
 } from '../../types';
-import sheetData from '../../../secret/sheetData.json';
 import { getWorldInfo } from './vrchatAPI';
-
-const spreadsheetId = sheetData.spreadsheetId;
-const sheetId = sheetData.sheetId;
-const sheetName = sheetData.sheetName;
-
-const sheetInfos = {
-  World: { sheetName: 'sheet1', sheetId: 209660619 },
-  TagStyle: { sheetName: 'tagData', sheetId: 1994142434 },
-  CheckerWorld: { sheetName: 'checker_sheet1', sheetId: 765529254 },
-};
+import { sheetInfos, spreadsheetId, adminEmail } from './accountStrings';
 
 // console.log('path', path.join(path.dirname(app.getPath('exe'))));
 // sheet API 초기화
@@ -77,7 +67,7 @@ export async function testEditSheet() {
   //   console.error(error);
   //   throw error;
   // }
-  const protectedRangeId = await protectSheet(sheetId);
+  const protectedRangeId = await protectSheet(sheetInfos.World.sheetId);
   await unprotectSheet(protectedRangeId);
 }
 
@@ -205,7 +195,7 @@ async function protectSheet(sheetID: number): Promise<number> {
                 sheetId: sheetID,
               },
               editors: {
-                users: [sheetData.admin_email.concat([keys.client_email])],
+                users: [[adminEmail]],
               },
             },
           },
