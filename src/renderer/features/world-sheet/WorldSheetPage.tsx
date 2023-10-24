@@ -253,14 +253,13 @@ export default function WorldSheetPage() {
             dataIndex="name"
             sorter={(a: World, b: World) => a.name.localeCompare(b.name)}
             render={(_, world) => (
-              <Typography.Text
-                css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ tooltip: world.name }}
-              >
+              <Typography.Text css={{ wordBreak: 'keep-all' }}>
                 <Typography.Link
                   onClick={(e) => {
                     hookMember.onClickOpenWorldInfoModal(world);
                   }}
+                  ellipsis={true}
+                  copyable
                 >
                   {world.name}
                 </Typography.Link>
@@ -295,7 +294,16 @@ export default function WorldSheetPage() {
             title="제작자"
             dataIndex="author"
             sorter={(a: World, b: World) => a.author.localeCompare(b.author)}
-            ellipsis
+            // ellipsis
+            render={(_, world) => (
+              <Typography.Text
+                css={{ wordBreak: 'keep-all' }}
+                ellipsis={{ tooltip: world.author }}
+                copyable
+              >
+                {world.author}
+              </Typography.Text>
+            )}
           />
           {isAllType && (
             <Column
