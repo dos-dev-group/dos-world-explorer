@@ -128,14 +128,13 @@ export default function WorldFavoritePage() {
               a.name.localeCompare(b.name)
             }
             render={(name, world) => (
-              <Typography.Text
-                css={{ wordBreak: 'keep-all' }}
-                ellipsis={{ tooltip: name }}
-              >
+              <Typography.Text css={{ wordBreak: 'keep-all' }}>
                 <Typography.Link
                   onClick={(e) => {
                     hookMember.onOpenWorldInfoModal(world);
                   }}
+                  ellipsis
+                  copyable
                 >
                   {name}
                 </Typography.Link>
@@ -149,7 +148,16 @@ export default function WorldFavoritePage() {
             sorter={(a: LimitedWorld, b: LimitedWorld) =>
               a.authorName.localeCompare(b.authorName)
             }
-            ellipsis
+            // ellipsis
+            render={(_, world) => (
+              <Typography.Text
+                css={{ wordBreak: 'keep-all' }}
+                ellipsis={{ tooltip: world.authorName }}
+                copyable
+              >
+                {world.authorName}
+              </Typography.Text>
+            )}
           />
           <Column
             width={10}
