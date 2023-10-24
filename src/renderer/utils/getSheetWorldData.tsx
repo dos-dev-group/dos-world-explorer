@@ -4,9 +4,9 @@ import { World, WorldData, TagStyle } from '@src/types';
 import { NoDataError } from './error';
 
 const sheetUrl =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5aaBlO_r5xaHXz7uac1ya_D_yTQTLMY7KrHinZVLobJ66l7f0999AIsCYoY5gAlhTEbzBIrmBbDA2/pubhtml?gid=209660619&single=true';
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTIfeYsn61kyygaoO8a6FBChhhWvq2E2wwUiUR83OfxdElXoEz7lc2q79lBrDxHAxrhEry2gd20zL7i/pubhtml?gid=2042658372&single=true';
 const sheetTagUrl =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vS5aaBlO_r5xaHXz7uac1ya_D_yTQTLMY7KrHinZVLobJ66l7f0999AIsCYoY5gAlhTEbzBIrmBbDA2/pubhtml?gid=1994142434&single=true';
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTIfeYsn61kyygaoO8a6FBChhhWvq2E2wwUiUR83OfxdElXoEz7lc2q79lBrDxHAxrhEry2gd20zL7i/pubhtml?gid=189423536&single=true';
 
 const domparser = new DOMParser();
 // eslint-disable-next-line consistent-return
