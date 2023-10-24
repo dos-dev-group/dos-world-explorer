@@ -288,12 +288,14 @@ export default function BookmarkPage() {
                 render={(_, world) => (
                   <Typography.Text
                     css={{ wordBreak: 'keep-all' }}
-                    ellipsis={{ tooltip: world.name }}
+                    // ellipsis={{ tooltip: world.name }}
                   >
                     <Typography.Link
                       onClick={(e) => {
                         hookMember.onClickToggleInfoModal(world);
                       }}
+                      ellipsis
+                      copyable
                     >
                       {world.name}
                     </Typography.Link>
@@ -307,7 +309,16 @@ export default function BookmarkPage() {
                 sorter={(a: World, b: World) =>
                   a.author.localeCompare(b.author)
                 }
-                ellipsis
+                // ellipsis
+                render={(_, world) => (
+                  <Typography.Text
+                    css={{ wordBreak: 'keep-all' }}
+                    ellipsis={{ tooltip: world.author }}
+                    copyable
+                  >
+                    {world.author}
+                  </Typography.Text>
+                )}
               />
               <Column
                 responsive={['xl']}
