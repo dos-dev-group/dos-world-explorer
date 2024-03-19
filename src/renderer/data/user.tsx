@@ -70,8 +70,7 @@ export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
         setIsAdmin(true);
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setIsAdmin]);
+  }, [isAdmin, setIsAdmin]);
 
   const hookMember: VrcCurrentUserHookMember = {
     currentUser: currentUser,
