@@ -1,5 +1,4 @@
 /* eslint-disable promise/no-nesting */
-import authUsers from '@secret/authUsers.json';
 import { AuthType, UserLogin } from '@src/types';
 import { message } from 'antd';
 import { useDebugValue, useEffect } from 'react';
@@ -13,6 +12,7 @@ import {
   verify2FAcodeToMain,
   verify2FAEmailCodeToMain,
 } from '../utils/ipc/vrchatAPIToMain';
+import { getSheetAuthToMain } from '../utils/ipc/editSheetToMain';
 
 // const USER_LOGIN_LOCALSTORAGE_KEY = 'USER_LOGIN';
 
@@ -36,6 +36,11 @@ const currentUserState = atom<CurrentUser | undefined>({
   effects: [vrcCurrentUserEffect()],
 });
 
+const isAdminState = atom<boolean>({
+  key: 'isAdminState',
+  default: false,
+});
+
 export interface VrcCurrentUserHookMember {
   currentUser: CurrentUser | undefined;
   currentAuthType: AuthType;
@@ -47,6 +52,7 @@ export interface VrcCurrentUserHookMember {
 export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
   const resetUser = useResetRecoilState(currentUserState);
+  const [isAdmin, setIsAdmin] = useRecoilState(isAdminState);
   useDebugValue(currentUser);
 
   useEffect(() => {
@@ -57,11 +63,20 @@ export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
     return clearInterval(id);
   }, [setCurrentUser]);
 
+  useEffect(() => {
+    if (isAdmin) return;
+    getSheetAuthToMain()
+      .then((auth) => {
+        setIsAdmin(true);
+      })
+      .catch((reason) => {
+        setIsAdmin(false);
+      });
+  }, [isAdmin, setIsAdmin]);
+
   const hookMember: VrcCurrentUserHookMember = {
     currentUser: currentUser,
-    currentAuthType: authUsers.admin.includes(currentUser?.id || '')
-      ? 'ADMIN'
-      : 'USER',
+    currentAuthType: isAdmin ? 'ADMIN' : 'USER',
     async login(userLogin: UserLogin): Promise<CurrentUser> {
       const user = await login(userLogin);
       setCurrentUser(user);

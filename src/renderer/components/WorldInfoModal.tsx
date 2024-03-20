@@ -62,7 +62,7 @@ function WorldInfoModal(props: Props) {
   );
 
   useEffect(() => {
-    if (props.world && props.visible) {
+    if (props.world && props.visible && props.world?.type !== '소실') {
       getWorldAllInfoToMain(props.world.key).then((world) =>
         setVRCWorldInfo(world),
       );

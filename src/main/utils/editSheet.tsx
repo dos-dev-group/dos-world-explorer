@@ -45,6 +45,22 @@ fs.readFile(
   },
 );
 
+export function getSheetAuth() {
+  return new Promise((resolve, reject) => {
+    fs.readFile(
+      path.join(path.dirname(app.getPath('exe')), 'sheetAuth.json'),
+      'utf8',
+      (err, data) => {
+        if (err) {
+          console.warn('[WARN]', err.name, err.message);
+          reject(err);
+        }
+        resolve(data);
+      },
+    );
+  });
+}
+
 async function transeImageUrl(imageUrl: string): Promise<string> {
   try {
     const html = await axios.get(imageUrl);

@@ -96,12 +96,14 @@ const useLoginPage = (): HookMember => {
             setTwoFactorAuthState('TFA');
           } else if (err === LoginResult.TWOFACTOREMAIL) {
             setTwoFactorAuthState('EMAIL');
+          } else if (err === LoginResult.InvalidIDPW) {
+            message.error('아이디나 비밀번호가 틀렸습니다.');
           } else {
             throw err;
           }
         })
         .catch((err) => {
-          message.error(err.toString());
+          message.error(LoginResult[err] + ` (ErrorCode: ${err})`);
           setIsLoginProgress(false);
         });
     },

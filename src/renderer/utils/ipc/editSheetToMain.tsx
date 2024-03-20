@@ -61,6 +61,21 @@ export function getTagStyleDataToMain() {
   });
 }
 
+export function getSheetAuthToMain(): Promise<string> {
+  window.electron.ipcRenderer.sendMessage('getSheetAuthToMain', []);
+  return new Promise<string>((resolve, reject) => {
+    window.electron.ipcRenderer.once(
+      'getSheetAuthToRenderer',
+      (result: unknown) => {
+        if (result === null) {
+          reject(new NoDataError('No Data'));
+        }
+        resolve(result as string);
+      },
+    );
+  });
+}
+
 export function addSheetToMain(
   type: 'World' | 'CheckerWorld' | 'TagStyle',
   input: any,

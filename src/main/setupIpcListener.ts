@@ -8,6 +8,7 @@ import {
   modifySheet,
   getCheckerWorldData,
   getTagStyleData,
+  getSheetAuth,
 } from './utils/editSheet';
 import {
   testVrchatAPI,
@@ -168,6 +169,14 @@ export default function setupIpcListener() {
   });
 
   // ###################################### for editSheet.tsx ######################################
+
+  ipcMain.on('getSheetAuthToMain', async (event, arg) => {
+    try {
+      event.reply('getSheetAuthToRenderer', await getSheetAuth());
+    } catch {
+      event.reply('getSheetAuthToRenderer', null);
+    }
+  });
 
   ipcMain.on('testEditSheetToMain', async (event, arg) => {
     event.reply('testEditSheetToRenderer', await testEditSheet());
