@@ -65,11 +65,13 @@ export const useVrcCurrentUser = (): VrcCurrentUserHookMember => {
 
   useEffect(() => {
     if (isAdmin) return;
-    getSheetAuthToMain().then((auth) => {
-      if (auth !== null) {
+    getSheetAuthToMain()
+      .then((auth) => {
         setIsAdmin(true);
-      }
-    });
+      })
+      .catch((reason) => {
+        setIsAdmin(false);
+      });
   }, [isAdmin, setIsAdmin]);
 
   const hookMember: VrcCurrentUserHookMember = {
